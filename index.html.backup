@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morelos Trabaja | V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Cargamos Firebase v8 (Más estable para previos) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .hero-gradient {
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
+                        url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1200');
+            background-size: cover; background-position: center;
+        }
+        .card-anuncio { 
+            transition: all 0.3s ease; 
+            border-left: 6px solid #3b82f6; 
+        }
+        .card-anuncio:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Navegación -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 py-4 px-6">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black text-blue-900 tracking-tighter uppercase">
+                Morelos<span class="text-blue-500">Trabaja</span>
+            </h1>
+            <div class="flex items-center space-x-4">
+                <a href="publicar.html" class="bg-red-600 text-white px-5 py-2 rounded-full font-black text-xs shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest">
+                    📢 Publicar Gratis
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cabecera Hero -->
+    <header class="hero-gradient py-24 px-6 text-center text-white">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+                El portal de empleos de Morelos.
+            </h2>
+            <p class="text-blue-100 text-lg mb-10 font-medium italic opacity-80">
+                "Oportunidades reales para Yautepec, Cuautla y todo el estado."
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="publicar.html" class="bg-white text-blue-900 px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-blue-50 transition-all">
+                    COMENZAR AHORA
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Botones de Categoría -->
+    <section class="max-w-5xl mx-auto -mt-14 px-6 relative z-10">
+        <div class="grid grid-cols-3 gap-4 md:gap-8">
+            <button onclick="filtrar('empleo')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-blue-500 flex flex-col items-center hover:scale-105 transition-all">
+                <span class="text-4xl mb-3">💼</span>
+                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Empleos</span>
+            </button>
+            <button onclick="filtrar('servicios')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-green-500 flex flex-col items-center hover:scale-105 transition-all">
+                <span class="text-4xl mb-3">🛠️</span>
+                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Servicios</span>
+            </button>
+            <button onclick="filtrar('ventas')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-purple-500 flex flex-col items-center hover:scale-105 transition-all">
+                <span class="text-4xl mb-3">🛍️</span>
+                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Ventas</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Lista de Anuncios -->
+    <main class="max-w-2xl mx-auto p-6 mt-12" id="contenedor-anuncios">
+        <div class="text-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mx-auto"></div>
+            <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando anuncios...</p>
+        </div>
+    </main>
+
+    <script>
+        // Configuración de Antonio
+        const firebaseConfig = {
+            apiKey: "AIzaSyBMDAS5Uqig7NzaHP3h2huzRL30Uo5t7rM",
+            authDomain: "morelos-trabaja.firebaseapp.com",
+            projectId: "morelos-trabaja",
+            storageBucket: "morelos-trabaja.firebasestorage.app",
+            messagingSenderId: "506981339593",
+            appId: "1:506981339593:web:266f12812305d1a92d1818"
+        };
+
+        // Función para mostrar anuncios de ejemplo si falla la conexión (Solo para el previo)
+        function mostrarEjemplos() {
+            const cont = document.getElementById('contenedor-anuncios');
+            cont.innerHTML = `
+                <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700">
+                    <i class="fa fa-info-circle mr-2"></i> MODO VISTA PREVIA: Mostrando ejemplos locales.
+                </div>
+                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center">
+                    <div>
+                        <span class="text-[10px] font-black px-2 py-1 bg-blue-100 text-blue-700 rounded-full uppercase italic mb-2 inline-block">EMPLEO</span>
+                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">Cocinero(a) para restaurante</h3>
+                        <p class="text-slate-500 mt-2">Se busca personal con experiencia en comida mexicana. Zona centro Yautepec.</p>
+                    </div>
+                    <div class="bg-green-500 text-white p-4 rounded-2xl shadow-lg"><i class="fab fa-whatsapp text-2xl"></i></div>
+                </div>
+                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center" style="border-left-color: #10b981;">
+                    <div>
+                        <span class="text-[10px] font-black px-2 py-1 bg-green-100 text-green-700 rounded-full uppercase italic mb-2 inline-block">SERVICIOS</span>
+                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">Plomero 24 Horas</h3>
+                        <p class="text-slate-500 mt-2">Reparación de fugas, tinacos y bombas. Servicio rápido en todo Cuautla.</p>
+                    </div>
+                    <div class="bg-green-500 text-white p-4 rounded-2xl shadow-lg"><i class="fab fa-whatsapp text-2xl"></i></div>
+                </div>
+            `;
+        }
+
+        async function filtrar(cat = null) {
+            const cont = document.getElementById('contenedor-anuncios');
+            if (typeof firebase === 'undefined') {
+                mostrarEjemplos();
+                return;
+            }
+
+            try {
+                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                const db = firebase.firestore();
+                
+                let ref = db.collection("anuncios").orderBy("fecha", "desc");
+                if(cat) ref = ref.where("categoria", "==", cat);
+
+                const snap = await ref.get();
+                cont.innerHTML = '';
+
+                if(snap.empty) {
+                    cont.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold">No hay anuncios aquí todavía.</div>';
+                    return;
+                }
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const borderColor = d.categoria === 'servicios' ? '#10b981' : d.categoria === 'ventas' ? '#a855f7' : '#3b82f6';
+                    cont.innerHTML += `
+                        <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center" style="border-left-color: ${borderColor}">
+                            <div>
+                                <span class="text-[10px] font-black px-2 py-1 bg-slate-100 text-slate-600 rounded-full uppercase italic mb-2 inline-block">${d.categoria}</span>
+                                <h3 class="text-2xl font-black text-slate-800 tracking-tight">${d.titulo}</h3>
+                                <p class="text-slate-500 mt-2">${d.descripcion}</p>
+                            </div>
+                            <a href="https://wa.me/${d.whatsapp}" target="_blank" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
+                                <i class="fab fa-whatsapp text-2xl"></i>
+                            </a>
+                        </div>`;
+                });
+            } catch (e) {
+                console.error(e);
+                mostrarEjemplos();
+            }
+        }
+
+        window.onload = () => filtrar();
+    </script>
+</body>
+</html>

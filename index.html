@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morelos Trabaja | V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Cargamos Firebase v8 (Más estable para previos) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .hero-gradient {
+            background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
+                        url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1200');
+            background-size: cover; background-position: center;
+        }
+        /* La clase card-anuncio ahora usa border-l-[6px] y el color se asigna dinámicamente con clases de Tailwind */
+        .card-anuncio { 
+            transition: all 0.3s ease; 
+        }
+        .card-anuncio:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Navegación -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 py-4 px-6">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black text-blue-900 tracking-tighter uppercase">
+                Morelos<span class="text-blue-500">Trabaja</span>
+            </h1>
+            <div class="flex items-center space-x-4">
+                <a href="publicar.html" class="bg-red-600 text-white px-5 py-2 rounded-full font-black text-xs shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest">
+                    📢 Publicar Gratis
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cabecera Hero -->
+    <header class="hero-gradient py-24 px-6 text-center text-white">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+                El portal de empleos de Morelos.
+            </h2>
+            <p class="text-blue-100 text-lg mb-10 font-medium italic opacity-80">
+                "Oportunidades reales para Yautepec, Cuautla y todo el estado."
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="publicar.html" class="bg-white text-blue-900 px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-blue-50 transition-all">
+                    COMENZAR AHORA
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Botones de Categoría -->
+    <section class="max-w-5xl mx-auto -mt-14 px-6 relative z-10">
+        <div class="grid grid-cols-3 gap-4 md:gap-8">
+            <button onclick="filtrar('empleo')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-blue-500 flex flex-col items-center hover:scale-105 transition-all">
+                <span class="text-4xl mb-3">💼</span>
+                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Empleos</span>
+            </button>
+            <button onclick="filtrar('servicios')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-green-500 flex flex-col items-center hover:scale-105 transition-all">
+                <span class="text-4xl mb-3">🛠️</span>
+                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Servicios</span>
+            </button>
+            <button onclick="filtrar('ventas')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-purple-500 flex flex-col items-center hover:scale-105 transition-all">
+                <span class="text-4xl mb-3">🛍️</span>
+                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Ventas</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Lista de Anuncios -->
+    <main class="max-w-2xl mx-auto p-6 mt-12" id="contenedor-anuncios">
+        <!-- El contenido inicial se cargará aquí (spinner o anuncios) -->
+    </main>
+
+    <script>
+        // --- Configuración y Constantes ---
+        // La apiKey está expuesta en el lado del cliente, lo cual es típico para aplicaciones SPA con Firebase.
+        // Asegúrate de que tus Reglas de Seguridad de Firestore (en la consola de Firebase)
+        // restrinjan las operaciones de escritura (allow write: if false;) y que
+        // hayas configurado las restricciones de API Key en la Consola de Google Cloud
+        // para limitar su uso a dominios y APIs específicos.
+        const firebaseConfig = {
+            apiKey: "AIzaSyBMDAS5Uqig7NzaHP3h2huzRL30Uo5t7rM",
+            authDomain: "morelos-trabaja.firebaseapp.com",
+            projectId: "morelos-trabaja",
+            storageBucket: "morelos-trabaja.firebasestorage.app",
+            messagingSenderId: "506981339593",
+            appId: "1:506981339593:web:266f12812305d1a92d1818"
+        };
+
+        const CATEGORY_STYLES = {
+            empleo: {
+                borderColorClass: 'border-blue-500',
+                tagBgColorClass: 'bg-blue-100',
+                tagTextColorClass: 'text-blue-700'
+            },
+            servicios: {
+                borderColorClass: 'border-emerald-500', // Un verde de Tailwind
+                tagBgColorClass: 'bg-green-100',
+                tagTextColorClass: 'text-green-700'
+            },
+            ventas: {
+                borderColorClass: 'border-purple-500',
+                tagBgColorClass: 'bg-purple-100',
+                tagTextColorClass: 'text-purple-700'
+            },
+            default: { // Estilos por defecto si la categoría no coincide
+                borderColorClass: 'border-slate-300',
+                tagBgColorClass: 'bg-slate-100',
+                tagTextColorClass: 'text-slate-600'
+            }
+        };
+
+        const LOADING_SPINNER_HTML = `
+            <div class="text-center py-20" id="loading-spinner">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mx-auto"></div>
+                <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando anuncios...</p>
+            </div>
+        `;
+
+        const NO_ANUNCIOS_HTML = `
+            <div class="text-center py-20 text-slate-400 font-bold">No hay anuncios aquí todavía.</div>
+        `;
+
+        const PREVIEW_MODE_BANNER = `
+            <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700">
+                <i class="fa fa-info-circle mr-2"></i> MODO VISTA PREVIA: Mostrando ejemplos locales.
+            </div>
+        `;
+
+        // --- Funciones de Renderizado ---
+
+        /**
+         * Genera el HTML para una tarjeta de anuncio.
+         * @param {object} data - Datos del anuncio (titulo, descripcion, categoria, whatsapp).
+         * @param {boolean} isExample - Indica si es un anuncio de ejemplo (para el banner informativo).
+         * @returns {string} HTML de la tarjeta del anuncio.
+         */
+        function renderAnuncioCard(data, isExample = false) {
+            const category = data.categoria || 'default';
+            const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
+
+            return `
+                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center border-l-[6px] ${style.borderColorClass}">
+                    <div>
+                        <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${category.toUpperCase()}</span>
+                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">${data.titulo}</h3>
+                        <p class="text-slate-500 mt-2">${data.descripcion}</p>
+                    </div>
+                    <a href="https://wa.me/${data.whatsapp}" target="_blank" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
+                        <i class="fab fa-whatsapp text-2xl"></i>
+                    </a>
+                </div>
+            `;
+        }
+
+        // Función para mostrar anuncios de ejemplo si falla la conexión o Firebase no está disponible.
+        function mostrarEjemplos() {
+            const cont = document.getElementById('contenedor-anuncios');
+            cont.innerHTML = PREVIEW_MODE_BANNER; // Muestra el banner de modo vista previa
+
+            // Anuncios de ejemplo con los nuevos estilos
+            const ejemplos = [
+                {
+                    categoria: 'empleo',
+                    titulo: 'Cocinero(a) para restaurante',
+                    descripcion: 'Se busca personal con experiencia en comida mexicana. Zona centro Yautepec.',
+                    whatsapp: '5217771234567' // Número de ejemplo
+                },
+                {
+                    categoria: 'servicios',
+                    titulo: 'Plomero 24 Horas',
+                    descripcion: 'Reparación de fugas, tinacos y bombas. Servicio rápido en todo Cuautla.',
+                    whatsapp: '5217779876543' // Número de ejemplo
+                }
+            ];
+
+            ejemplos.forEach(ejemplo => {
+                cont.innerHTML += renderAnuncioCard(ejemplo, true);
+            });
+        }
+
+        /**
+         * Filtra y muestra anuncios de Firebase Firestore o ejemplos locales.
+         * @param {string|null} cat - Categoría para filtrar (empleo, servicios, ventas) o null para todas.
+         */
+        async function filtrar(cat = null) {
+            const cont = document.getElementById('contenedor-anuncios');
+            cont.innerHTML = LOADING_SPINNER_HTML; // Muestra el spinner de carga
+
+            // Verifica si Firebase está cargado, si no, muestra ejemplos.
+            if (typeof firebase === 'undefined' || typeof firebase.firestore === 'undefined') {
+                mostrarEjemplos();
+                return;
+            }
+
+            try {
+                // Inicializa Firebase si no se ha hecho ya
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                const db = firebase.firestore();
+                
+                let queryRef = db.collection("anuncios").orderBy("fecha", "desc");
+                if (cat) {
+                    queryRef = queryRef.where("categoria", "==", cat);
+                }
+
+                const snapshot = await queryRef.get();
+                cont.innerHTML = ''; // Limpia el spinner
+
+                if (snapshot.empty) {
+                    cont.innerHTML = NO_ANUNCIOS_HTML;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    cont.innerHTML += renderAnuncioCard(data);
+                });
+            } catch (error) {
+                console.error("Error al cargar anuncios de Firebase:", error);
+                mostrarEjemplos(); // En caso de error, muestra los ejemplos
+            }
+        }
+
+        // --- Event Listeners ---
+        window.onload = () => filtrar(); // Carga todos los anuncios al iniciar la página
+    </script>
+</body>
+</html>
