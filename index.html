@@ -108,9 +108,9 @@
                 tagTextColorClass: 'text-blue-700'
             },
             servicios: {
-                borderColorClass: 'border-emerald-500', // Un verde de Tailwind
-                tagBgColorClass: 'bg-green-100',
-                tagTextColorClass: 'text-green-700'
+                borderColorClass: 'border-emerald-500', 
+                tagBgColorClass: 'bg-emerald-100', // Corregido para usar 'emerald' para consistencia
+                tagTextColorClass: 'text-emerald-700' // Corregido para usar 'emerald' para consistencia
             },
             ventas: {
                 borderColorClass: 'border-purple-500',
@@ -209,6 +209,7 @@
 
             try {
                 // Inicializa Firebase si no se ha hecho ya
+                // Esta verificación evita errores si la función 'filtrar' se llama múltiples veces.
                 if (!firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
                 }

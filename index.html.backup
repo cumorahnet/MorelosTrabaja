@@ -19,9 +19,9 @@
                         url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1200');
             background-size: cover; background-position: center;
         }
+        /* La clase card-anuncio ahora usa border-l-[6px] y el color se asigna dinámicamente con clases de Tailwind */
         .card-anuncio { 
             transition: all 0.3s ease; 
-            border-left: 6px solid #3b82f6; 
         }
         .card-anuncio:hover { 
             transform: translateY(-4px); 
@@ -82,14 +82,16 @@
 
     <!-- Lista de Anuncios -->
     <main class="max-w-2xl mx-auto p-6 mt-12" id="contenedor-anuncios">
-        <div class="text-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mx-auto"></div>
-            <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando anuncios...</p>
-        </div>
+        <!-- El contenido inicial se cargará aquí (spinner o anuncios) -->
     </main>
 
     <script>
-        // Configuración de Antonio
+        // --- Configuración y Constantes ---
+        // La apiKey está expuesta en el lado del cliente, lo cual es típico para aplicaciones SPA con Firebase.
+        // Asegúrate de que tus Reglas de Seguridad de Firestore (en la consola de Firebase)
+        // restrinjan las operaciones de escritura (allow write: if false;) y que
+        // hayas configurado las restricciones de API Key en la Consola de Google Cloud
+        // para limitar su uso a dominios y APIs específicos.
         const firebaseConfig = {
             apiKey: "AIzaSyBMDAS5Uqig7NzaHP3h2huzRL30Uo5t7rM",
             authDomain: "morelos-trabaja.firebaseapp.com",
@@ -99,76 +101,145 @@
             appId: "1:506981339593:web:266f12812305d1a92d1818"
         };
 
-        // Función para mostrar anuncios de ejemplo si falla la conexión (Solo para el previo)
-        function mostrarEjemplos() {
-            const cont = document.getElementById('contenedor-anuncios');
-            cont.innerHTML = `
-                <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700">
-                    <i class="fa fa-info-circle mr-2"></i> MODO VISTA PREVIA: Mostrando ejemplos locales.
-                </div>
-                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center">
+        const CATEGORY_STYLES = {
+            empleo: {
+                borderColorClass: 'border-blue-500',
+                tagBgColorClass: 'bg-blue-100',
+                tagTextColorClass: 'text-blue-700'
+            },
+            servicios: {
+                borderColorClass: 'border-emerald-500', 
+                tagBgColorClass: 'bg-emerald-100', // Corregido para usar 'emerald' para consistencia
+                tagTextColorClass: 'text-emerald-700' // Corregido para usar 'emerald' para consistencia
+            },
+            ventas: {
+                borderColorClass: 'border-purple-500',
+                tagBgColorClass: 'bg-purple-100',
+                tagTextColorClass: 'text-purple-700'
+            },
+            default: { // Estilos por defecto si la categoría no coincide
+                borderColorClass: 'border-slate-300',
+                tagBgColorClass: 'bg-slate-100',
+                tagTextColorClass: 'text-slate-600'
+            }
+        };
+
+        const LOADING_SPINNER_HTML = `
+            <div class="text-center py-20" id="loading-spinner">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mx-auto"></div>
+                <p class="mt-4 text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando anuncios...</p>
+            </div>
+        `;
+
+        const NO_ANUNCIOS_HTML = `
+            <div class="text-center py-20 text-slate-400 font-bold">No hay anuncios aquí todavía.</div>
+        `;
+
+        const PREVIEW_MODE_BANNER = `
+            <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700">
+                <i class="fa fa-info-circle mr-2"></i> MODO VISTA PREVIA: Mostrando ejemplos locales.
+            </div>
+        `;
+
+        // --- Funciones de Renderizado ---
+
+        /**
+         * Genera el HTML para una tarjeta de anuncio.
+         * @param {object} data - Datos del anuncio (titulo, descripcion, categoria, whatsapp).
+         * @param {boolean} isExample - Indica si es un anuncio de ejemplo (para el banner informativo).
+         * @returns {string} HTML de la tarjeta del anuncio.
+         */
+        function renderAnuncioCard(data, isExample = false) {
+            const category = data.categoria || 'default';
+            const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
+
+            return `
+                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center border-l-[6px] ${style.borderColorClass}">
                     <div>
-                        <span class="text-[10px] font-black px-2 py-1 bg-blue-100 text-blue-700 rounded-full uppercase italic mb-2 inline-block">EMPLEO</span>
-                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">Cocinero(a) para restaurante</h3>
-                        <p class="text-slate-500 mt-2">Se busca personal con experiencia en comida mexicana. Zona centro Yautepec.</p>
+                        <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${category.toUpperCase()}</span>
+                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">${data.titulo}</h3>
+                        <p class="text-slate-500 mt-2">${data.descripcion}</p>
                     </div>
-                    <div class="bg-green-500 text-white p-4 rounded-2xl shadow-lg"><i class="fab fa-whatsapp text-2xl"></i></div>
-                </div>
-                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center" style="border-left-color: #10b981;">
-                    <div>
-                        <span class="text-[10px] font-black px-2 py-1 bg-green-100 text-green-700 rounded-full uppercase italic mb-2 inline-block">SERVICIOS</span>
-                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">Plomero 24 Horas</h3>
-                        <p class="text-slate-500 mt-2">Reparación de fugas, tinacos y bombas. Servicio rápido en todo Cuautla.</p>
-                    </div>
-                    <div class="bg-green-500 text-white p-4 rounded-2xl shadow-lg"><i class="fab fa-whatsapp text-2xl"></i></div>
+                    <a href="https://wa.me/${data.whatsapp}" target="_blank" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
+                        <i class="fab fa-whatsapp text-2xl"></i>
+                    </a>
                 </div>
             `;
         }
 
+        // Función para mostrar anuncios de ejemplo si falla la conexión o Firebase no está disponible.
+        function mostrarEjemplos() {
+            const cont = document.getElementById('contenedor-anuncios');
+            cont.innerHTML = PREVIEW_MODE_BANNER; // Muestra el banner de modo vista previa
+
+            // Anuncios de ejemplo con los nuevos estilos
+            const ejemplos = [
+                {
+                    categoria: 'empleo',
+                    titulo: 'Cocinero(a) para restaurante',
+                    descripcion: 'Se busca personal con experiencia en comida mexicana. Zona centro Yautepec.',
+                    whatsapp: '5217771234567' // Número de ejemplo
+                },
+                {
+                    categoria: 'servicios',
+                    titulo: 'Plomero 24 Horas',
+                    descripcion: 'Reparación de fugas, tinacos y bombas. Servicio rápido en todo Cuautla.',
+                    whatsapp: '5217779876543' // Número de ejemplo
+                }
+            ];
+
+            ejemplos.forEach(ejemplo => {
+                cont.innerHTML += renderAnuncioCard(ejemplo, true);
+            });
+        }
+
+        /**
+         * Filtra y muestra anuncios de Firebase Firestore o ejemplos locales.
+         * @param {string|null} cat - Categoría para filtrar (empleo, servicios, ventas) o null para todas.
+         */
         async function filtrar(cat = null) {
             const cont = document.getElementById('contenedor-anuncios');
-            if (typeof firebase === 'undefined') {
+            cont.innerHTML = LOADING_SPINNER_HTML; // Muestra el spinner de carga
+
+            // Verifica si Firebase está cargado, si no, muestra ejemplos.
+            if (typeof firebase === 'undefined' || typeof firebase.firestore === 'undefined') {
                 mostrarEjemplos();
                 return;
             }
 
             try {
-                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                // Inicializa Firebase si no se ha hecho ya
+                // Esta verificación evita errores si la función 'filtrar' se llama múltiples veces.
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
                 const db = firebase.firestore();
                 
-                let ref = db.collection("anuncios").orderBy("fecha", "desc");
-                if(cat) ref = ref.where("categoria", "==", cat);
+                let queryRef = db.collection("anuncios").orderBy("fecha", "desc");
+                if (cat) {
+                    queryRef = queryRef.where("categoria", "==", cat);
+                }
 
-                const snap = await ref.get();
-                cont.innerHTML = '';
+                const snapshot = await queryRef.get();
+                cont.innerHTML = ''; // Limpia el spinner
 
-                if(snap.empty) {
-                    cont.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold">No hay anuncios aquí todavía.</div>';
+                if (snapshot.empty) {
+                    cont.innerHTML = NO_ANUNCIOS_HTML;
                     return;
                 }
 
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const borderColor = d.categoria === 'servicios' ? '#10b981' : d.categoria === 'ventas' ? '#a855f7' : '#3b82f6';
-                    cont.innerHTML += `
-                        <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center" style="border-left-color: ${borderColor}">
-                            <div>
-                                <span class="text-[10px] font-black px-2 py-1 bg-slate-100 text-slate-600 rounded-full uppercase italic mb-2 inline-block">${d.categoria}</span>
-                                <h3 class="text-2xl font-black text-slate-800 tracking-tight">${d.titulo}</h3>
-                                <p class="text-slate-500 mt-2">${d.descripcion}</p>
-                            </div>
-                            <a href="https://wa.me/${d.whatsapp}" target="_blank" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
-                                <i class="fab fa-whatsapp text-2xl"></i>
-                            </a>
-                        </div>`;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    cont.innerHTML += renderAnuncioCard(data);
                 });
-            } catch (e) {
-                console.error(e);
-                mostrarEjemplos();
+            } catch (error) {
+                console.error("Error al cargar anuncios de Firebase:", error);
+                mostrarEjemplos(); // En caso de error, muestra los ejemplos
             }
         }
 
-        window.onload = () => filtrar();
+        // --- Event Listeners ---
+        window.onload = () => filtrar(); // Carga todos los anuncios al iniciar la página
     </script>
 </body>
 </html>
