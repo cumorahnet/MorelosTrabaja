@@ -32,7 +32,7 @@
                 <label class="block font-bold text-slate-700">WhatsApp (con lada)
                     <input name="whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full border rounded-xl p-3" placeholder="777 123 4567">
                 </label>
-                <button id="enviar" class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white rounded-xl p-4 font-black" type="submit">PUBLICAR ANUNCIO</button>
+                <button id="enviar" disabled class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white rounded-xl p-4 font-black" type="submit">COMPROBANDO SESIÓN...</button>
                 <p id="estado" role="status" aria-live="polite" class="text-sm font-bold"></p>
             </form>
         </section>
@@ -51,20 +51,36 @@
         const form = document.getElementById('form-anuncio');
         const estado = document.getElementById('estado');
         const enviar = document.getElementById('enviar');
+        const auth = firebase.auth();
+        let authenticatedUser = null;
 
         // Intentar autenticación anónima en carga para permitir creaciones seguras
-        firebase.auth().onAuthStateChanged(user => {
-            if (!user) {
-                // iniciar sesión anónimo automáticamente
-                firebase.auth().signInAnonymously().catch(err => {
-                    console.error('No se pudo iniciar sesión anónimo:', err);
-                });
+        const unsubscribeAuth = auth.onAuthStateChanged(async user => {
+            if (!user || user.isAnonymous) {
+                authenticatedUser = null;
+                estado.textContent = 'Necesitas iniciar sesión para publicar. Redirigiendo...';
+                estado.className = 'text-sm font-bold text-blue-700';
+                if (user?.isAnonymous) {
+                    try { await auth.signOut(); }
+                    catch (error) { console.error('No se pudo cerrar la sesión anónima:', error.code); }
+                }
+                window.location.replace('index.html');
+                return;
             }
+            authenticatedUser = user;
+            enviar.disabled = false;
+            enviar.textContent = 'PUBLICAR ANUNCIO';
         });
+        window.addEventListener('pagehide', unsubscribeAuth, { once: true });
 
         form.addEventListener('submit', async event => {
             event.preventDefault();
             if (!form.reportValidity()) return;
+            if (!authenticatedUser) {
+                estado.textContent = 'Tu sesión no está disponible. Inicia sesión nuevamente.';
+                estado.className = 'text-sm font-bold text-red-700';
+                return;
+            }
 
             const values = new FormData(form);
             const whatsapp = String(values.get('whatsapp')).replace(/\D/g, '');
@@ -79,19 +95,12 @@
             estado.className = 'text-sm font-bold text-slate-500';
 
             try {
-                // Asegurar que el usuario esté autenticado (anónimo o con cuenta)
-                if (!firebase.auth().currentUser) {
-                    await firebase.auth().signInAnonymously();
-                }
-                const uid = firebase.auth().currentUser && firebase.auth().currentUser.uid;
-                if (!uid) throw new Error('No se pudo obtener authorUid tras autenticación.');
-
                 await firebase.firestore().collection('anuncios').add({
                     categoria: values.get('categoria'),
                     titulo: String(values.get('titulo')).trim(),
                     descripcion: String(values.get('descripcion')).trim(),
                     whatsapp,
-                    authorUid: uid,
+                    authorUid: authenticatedUser.uid,
                     fecha: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 form.reset();

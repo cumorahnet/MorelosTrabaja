@@ -26,6 +26,7 @@ service cloud.firestore {
 
       // Solo usuarios autenticados pueden crear y deben incluir authorUid == request.auth.uid
       allow create: if request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
         && request.resource.data.keys().hasAll(['categoria','titulo','descripcion','whatsapp','fecha','authorUid'])
         && request.resource.data.authorUid == request.auth.uid
         && request.resource.data.categoria in ['empleo','servicios','ventas']
@@ -39,7 +40,9 @@ service cloud.firestore {
         && request.resource.data.whatsapp.matches('^[0-9]{10,15}$');
 
       // Actualizaciones/eliminaciones solo por el autor (authorUid coincide con auth.uid)
-      allow update, delete: if request.auth != null && resource.data.authorUid == request.auth.uid;
+      allow update, delete: if request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && resource.data.authorUid == request.auth.uid;
     }
 
     // OPCIÓN B - Público pero validado: permite creación desde cliente

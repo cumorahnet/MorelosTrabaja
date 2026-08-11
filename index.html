@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja | V2 — VERSION 36.8</title>
+    <title>Morelos Trabaja | V2 — VERSION 36.13</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -52,6 +52,12 @@
                     <p id="auth-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
                     <button id="auth-submit" type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">CREAR CUENTA</button>
                 </form>
+                <div class="my-5 flex items-center gap-3 text-xs font-bold text-slate-400">
+                    <span class="h-px flex-1 bg-slate-200"></span>O CONTINÚA CON<span class="h-px flex-1 bg-slate-200"></span>
+                </div>
+                <button id="google-login" type="button" class="w-full rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
+                    <i class="fab fa-google mr-2 text-red-500" aria-hidden="true"></i> GOOGLE
+                </button>
                 <div class="mt-5 flex flex-col items-center gap-3 text-sm">
                     <button id="auth-reset" type="button" class="font-bold text-blue-700 hover:underline disabled:opacity-60">Olvidé mi contraseña</button>
                     <button id="auth-toggle" type="button" class="text-slate-600 disabled:opacity-60">Ya tengo cuenta. <span class="font-black text-blue-700">Iniciar sesión</span></button>
@@ -60,16 +66,178 @@
         </section>
     </div>
 
+    <!-- Nuevo Overlay para Publicar Anuncios -->
+    <div id="publish-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="publish-title">
+            <button onclick="hidePublishOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <p class="text-xs font-black tracking-[0.25em] text-red-600 uppercase">Publicar Anuncio</p>
+            <h2 id="publish-title" class="text-3xl font-black text-blue-950 mt-2">¿Qué quieres publicar?</h2>
+            <p id="publish-subtitle" class="text-slate-500 mt-2 mb-7">Selecciona la categoría de tu anuncio.</p>
+
+            <div id="category-selection" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <button onclick="showSpecificPublishForm('empleo')" class="bg-blue-50 text-blue-800 p-4 rounded-xl font-bold flex flex-col items-center hover:bg-blue-100 transition-all">
+                    <span class="text-3xl mb-2">💼</span>Empleo
+                </button>
+                <button onclick="showSpecificPublishForm('servicios')" class="bg-emerald-50 text-emerald-800 p-4 rounded-xl font-bold flex flex-col items-center hover:bg-emerald-100 transition-all">
+                    <span class="text-3xl mb-2">🛠️</span>Servicio
+                </button>
+                <button onclick="showSpecificPublishForm('ventas')" class="bg-purple-50 text-purple-800 p-4 rounded-xl font-bold flex flex-col items-center hover:bg-purple-100 transition-all">
+                    <span class="text-3xl mb-2">🛍️</span>Venta
+                </button>
+            </div>
+
+            <div id="publish-forms-container">
+                <!-- Empleo Form -->
+                <form id="form-empleo" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-black text-blue-950 mt-2">Publicar Empleo</h3>
+                    <p class="text-slate-500 mb-4">Ingresa los detalles del puesto que ofreces.</p>
+                    <label class="block text-sm font-bold text-slate-700">Título del Anuncio
+                        <input type="text" id="empleo-titulo" required minlength="4" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Chef para restaurante">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Descripción del Puesto
+                        <textarea id="empleo-descripcion" required minlength="10" maxlength="500" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Funciones, requisitos, beneficios..."></textarea>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">WhatsApp de Contacto (10-15 dígitos)
+                        <input type="tel" id="empleo-whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 5217771234567">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Zona de Trabajo
+                        <input type="text" id="empleo-zona" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Cuernavaca, Centro / Home Office">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Nombre de la Empresa (opcional)
+                        <input type="text" id="empleo-empresa" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Restaurante El Sabor">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Tipo de Empleo
+                        <select id="empleo-tipo-empleo" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecciona</option>
+                            <option value="permanente">Permanente</option>
+                            <option value="temporal">Temporal</option>
+                            <option value="por_contrato">Por Contrato</option>
+                            <option value="por_proyecto">Por Proyecto</option>
+                            <option value="freelance">Freelance</option>
+                            <option value="temporada">Temporada</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Área de Trabajo
+                        <select id="empleo-area-trabajo" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecciona</option>
+                            <option value="administracion">Administración</option>
+                            <option value="alimentos_bebidas">Alimentos y Bebidas</option>
+                            <option value="automotriz">Automotriz</option>
+                            <option value="contabilidad_finanzas">Contabilidad / Finanzas</option>
+                            <option value="construccion">Construcción</option>
+                            <option value="diseno">Diseño</option>
+                            <option value="educacion">Educación</option>
+                            <option value="informatica_it">Informática / IT</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="legal">Legal</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="manufactura">Manufactura</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="medicina_salud">Medicina / Salud</option>
+                            <option value="recursos_humanos">Recursos Humanos</option>
+                            <option value="restauracion">Restauración</option>
+                            <option value="servicio_cliente">Servicio al Cliente</option>
+                            <option value="ventas">Ventas</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </label>
+                    <p id="empleo-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+                    <button type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">PUBLICAR EMPLEO</button>
+                    <button type="button" onclick="showCategorySelection()" class="w-full mt-2 text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
+                </form>
+
+                <!-- Servicio Form -->
+                <form id="form-servicios" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-black text-emerald-950 mt-2">Publicar Servicio</h3>
+                    <p class="text-slate-500 mb-4">Ingresa los detalles del servicio que ofreces.</p>
+                    <label class="block text-sm font-bold text-slate-700">Título del Servicio
+                        <input type="text" id="servicios-titulo" required minlength="4" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ej: Plomero a domicilio 24/7">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Descripción del Servicio
+                        <textarea id="servicios-descripcion" required minlength="10" maxlength="500" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" rows="3" placeholder="Detalles de tu servicio, tarifas aproximadas, horarios..."></textarea>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">WhatsApp de Contacto (10-15 dígitos)
+                        <input type="tel" id="servicios-whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ej: 5217771234567">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Zona de Servicio
+                        <input type="text" id="servicios-zona" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ej: Cuautla y alrededores">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Tipo de Servicio
+                        <select id="servicios-tipo-servicio" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="">Selecciona</option>
+                            <option value="albanileria">Albañilería</option>
+                            <option value="carpinteria">Carpintería</option>
+                            <option value="clases_particulares">Clases Particulares</option>
+                            <option value="contaduria">Contaduría</option>
+                            <option value="diseno_grafico">Diseño Gráfico</option>
+                            <option value="electricidad">Electricidad</option>
+                            <option value="eventos">Eventos (Organización/Servicio)</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="limpieza">Limpieza</option>
+                            <option value="mantenimiento">Mantenimiento (General)</option>
+                            <option value="plomeria">Plomería</option>
+                            <option value="reparacion_electronica">Reparación Electrónica</option>
+                            <option value="taxi_transporte">Taxi / Transporte</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Experiencia / Calificaciones (opcional)
+                        <textarea id="servicios-experiencia" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" rows="2" placeholder="Ej: 10 años de experiencia, certificaciones..."></textarea>
+                    </label>
+                    <p id="servicios-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+                    <button type="submit" class="w-full rounded-xl bg-green-700 py-3.5 font-black text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">PUBLICAR SERVICIO</button>
+                    <button type="button" onclick="showCategorySelection()" class="w-full mt-2 text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
+                </form>
+
+                <!-- Venta Form -->
+                <form id="form-ventas" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-black text-purple-950 mt-2">Publicar Venta</h3>
+                    <p class="text-slate-500 mb-4">Ingresa los detalles del artículo que deseas vender.</p>
+                    <label class="block text-sm font-bold text-slate-700">Título del Artículo
+                        <input type="text" id="ventas-titulo" required minlength="4" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: Bicicleta de montaña Rodada 29">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Descripción del Artículo
+                        <textarea id="ventas-descripcion" required minlength="10" maxlength="500" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" placeholder="Características, estado, detalles, motivos de venta..."></textarea>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">WhatsApp de Contacto (10-15 dígitos)
+                        <input type="tel" id="ventas-whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: 5217771234567">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Ubicación del Producto
+                        <input type="text" id="ventas-zona" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: Jiutepec, Colonia Zapata">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Precio ($ MXN)
+                        <input type="number" id="ventas-precio" required min="0" step="any" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: 1500">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Condición
+                        <select id="ventas-condicion" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Selecciona</option>
+                            <option value="nuevo">Nuevo</option>
+                            <option value="usado_excelente">Usado - Excelente</option>
+                            <option value="usado_bueno">Usado - Bueno</option>
+                            <option value="usado_aceptable">Usado - Aceptable</option>
+                            <option value="para_partes">Para Partes</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Tipo de Producto
+                        <input type="text" id="ventas-tipo-producto" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: Electrónica, Muebles, Ropa, Vehículos, Servicios">
+                    </label>
+                    <p id="ventas-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+                    <button type="submit" class="w-full rounded-xl bg-purple-700 py-3.5 font-black text-white hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-60">PUBLICAR VENTA</button>
+                    <button type="button" onclick="showCategorySelection()" class="w-full mt-2 text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
     <!-- Navegación -->
     <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 py-4 px-6">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-black text-blue-900 tracking-tighter uppercase">Morelos<span class="text-blue-500">Trabaja</span> — VERSION 36.8</h1>
+            <h1 class="text-2xl font-black text-blue-900 tracking-tighter uppercase">Morelos<span class="text-blue-500">Trabaja</span> — VERSION 36.13</h1>
             <div class="flex items-center space-x-4">
                 <span id="session-email" class="hidden text-xs font-bold text-slate-600"></span>
                 <button id="logout-button" type="button" class="hidden text-xs font-black text-blue-800 hover:underline">SALIR</button>
-                <a href="publicar.html" class="bg-red-600 text-white px-5 py-2 rounded-full font-black text-xs shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest">
-                    📢 Publicar Gratis
-                </a>
             </div>
         </div>
     </nav>
@@ -84,9 +252,9 @@
                 "Oportunidades reales para Yautepec, Cuautla y todo el estado."
             </p>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <a href="publicar.html" class="bg-white text-blue-900 px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-blue-50 transition-all">
-                    COMENZAR AHORA
-                </a>
+                <button onclick="showPublishOverlay()" class="bg-red-600 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-red-700 transition-all uppercase tracking-widest">
+                    📢 Publica Gratis
+                </button>
             </div>
         </div>
     </header>
@@ -175,7 +343,7 @@
             return firebase.app();
         }
 
-        const AUTH_ERROR_MESSAGES = {
+        const GENERIC_ERROR_MESSAGES = {
             'auth/email-already-in-use': 'Ese correo ya tiene una cuenta. Inicia sesión.',
             'auth/invalid-email': 'Escribe un correo electrónico válido.',
             'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
@@ -184,7 +352,15 @@
             'auth/invalid-login-credentials': 'El correo o la contraseña no son correctos.',
             'auth/too-many-requests': 'Demasiados intentos. Espera un momento e intenta de nuevo.',
             'auth/network-request-failed': 'No hay conexión. Revisa tu red e intenta de nuevo.',
-            'auth/operation-not-allowed': 'La autenticación por correo y contraseña no está habilitada. Contacta al administrador.'
+            'auth/operation-not-allowed': 'Activa el proveedor Correo/Contraseña en Firebase Authentication.',
+            'auth/configuration-not-found': 'Firebase Authentication aún no está configurado para este proyecto.',
+            'auth/popup-blocked': 'El navegador bloqueó la ventana de Google. Permite ventanas emergentes e intenta de nuevo.',
+            'auth/popup-closed-by-user': 'Se cerró la ventana de Google antes de completar el acceso.',
+            'auth/account-exists-with-different-credential': 'Ese correo ya está registrado con otro método de acceso.',
+            'auth/unauthorized-domain': 'Este dominio no está autorizado en Firebase para iniciar sesión con Google.',
+            'permission-denied': 'Permiso denegado. Revisa las Reglas de Seguridad de Firestore para permitir la escritura.',
+            'auth/requires-account': 'Inicia sesión con correo o Google para publicar.',
+            'form/invalid-ad': 'Revisa el título, la descripción y el WhatsApp antes de publicar.'
         };
 
         function setupAuthentication() {
@@ -199,6 +375,7 @@
             const submitButton = document.getElementById('auth-submit');
             const toggleButton = document.getElementById('auth-toggle');
             const resetButton = document.getElementById('auth-reset');
+            const googleButton = document.getElementById('google-login');
             const title = document.getElementById('auth-title');
             const subtitle = document.getElementById('auth-subtitle');
             const message = document.getElementById('auth-message');
@@ -219,7 +396,7 @@
             };
             const setLoading = value => {
                 loading = value;
-                [emailInput, passwordInput, submitButton, toggleButton, resetButton].forEach(control => control.disabled = value);
+                [emailInput, passwordInput, submitButton, toggleButton, resetButton, googleButton].forEach(control => control.disabled = value);
                 submitButton.textContent = value ? 'PROCESANDO...' : (isRegistering ? 'CREAR CUENTA' : 'INICIAR SESIÓN');
             };
             const renderMode = () => {
@@ -249,11 +426,54 @@
                     if (isRegistering) await auth.createUserWithEmailAndPassword(email, passwordInput.value);
                     else await auth.signInWithEmailAndPassword(email, passwordInput.value);
                 } catch (error) {
-                    console.error('Firebase Auth:', error.code, error); // Log full error object
-                    const errorMessage = AUTH_ERROR_MESSAGES[error.code] || 'No fue posible completar la operación. Intenta nuevamente.';
+                    console.error('Firebase Auth:', error.code, error);
+                    const errorMessage = GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible completar la operación. Intenta nuevamente.';
                     showMessage(errorMessage);
-                    setLoading(false); 
+                } finally {
+                    setLoading(false);
                 }
+            });
+
+            googleButton.addEventListener('click', async () => {
+                if (loading) return;
+                clearMessage();
+                setLoading(true);
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    provider.setCustomParameters({ prompt: 'select_account' });
+                    const prefersRedirect = window.matchMedia('(max-width: 767px)').matches;
+                    if (prefersRedirect) {
+                        await auth.signInWithRedirect(provider);
+                        return;
+                    }
+                    try {
+                        await auth.signInWithPopup(provider);
+                    } catch (error) {
+                        if (error.code === 'auth/popup-blocked') {
+                            await auth.signInWithRedirect(provider);
+                            return;
+                        }
+                        throw error;
+                    }
+                } catch (error) {
+                    console.error('Firebase Auth Google:', error.code, error);
+                    const errorMessage = error.code === 'auth/unauthorized-domain'
+                        ? `Autoriza el dominio ${window.location.hostname} en Firebase Authentication.`
+                        : (GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible acceder con Google. Intenta nuevamente.');
+                    showMessage(errorMessage);
+                } finally {
+                    setLoading(false);
+                }
+            });
+
+            auth.getRedirectResult().catch(error => {
+                console.error('Firebase Auth Google redirect:', error.code, error);
+                const errorMessage = error.code === 'auth/unauthorized-domain'
+                    ? `Autoriza el dominio ${window.location.hostname} en Firebase Authentication.`
+                    : (GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible completar el acceso con Google.');
+                resolving.classList.add('hidden');
+                content.classList.remove('hidden');
+                showMessage(errorMessage);
             });
 
             resetButton.addEventListener('click', async () => {
@@ -273,7 +493,7 @@
                     showMessage('Te enviamos un enlace para restablecer tu contraseña.', 'success');
                 } catch (error) {
                     console.error('Firebase Auth reset:', error.code, error); // Log full error object
-                    const errorMessage = AUTH_ERROR_MESSAGES[error.code] || 'No fue posible enviar el enlace. Intenta nuevamente.';
+                    const errorMessage = GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible enviar el enlace. Intenta nuevamente.';
                     showMessage(errorMessage);
                 } finally {
                     setLoading(false);
@@ -287,25 +507,32 @@
                 finally { logoutButton.disabled = false; }
             });
 
-            const unsubscribeAuth = auth.onAuthStateChanged(user => {
-                resolving.classList.add('hidden');
-                const registeredUser = user && !user.isAnonymous ? user : null;
-                overlay.classList.toggle('hidden', Boolean(registeredUser));
-                content.classList.toggle('hidden', Boolean(registeredUser));
-                sessionEmail.textContent = registeredUser ? registeredUser.email : '';
-                sessionEmail.classList.toggle('hidden', !registeredUser);
-                logoutButton.classList.toggle('hidden', !registeredUser);
-                if (!registeredUser) emailInput.focus();
-            });
+            const unsubscribeAuth = auth.onAuthStateChanged(
+                user => {
+                    resolving.classList.add('hidden');
+                    const registeredUser = user && !user.isAnonymous ? user : null;
+                    overlay.classList.toggle('hidden', Boolean(registeredUser));
+                    content.classList.toggle('hidden', Boolean(registeredUser));
+                    sessionEmail.textContent = registeredUser ? registeredUser.email : '';
+                    sessionEmail.classList.toggle('hidden', !registeredUser);
+                    logoutButton.classList.toggle('hidden', !registeredUser);
+                    if (!registeredUser) emailInput.focus();
+                },
+                error => {
+                    console.error('Firebase Auth observer:', error.code, error);
+                    resolving.classList.add('hidden');
+                    content.classList.remove('hidden');
+                    showMessage(GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible comprobar tu sesión. Recarga la página.');
+                }
+            );
             window.addEventListener('pagehide', unsubscribeAuth, { once: true });
         }
 
-        // --- Funciones de Renderizado ---
+        // --- Funciones de Renderizado y Publicación ---
 
         /**
          * Genera el HTML para una tarjeta de anuncio.
-         * @param {object} data - Datos del anuncio (titulo, descripcion, categoria, whatsapp).
-         * @param {boolean} isExample - Indica si es un anuncio de ejemplo (para el banner informativo).
+         * @param {object} data - Datos del anuncio (titulo, descripcion, categoria, whatsapp, zona, empresa, tipo_empleo, area_trabajo, tipo_servicio, experiencia_servicio, precio, condicion, tipo_producto).
          * @returns {string} HTML de la tarjeta del anuncio.
          */
         function escapeHtml(value) {
@@ -323,6 +550,35 @@
             const category = String(data.categoria || 'default').toLowerCase();
             const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
             const whatsapp = normalizeWhatsapp(data.whatsapp);
+
+            const zona = escapeHtml(data.zona || '');
+            const empresa = escapeHtml(data.empresa || '');
+            const tipoEmpleo = escapeHtml(data.tipo_empleo || '');
+            const areaTrabajo = escapeHtml(data.area_trabajo || '');
+            const tipoServicio = escapeHtml(data.tipo_servicio || '');
+            const experienciaServicio = escapeHtml(data.experiencia_servicio || '');
+            const precio = data.precio ? `$${Number(data.precio).toLocaleString('es-MX')}` : '';
+            const condicion = escapeHtml(data.condicion || '');
+            const tipoProducto = escapeHtml(data.tipo_producto || '');
+
+            let specificFieldsHtml = '';
+
+            if (category === 'empleo') {
+                if (empresa) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Empresa:</strong> ${empresa}</p>`;
+                if (tipoEmpleo) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Tipo:</strong> ${tipoEmpleo}</p>`;
+                if (areaTrabajo) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Área:</strong> ${areaTrabajo}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Zona:</strong> ${zona}</p>`;
+            } else if (category === 'servicios') {
+                if (tipoServicio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Tipo:</strong> ${tipoServicio}</p>`;
+                if (experienciaServicio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Experiencia:</strong> ${experienciaServicio}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Zona de Servicio:</strong> ${zona}</p>`;
+            } else if (category === 'ventas') {
+                if (precio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Precio:</strong> ${precio}</p>`;
+                if (condicion) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Condición:</strong> ${condicion}</p>`;
+                if (tipoProducto) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Producto:</strong> ${tipoProducto}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Ubicación:</strong> ${zona}</p>`;
+            }
+
             const contactLink = whatsapp ? `
                     <a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
                         <i class="fab fa-whatsapp text-2xl" aria-hidden="true"></i>
@@ -334,6 +590,7 @@
                         <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${escapeHtml(category)}</span>
                         <h3 class="text-2xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
                         <p class="text-slate-500 mt-2">${escapeHtml(data.descripcion)}</p>
+                        ${specificFieldsHtml}
                     </div>
                     ${contactLink}
                 </div>
@@ -351,18 +608,35 @@
                     categoria: 'empleo',
                     titulo: 'Cocinero(a) para restaurante',
                     descripcion: 'Se busca personal con experiencia en comida mexicana. Zona centro Yautepec.',
-                    whatsapp: '5217771234567' // Número de ejemplo
+                    whatsapp: '5217771234567', // Número de ejemplo
+                    empresa: 'Restaurante "El Sabor"',
+                    tipo_empleo: 'Permanente',
+                    area_trabajo: 'Alimentos y Bebidas',
+                    zona: 'Yautepec, Centro'
                 },
                 {
                     categoria: 'servicios',
                     titulo: 'Plomero 24 Horas',
                     descripcion: 'Reparación de fugas, tinacos y bombas. Servicio rápido en todo Cuautla.',
-                    whatsapp: '5217779876543' // Número de ejemplo
+                    whatsapp: '5217779876543', // Número de ejemplo
+                    tipo_servicio: 'Plomería',
+                    experiencia_servicio: '15 años de experiencia',
+                    zona: 'Cuautla y alrededores'
+                },
+                {
+                    categoria: 'ventas',
+                    titulo: 'Bicicleta de Montaña Seminueva',
+                    descripcion: 'Bicicleta rodada 29, frenos de disco, suspensión delantera. Poco uso.',
+                    whatsapp: '5217771122334',
+                    precio: 15000,
+                    condicion: 'Usado - Excelente',
+                    tipo_producto: 'Deportes',
+                    zona: 'Cuernavaca'
                 }
             ];
 
             ejemplos.forEach(ejemplo => {
-                cont.innerHTML += renderAnuncioCard(ejemplo, true);
+                cont.innerHTML += renderAnuncioCard(ejemplo);
             });
         }
 
@@ -382,7 +656,6 @@
 
             try {
                 // Inicializa Firebase si no se ha hecho ya
-                // Esta verificación evita errores si la función 'filtrar' se llama múltiples veces.
                 initializeFirebase();
                 const db = firebase.firestore();
                 
@@ -413,6 +686,140 @@
                 mostrarEjemplos(); // En caso de error, muestra los ejemplos
             }
         }
+
+
+        // --- Funciones para el flujo de Publicación ---
+
+        const publishOverlay = document.getElementById('publish-overlay');
+        const categorySelection = document.getElementById('category-selection');
+        const publishFormsContainer = document.getElementById('publish-forms-container');
+        const publishTitle = document.getElementById('publish-title');
+        const publishSubtitle = document.getElementById('publish-subtitle');
+
+        function showPublishOverlay() {
+            publishOverlay.classList.remove('hidden');
+            showCategorySelection();
+        }
+
+        function hidePublishOverlay() {
+            publishOverlay.classList.add('hidden');
+        }
+
+        function showCategorySelection() {
+            publishTitle.textContent = '¿Qué quieres publicar?';
+            publishSubtitle.textContent = 'Selecciona la categoría de tu anuncio.';
+            categorySelection.classList.remove('hidden');
+            Array.from(publishFormsContainer.children).forEach(form => form.classList.add('hidden'));
+        }
+
+        function showSpecificPublishForm(category) {
+            categorySelection.classList.add('hidden');
+            Array.from(publishFormsContainer.children).forEach(form => form.classList.add('hidden')); // Hide all forms
+
+            let formToShow;
+            let formTitle = '';
+            let formSubtitle = '';
+
+            if (category === 'empleo') {
+                formToShow = document.getElementById('form-empleo');
+                formTitle = 'Publicar Empleo';
+                formSubtitle = 'Ingresa los detalles del puesto que ofreces.';
+            } else if (category === 'servicios') {
+                formToShow = document.getElementById('form-servicios');
+                formTitle = 'Publicar Servicio';
+                formSubtitle = 'Ingresa los detalles del servicio que ofreces.';
+            } else if (category === 'ventas') {
+                formToShow = document.getElementById('form-ventas');
+                formTitle = 'Publicar Venta';
+                formSubtitle = 'Ingresa los detalles del artículo que deseas vender.';
+            }
+
+            if (formToShow) {
+                publishTitle.textContent = formTitle;
+                publishSubtitle.textContent = formSubtitle;
+                formToShow.classList.remove('hidden');
+            }
+        }
+
+        async function submitPublishForm(event, category) {
+            event.preventDefault();
+            const form = event.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const messageElement = form.querySelector('[role="status"]');
+
+            if (!form.reportValidity()) return;
+
+            submitButton.disabled = true;
+            messageElement.textContent = 'Publicando...';
+            messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-blue-50 text-blue-700'; // Neutral message
+            messageElement.classList.remove('hidden'); // Ensure message is visible
+
+            try {
+                initializeFirebase();
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser || currentUser.isAnonymous) {
+                    const authError = new Error('Se requiere una cuenta registrada.');
+                    authError.code = 'auth/requires-account';
+                    throw authError;
+                }
+                const db = firebase.firestore();
+                const titulo = form.querySelector(`#${category}-titulo`).value.trim();
+                const descripcion = form.querySelector(`#${category}-descripcion`).value.trim();
+                const whatsapp = normalizeWhatsapp(form.querySelector(`#${category}-whatsapp`).value);
+                if (titulo.length < 4 || titulo.length > 80 || descripcion.length < 10 || descripcion.length > 500 || !whatsapp) {
+                    const validationError = new Error('Los datos del anuncio no cumplen las validaciones.');
+                    validationError.code = 'form/invalid-ad';
+                    throw validationError;
+                }
+                const anuncioData = {
+                    categoria: category,
+                    titulo,
+                    descripcion,
+                    whatsapp,
+                    zona: form.querySelector(`#${category}-zona`).value.trim(),
+                    authorUid: currentUser.uid,
+                    fecha: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (category === 'empleo') {
+                    anuncioData.empresa = form.querySelector('#empleo-empresa').value.trim();
+                    anuncioData.tipo_empleo = form.querySelector('#empleo-tipo-empleo').value;
+                    anuncioData.area_trabajo = form.querySelector('#empleo-area-trabajo').value;
+                } else if (category === 'servicios') {
+                    anuncioData.tipo_servicio = form.querySelector('#servicios-tipo-servicio').value;
+                    anuncioData.experiencia_servicio = form.querySelector('#servicios-experiencia').value.trim();
+                } else if (category === 'ventas') {
+                    anuncioData.precio = parseFloat(form.querySelector('#ventas-precio').value);
+                    anuncioData.condicion = form.querySelector('#ventas-condicion').value;
+                    anuncioData.tipo_producto = form.querySelector('#ventas-tipo-producto').value.trim();
+                }
+
+                await db.collection("anuncios").add(anuncioData);
+
+                messageElement.textContent = '¡Anuncio publicado con éxito!';
+                messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700';
+                form.reset(); // Limpia el formulario
+                filtrar(); // Recarga los anuncios en la página principal
+                setTimeout(() => {
+                    hidePublishOverlay(); // Cierra el modal después de un éxito
+                    showCategorySelection(); // Vuelve a la selección de categoría para el próximo anuncio
+                }, 2000);
+
+            } catch (error) {
+                console.error("Error al publicar anuncio:", error);
+                const errorMessage = GENERIC_ERROR_MESSAGES[error.code] || 'Error al publicar. Revisa la consola para más detalles.';
+                messageElement.textContent = errorMessage;
+                messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-red-50 text-red-700';
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
+        // Asignar event listeners a los formularios de publicación
+        document.getElementById('form-empleo').addEventListener('submit', (e) => submitPublishForm(e, 'empleo'));
+        document.getElementById('form-servicios').addEventListener('submit', (e) => submitPublishForm(e, 'servicios'));
+        document.getElementById('form-ventas').addEventListener('submit', (e) => submitPublishForm(e, 'ventas'));
+
 
         // --- Event Listeners ---
         window.addEventListener('load', () => {
