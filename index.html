@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja | V2</title>
+    <title>Morelos Trabaja | V2 — VERSION 36.6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -63,9 +63,7 @@
     <!-- Navegación -->
     <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 py-4 px-6">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-black text-blue-900 tracking-tighter uppercase">
-                Morelos<span class="text-blue-500">Trabaja</span>
-            </h1>
+            <h1 class="text-2xl font-black text-blue-900 tracking-tighter uppercase">Morelos<span class="text-blue-500">Trabaja</span> — VERSION 36.6</h1>
             <div class="flex items-center space-x-4">
                 <span id="session-email" class="hidden text-xs font-bold text-slate-600"></span>
                 <button id="logout-button" type="button" class="hidden text-xs font-black text-blue-800 hover:underline">SALIR</button>
@@ -249,11 +247,12 @@
                     const email = emailInput.value.trim();
                     if (isRegistering) await auth.createUserWithEmailAndPassword(email, passwordInput.value);
                     else await auth.signInWithEmailAndPassword(email, passwordInput.value);
+                    // Si tiene éxito, onAuthStateChanged manejará las actualizaciones de la interfaz de usuario (ocultando el overlay).
+                    // No es necesario llamar a setLoading(false) aquí, ya que el overlay desaparecerá.
                 } catch (error) {
                     console.error('Firebase Auth:', error.code);
                     showMessage(AUTH_ERROR_MESSAGES[error.code] || 'No fue posible completar la operación. Intenta nuevamente.');
-                } finally {
-                    setLoading(false);
+                    setLoading(false); // Solo restablece el estado de carga si hubo un error.
                 }
             });
 
