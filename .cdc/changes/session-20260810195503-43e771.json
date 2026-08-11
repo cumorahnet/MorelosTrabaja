@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "1.0",
+  "sessionId": "session-20260810195503-43e771",
+  "generatedAt": "2026-08-11T00:27:23.245Z",
+  "startState": {
+    "available": true,
+    "commit": "2812a7a20553563f735dc8b337531e8c50d96a2f",
+    "branch": "main",
+    "timestamp": "2026-08-10T19:55:03.886Z",
+    "dirty": true,
+    "workingTree": [
+      {
+        "status": "M",
+        "path": "version.json"
+      },
+      {
+        "status": "??",
+        "path": ".firebase/"
+      },
+      {
+        "status": "??",
+        "path": ".firebaserc"
+      },
+      {
+        "status": "??",
+        "path": "CHANGELOG.md"
+      },
+      {
+        "status": "??",
+        "path": "DECISIONS.md"
+      },
+      {
+        "status": "??",
+        "path": "NEXT.md"
+      },
+      {
+        "status": "??",
+        "path": "firebase.json"
+      }
+    ]
+  },
+  "endState": {
+    "available": true,
+    "commit": "2812a7a20553563f735dc8b337531e8c50d96a2f",
+    "branch": "main",
+    "timestamp": "2026-08-11T00:27:23.245Z",
+    "dirty": true,
+    "workingTree": [
+      {
+        "status": "M",
+        "path": "index.html"
+      },
+      {
+        "status": "M",
+        "path": "version.json"
+      },
+      {
+        "status": "??",
+        "path": ".firebase/"
+      },
+      {
+        "status": "??",
+        "path": ".firebaserc"
+      },
+      {
+        "status": "??",
+        "path": "CHANGELOG.md"
+      },
+      {
+        "status": "??",
+        "path": "DECISIONS.md"
+      },
+      {
+        "status": "??",
+        "path": "NEXT.md"
+      },
+      {
+        "status": "??",
+        "path": "firebase.json"
+      },
+      {
+        "status": "??",
+        "path": "firestore.rules"
+      },
+      {
+        "status": "??",
+        "path": "publicar.html"
+      }
+    ]
+  },
+  "analysis": {
+    "source": "git",
+    "files": [
+      {
+        "path": "index.html",
+        "previousPath": null,
+        "type": "modified",
+        "additions": 31,
+        "deletions": 12,
+        "area": "user-interface",
+        "preExistingAtStart": false
+      },
+      {
+        "path": "version.json",
+        "previousPath": null,
+        "type": "modified",
+        "additions": 1,
+        "deletions": 1,
+        "area": "application",
+        "preExistingAtStart": true
+      },
+      {
+        "path": "firestore.rules",
+        "previousPath": null,
+        "type": "added",
+        "additions": 69,
+        "deletions": 0,
+        "area": "application",
+        "preExistingAtStart": false
+      },
+      {
+        "path": "publicar.html",
+        "previousPath": null,
+        "type": "added",
+        "additions": 110,
+        "deletions": 0,
+        "area": "user-interface",
+        "preExistingAtStart": false
+      }
+    ],
+    "commits": [],
+    "totals": {
+      "files": 4,
+      "additions": 211,
+      "deletions": 13
+    }
+  },
+  "summary": {
+    "objective": "",
+    "technicalChanges": [
+      "modified: index.html",
+      "modified: version.json",
+      "added: firestore.rules",
+      "added: publicar.html"
+    ],
+    "affectedAreas": [
+      "user-interface",
+      "application"
+    ],
+    "tests": {
+      "filesChanged": 0,
+      "paths": []
+    },
+    "dependencies": [],
+    "backups": [],
+    "risks": [
+      "El análisis incluye archivos que ya tenían cambios al iniciar la sesión."
+    ],
+    "pending": []
+  }
+}

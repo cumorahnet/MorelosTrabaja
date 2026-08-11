@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar anuncio | Morelos Trabaja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+    <main class="max-w-xl mx-auto px-6 py-12">
+        <a href="index.html" class="text-blue-700 font-bold">← Volver a los anuncios</a>
+        <section class="bg-white rounded-3xl shadow-lg p-8 mt-6">
+            <h1 class="text-3xl font-black text-blue-900">Publica gratis</h1>
+            <p class="text-slate-500 mt-2 mb-8">Comparte una oportunidad con la comunidad de Morelos.</p>
+            <form id="form-anuncio" class="space-y-5">
+                <label class="block font-bold text-slate-700">Categoría
+                    <select name="categoria" required class="mt-2 w-full border rounded-xl p-3 bg-white">
+                        <option value="empleo">Empleo</option>
+                        <option value="servicios">Servicios</option>
+                        <option value="ventas">Ventas</option>
+                    </select>
+                </label>
+                <label class="block font-bold text-slate-700">Título
+                    <input name="titulo" required minlength="4" maxlength="80" class="mt-2 w-full border rounded-xl p-3" autocomplete="off">
+                </label>
+                <label class="block font-bold text-slate-700">Descripción
+                    <textarea name="descripcion" required minlength="10" maxlength="500" rows="5" class="mt-2 w-full border rounded-xl p-3"></textarea>
+                </label>
+                <label class="block font-bold text-slate-700">WhatsApp (con lada)
+                    <input name="whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full border rounded-xl p-3" placeholder="777 123 4567">
+                </label>
+                <button id="enviar" class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white rounded-xl p-4 font-black" type="submit">PUBLICAR ANUNCIO</button>
+                <p id="estado" role="status" aria-live="polite" class="text-sm font-bold"></p>
+            </form>
+        </section>
+    </main>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBMDAS5Uqig7NzaHP3h2huzRL30Uo5t7rM",
+            authDomain: "morelos-trabaja.firebaseapp.com",
+            projectId: "morelos-trabaja",
+            storageBucket: "morelos-trabaja.firebasestorage.app",
+            messagingSenderId: "506981339593",
+            appId: "1:506981339593:web:266f12812305d1a92d1818"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const form = document.getElementById('form-anuncio');
+        const estado = document.getElementById('estado');
+        const enviar = document.getElementById('enviar');
+
+        // Intentar autenticación anónima en carga para permitir creaciones seguras
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                // iniciar sesión anónimo automáticamente
+                firebase.auth().signInAnonymously().catch(err => {
+                    console.error('No se pudo iniciar sesión anónimo:', err);
+                });
+            }
+        });
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!form.reportValidity()) return;
+
+            const values = new FormData(form);
+            const whatsapp = String(values.get('whatsapp')).replace(/\D/g, '');
+            if (!/^\d{10,15}$/.test(whatsapp)) {
+                estado.textContent = 'Escribe un número de WhatsApp válido, con lada.';
+                estado.className = 'text-sm font-bold text-red-700';
+                return;
+            }
+
+            enviar.disabled = true;
+            estado.textContent = 'Publicando…';
+            estado.className = 'text-sm font-bold text-slate-500';
+
+            try {
+                // Asegurar que el usuario esté autenticado (anónimo o con cuenta)
+                if (!firebase.auth().currentUser) {
+                    await firebase.auth().signInAnonymously();
+                }
+                const uid = firebase.auth().currentUser && firebase.auth().currentUser.uid;
+                if (!uid) throw new Error('No se pudo obtener authorUid tras autenticación.');
+
+                await firebase.firestore().collection('anuncios').add({
+                    categoria: values.get('categoria'),
+                    titulo: String(values.get('titulo')).trim(),
+                    descripcion: String(values.get('descripcion')).trim(),
+                    whatsapp,
+                    authorUid: uid,
+                    fecha: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                form.reset();
+                estado.textContent = 'Anuncio publicado. Ya puedes verlo en la página principal.';
+                estado.className = 'text-sm font-bold text-green-700';
+            } catch (error) {
+                console.error('No se pudo publicar el anuncio:', error);
+                estado.textContent = 'No fue posible publicar. Revisa los permisos de Firestore e inténtalo nuevamente.';
+                estado.className = 'text-sm font-bold text-red-700';
+            } finally {
+                enviar.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

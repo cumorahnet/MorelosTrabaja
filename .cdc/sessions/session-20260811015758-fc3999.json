@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.0",
+  "id": "session-20260811015758-fc3999",
+  "projectId": "morelostrabaja",
+  "projectName": "morelostrabaja",
+  "status": "active",
+  "startedAt": "2026-08-11T01:57:58.388Z",
+  "closedAt": null,
+  "durationMs": null,
+  "objective": "",
+  "modifiedFiles": [],
+  "changes": [],
+  "startState": {
+    "available": true,
+    "commit": "2812a7a20553563f735dc8b337531e8c50d96a2f",
+    "branch": "main",
+    "timestamp": "2026-08-11T01:57:58.388Z",
+    "dirty": true,
+    "workingTree": [
+      {
+        "status": "M",
+        "path": "index.html"
+      },
+      {
+        "status": "M",
+        "path": "version.json"
+      },
+      {
+        "status": "??",
+        "path": ".firebase/"
+      },
+      {
+        "status": "??",
+        "path": ".firebaserc"
+      },
+      {
+        "status": "??",
+        "path": "CHANGELOG.md"
+      },
+      {
+        "status": "??",
+        "path": "DECISIONS.md"
+      },
+      {
+        "status": "??",
+        "path": "NEXT.md"
+      },
+      {
+        "status": "??",
+        "path": "firebase.json"
+      },
+      {
+        "status": "??",
+        "path": "firestore.rules"
+      },
+      {
+        "status": "??",
+        "path": "publicar.html"
+      }
+    ]
+  },
+  "baseline": {
+    ".firebaserc": {
+      "size": 62,
+      "mtimeMs": 1786149234174
+    },
+    "CHANGELOG.md": {
+      "size": 1588,
+      "mtimeMs": 1786411506376
+    },
+    "DECISIONS.md": {
+      "size": 167,
+      "mtimeMs": 1786165278628
+    },
+    "firebase.json": {
+      "size": 467,
+      "mtimeMs": 1786406606161
+    },
+    "firestore.rules": {
+      "size": 3190,
+      "mtimeMs": 1786407642631
+    },
+    "index.html": {
+      "size": 12856,
+      "mtimeMs": 1786391940397
+    },
+    "index.html.backup": {
+      "size": 11885,
+      "mtimeMs": 1782765284118
+    },
+    "NEXT.md": {
+      "size": 537,
+      "mtimeMs": 1786411506377
+    },
+    "publicar.html": {
+      "size": 5730,
+      "mtimeMs": 1786407642631
+    },
+    "version.json": {
+      "size": 31,
+      "mtimeMs": 1782765284123
+    },
+    ".firebase/hosting..cache": {
+      "size": 370,
+      "mtimeMs": 1786407640503
+    }
+  }
+}

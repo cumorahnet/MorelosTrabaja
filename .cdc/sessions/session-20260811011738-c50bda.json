@@ -1,0 +1,242 @@
+{
+  "schemaVersion": "1.0",
+  "id": "session-20260811011738-c50bda",
+  "projectId": "morelostrabaja",
+  "projectName": "morelostrabaja",
+  "status": "closed",
+  "startedAt": "2026-08-11T01:17:38.149Z",
+  "closedAt": "2026-08-11T01:25:00.593Z",
+  "durationMs": 442444,
+  "objective": "",
+  "modifiedFiles": [],
+  "changes": [],
+  "startState": {
+    "available": true,
+    "commit": "2812a7a20553563f735dc8b337531e8c50d96a2f",
+    "branch": "main",
+    "timestamp": "2026-08-11T01:17:38.149Z",
+    "dirty": true,
+    "workingTree": [
+      {
+        "status": "M",
+        "path": "index.html"
+      },
+      {
+        "status": "M",
+        "path": "version.json"
+      },
+      {
+        "status": "??",
+        "path": ".firebase/"
+      },
+      {
+        "status": "??",
+        "path": ".firebaserc"
+      },
+      {
+        "status": "??",
+        "path": "CHANGELOG.md"
+      },
+      {
+        "status": "??",
+        "path": "DECISIONS.md"
+      },
+      {
+        "status": "??",
+        "path": "NEXT.md"
+      },
+      {
+        "status": "??",
+        "path": "firebase.json"
+      },
+      {
+        "status": "??",
+        "path": "firestore.rules"
+      },
+      {
+        "status": "??",
+        "path": "publicar.html"
+      }
+    ]
+  },
+  "endState": {
+    "available": true,
+    "commit": "2812a7a20553563f735dc8b337531e8c50d96a2f",
+    "branch": "main",
+    "timestamp": "2026-08-11T01:25:00.593Z",
+    "dirty": true,
+    "workingTree": [
+      {
+        "status": "M",
+        "path": "index.html"
+      },
+      {
+        "status": "M",
+        "path": "version.json"
+      },
+      {
+        "status": "??",
+        "path": ".firebase/"
+      },
+      {
+        "status": "??",
+        "path": ".firebaserc"
+      },
+      {
+        "status": "??",
+        "path": "CHANGELOG.md"
+      },
+      {
+        "status": "??",
+        "path": "DECISIONS.md"
+      },
+      {
+        "status": "??",
+        "path": "NEXT.md"
+      },
+      {
+        "status": "??",
+        "path": "firebase.json"
+      },
+      {
+        "status": "??",
+        "path": "firestore.rules"
+      },
+      {
+        "status": "??",
+        "path": "publicar.html"
+      }
+    ]
+  },
+  "changeIntelligence": {
+    "path": ".cdc/changes/session-20260811011738-c50bda.json",
+    "summary": {
+      "objective": "",
+      "technicalChanges": [
+        "modified: index.html",
+        "modified: version.json"
+      ],
+      "affectedAreas": [
+        "user-interface",
+        "application"
+      ],
+      "tests": {
+        "filesChanged": 0,
+        "paths": []
+      },
+      "dependencies": [],
+      "backups": [],
+      "risks": [
+        "El análisis incluye archivos que ya tenían cambios al iniciar la sesión."
+      ],
+      "pending": []
+    },
+    "analysis": {
+      "source": "git",
+      "files": [
+        {
+          "path": "index.html",
+          "previousPath": null,
+          "type": "modified",
+          "additions": 31,
+          "deletions": 12,
+          "area": "user-interface",
+          "preExistingAtStart": true
+        },
+        {
+          "path": "version.json",
+          "previousPath": null,
+          "type": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "area": "application",
+          "preExistingAtStart": true
+        }
+      ],
+      "commits": [],
+      "totals": {
+        "files": 2,
+        "additions": 32,
+        "deletions": 13
+      }
+    }
+  },
+  "intelligentClosureProposal": {
+    "schemaVersion": "1.0",
+    "provider": "local-context",
+    "generatedAt": "2026-08-11T01:25:01.188Z",
+    "reviewStatus": "approved",
+    "summary": "Se cerró una sesión de trabajo del proyecto morelostrabaja. Se detectaron 0 cambio(s): 0 creado(s), 0 modificado(s) y 0 eliminado(s).",
+    "achievements": [],
+    "decisions": [],
+    "risks": [
+      "No se detectaron archivos modificados. Confirma que el trabajo se haya guardado dentro del proyecto y fuera de carpetas ignoradas.",
+      "El análisis incluye archivos que ya tenían cambios al iniciar la sesión."
+    ],
+    "pending": [],
+    "nextSteps": [
+      "Revisar y resolver los riesgos detectados en este cierre.",
+      "Definir el siguiente objetivo de trabajo del proyecto."
+    ],
+    "memorySuggestions": [],
+    "metrics": {
+      "total": 0,
+      "created": 0,
+      "modified": 0,
+      "deleted": 0,
+      "contextualizedFiles": 0
+    },
+    "evidence": {
+      "changedFiles": [],
+      "contextualizedFiles": []
+    },
+    "providerRequested": "local-context",
+    "fallback": null,
+    "proposedAt": "2026-08-11T01:25:01.188Z",
+    "reviewedAt": "2026-08-11T01:25:06.321Z",
+    "approvedAt": "2026-08-11T01:25:06.321Z",
+    "rejectedAt": null
+  },
+  "intelligentClosure": {
+    "schemaVersion": "1.0",
+    "provider": "local-context",
+    "generatedAt": "2026-08-11T01:25:01.188Z",
+    "reviewStatus": "approved",
+    "summary": "Se cerró una sesión de trabajo del proyecto morelostrabaja. Se detectaron 0 cambio(s): 0 creado(s), 0 modificado(s) y 0 eliminado(s).",
+    "achievements": [],
+    "decisions": [],
+    "risks": [
+      "No se detectaron archivos modificados. Confirma que el trabajo se haya guardado dentro del proyecto y fuera de carpetas ignoradas.",
+      "El análisis incluye archivos que ya tenían cambios al iniciar la sesión."
+    ],
+    "pending": [],
+    "nextSteps": [
+      "Revisar y resolver los riesgos detectados en este cierre.",
+      "Definir el siguiente objetivo de trabajo del proyecto."
+    ],
+    "memorySuggestions": [],
+    "metrics": {
+      "total": 0,
+      "created": 0,
+      "modified": 0,
+      "deleted": 0,
+      "contextualizedFiles": 0
+    },
+    "evidence": {
+      "changedFiles": [],
+      "contextualizedFiles": []
+    },
+    "providerRequested": "local-context",
+    "fallback": null,
+    "proposedAt": "2026-08-11T01:25:01.188Z",
+    "reviewedAt": "2026-08-11T01:25:06.321Z",
+    "approvedAt": "2026-08-11T01:25:06.321Z",
+    "rejectedAt": null,
+    "artifacts": {
+      "history": ".cdc/history/session-20260811011738-c50bda.md",
+      "changelog": "CHANGELOG.md",
+      "next": "NEXT.md",
+      "decisions": null
+    }
+  }
+}

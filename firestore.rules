@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Regla actual mínima (segura): lectura pública de 'anuncios', escritura denegada.
+    // Esto coincide con lo que compartiste y evita modificaciones desde el cliente.
+    match /anuncios/{anuncioId} {
+      allow read: if true;
+      allow write: if false; // evita escrituras desde el cliente
+    }
+
+    // Denegar el acceso por defecto al resto de colecciones
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------
+    // Opciones recomendadas
+    // -------------------------
+    // A continuación se incluyen dos variantes comentadas que puedes usar
+    // según tu estrategia de seguridad. Descomenta y adapta UNA de ellas
+    // si decides permitir publicaciones desde el cliente.
+
+    // OPCIÓN A - Recomendado: exigir autenticación para crear anuncios
+    match /anuncios/{anuncioId} {
+      allow read: if true;
+
+      // Solo usuarios autenticados pueden crear y deben incluir authorUid == request.auth.uid
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll(['categoria','titulo','descripcion','whatsapp','fecha','authorUid'])
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.categoria in ['empleo','servicios','ventas']
+        && request.resource.data.titulo is string
+        && request.resource.data.titulo.size() >= 4
+        && request.resource.data.titulo.size() <= 80
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() >= 10
+        && request.resource.data.descripcion.size() <= 500
+        && request.resource.data.whatsapp is string
+        && request.resource.data.whatsapp.matches('^[0-9]{10,15}$');
+
+      // Actualizaciones/eliminaciones solo por el autor (authorUid coincide con auth.uid)
+      allow update, delete: if request.auth != null && resource.data.authorUid == request.auth.uid;
+    }
+
+    // OPCIÓN B - Público pero validado: permite creación desde cliente
+    // Nota: esta opción es más vulnerable a spam; reforzar con App Check y
+    // moderación (Cloud Function) es muy recomendable.
+    /*
+    match /anuncios/{anuncioId} {
+      allow read: if true;
+
+      // Permite crear documentos si cumplen validaciones básicas de campos
+      allow create: if request.resource.data.keys().hasAll(['categoria','titulo','descripcion','whatsapp','fecha'])
+        && request.resource.data.categoria in ['empleo','servicios','ventas']
+        && request.resource.data.titulo is string
+        && request.resource.data.titulo.size() >= 4
+        && request.resource.data.titulo.size() <= 80
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() >= 10
+        && request.resource.data.descripcion.size() <= 500
+        && request.resource.data.whatsapp is string
+        && request.resource.data.whatsapp.matches('^[0-9]{10,15}$');
+
+      // No permitir update/delete desde el cliente
+      allow update, delete: if false;
+    }
+    */
+  }
+}

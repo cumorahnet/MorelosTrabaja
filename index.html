@@ -10,6 +10,7 @@
     <!-- Cargamos Firebase v8 (Más estable para previos) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -31,6 +32,34 @@
 </head>
 <body class="bg-slate-50 min-h-screen">
 
+    <div id="auth-overlay" class="fixed inset-0 z-[100] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5" aria-live="polite">
+        <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9" aria-labelledby="auth-title">
+            <div id="auth-resolving" class="py-16 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600 mx-auto"></div>
+                <p class="mt-4 text-slate-500 font-bold text-sm">Comprobando tu sesión...</p>
+            </div>
+            <div id="auth-content" class="hidden">
+                <p class="text-xs font-black tracking-[0.25em] text-blue-600 uppercase">Morelos Trabaja</p>
+                <h2 id="auth-title" class="text-3xl font-black text-blue-950 mt-2">Crea tu cuenta</h2>
+                <p id="auth-subtitle" class="text-slate-500 mt-2 mb-7">Regístrate para continuar.</p>
+                <form id="auth-form" class="space-y-4">
+                    <label class="block text-sm font-bold text-slate-700">Correo electrónico
+                        <input id="auth-email" type="email" autocomplete="email" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="tu@correo.com">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Contraseña
+                        <input id="auth-password" type="password" autocomplete="new-password" required minlength="6" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Mínimo 6 caracteres">
+                    </label>
+                    <p id="auth-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+                    <button id="auth-submit" type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">CREAR CUENTA</button>
+                </form>
+                <div class="mt-5 flex flex-col items-center gap-3 text-sm">
+                    <button id="auth-reset" type="button" class="font-bold text-blue-700 hover:underline disabled:opacity-60">Olvidé mi contraseña</button>
+                    <button id="auth-toggle" type="button" class="text-slate-600 disabled:opacity-60">Ya tengo cuenta. <span class="font-black text-blue-700">Iniciar sesión</span></button>
+                </div>
+            </div>
+        </section>
+    </div>
+
     <!-- Navegación -->
     <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 py-4 px-6">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
@@ -38,6 +67,8 @@
                 Morelos<span class="text-blue-500">Trabaja</span>
             </h1>
             <div class="flex items-center space-x-4">
+                <span id="session-email" class="hidden text-xs font-bold text-slate-600"></span>
+                <button id="logout-button" type="button" class="hidden text-xs font-black text-blue-800 hover:underline">SALIR</button>
                 <a href="publicar.html" class="bg-red-600 text-white px-5 py-2 rounded-full font-black text-xs shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest">
                     📢 Publicar Gratis
                 </a>
@@ -141,6 +172,134 @@
             </div>
         `;
 
+        function initializeFirebase() {
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            return firebase.app();
+        }
+
+        const AUTH_ERROR_MESSAGES = {
+            'auth/email-already-in-use': 'Ese correo ya tiene una cuenta. Inicia sesión.',
+            'auth/invalid-email': 'Escribe un correo electrónico válido.',
+            'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
+            'auth/wrong-password': 'El correo o la contraseña no son correctos.',
+            'auth/user-not-found': 'El correo o la contraseña no son correctos.',
+            'auth/invalid-login-credentials': 'El correo o la contraseña no son correctos.',
+            'auth/too-many-requests': 'Demasiados intentos. Espera un momento e intenta de nuevo.',
+            'auth/network-request-failed': 'No hay conexión. Revisa tu red e intenta de nuevo.'
+        };
+
+        function setupAuthentication() {
+            initializeFirebase();
+            const auth = firebase.auth();
+            const overlay = document.getElementById('auth-overlay');
+            const resolving = document.getElementById('auth-resolving');
+            const content = document.getElementById('auth-content');
+            const form = document.getElementById('auth-form');
+            const emailInput = document.getElementById('auth-email');
+            const passwordInput = document.getElementById('auth-password');
+            const submitButton = document.getElementById('auth-submit');
+            const toggleButton = document.getElementById('auth-toggle');
+            const resetButton = document.getElementById('auth-reset');
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            const message = document.getElementById('auth-message');
+            const sessionEmail = document.getElementById('session-email');
+            const logoutButton = document.getElementById('logout-button');
+            let isRegistering = true;
+            let loading = false;
+
+            const showMessage = (text, type = 'error') => {
+                message.textContent = text;
+                message.className = type === 'success'
+                    ? 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700'
+                    : 'rounded-xl px-4 py-3 text-sm font-bold bg-red-50 text-red-700';
+            };
+            const clearMessage = () => {
+                message.textContent = '';
+                message.className = 'hidden rounded-xl px-4 py-3 text-sm font-bold';
+            };
+            const setLoading = value => {
+                loading = value;
+                [emailInput, passwordInput, submitButton, toggleButton, resetButton].forEach(control => control.disabled = value);
+                submitButton.textContent = value ? 'PROCESANDO...' : (isRegistering ? 'CREAR CUENTA' : 'INICIAR SESIÓN');
+            };
+            const renderMode = () => {
+                clearMessage();
+                title.textContent = isRegistering ? 'Crea tu cuenta' : 'Bienvenido de nuevo';
+                subtitle.textContent = isRegistering ? 'Regístrate para continuar.' : 'Inicia sesión para continuar.';
+                submitButton.textContent = isRegistering ? 'CREAR CUENTA' : 'INICIAR SESIÓN';
+                toggleButton.innerHTML = isRegistering
+                    ? 'Ya tengo cuenta. <span class="font-black text-blue-700">Iniciar sesión</span>'
+                    : 'No tengo cuenta. <span class="font-black text-blue-700">Registrarme</span>';
+                passwordInput.autocomplete = isRegistering ? 'new-password' : 'current-password';
+            };
+
+            toggleButton.addEventListener('click', () => {
+                if (loading) return;
+                isRegistering = !isRegistering;
+                renderMode();
+            });
+
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                if (loading || !form.reportValidity()) return;
+                clearMessage();
+                setLoading(true);
+                try {
+                    const email = emailInput.value.trim();
+                    if (isRegistering) await auth.createUserWithEmailAndPassword(email, passwordInput.value);
+                    else await auth.signInWithEmailAndPassword(email, passwordInput.value);
+                } catch (error) {
+                    console.error('Firebase Auth:', error.code);
+                    showMessage(AUTH_ERROR_MESSAGES[error.code] || 'No fue posible completar la operación. Intenta nuevamente.');
+                } finally {
+                    setLoading(false);
+                }
+            });
+
+            resetButton.addEventListener('click', async () => {
+                if (loading) return;
+                const email = emailInput.value.trim();
+                if (!email) {
+                    showMessage('Escribe tu correo para enviarte el enlace de recuperación.');
+                    emailInput.focus();
+                    return;
+                }
+                clearMessage();
+                setLoading(true);
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    isRegistering = false;
+                    renderMode();
+                    showMessage('Te enviamos un enlace para restablecer tu contraseña.', 'success');
+                } catch (error) {
+                    console.error('Firebase Auth reset:', error.code);
+                    showMessage(AUTH_ERROR_MESSAGES[error.code] || 'No fue posible enviar el enlace. Intenta nuevamente.');
+                } finally {
+                    setLoading(false);
+                }
+            });
+
+            logoutButton.addEventListener('click', async () => {
+                logoutButton.disabled = true;
+                try { await auth.signOut(); }
+                catch (error) { console.error('Firebase Auth signOut:', error.code); }
+                finally { logoutButton.disabled = false; }
+            });
+
+            const unsubscribeAuth = auth.onAuthStateChanged(user => {
+                resolving.classList.add('hidden');
+                const registeredUser = user && !user.isAnonymous ? user : null;
+                overlay.classList.toggle('hidden', Boolean(registeredUser));
+                content.classList.toggle('hidden', Boolean(registeredUser));
+                sessionEmail.textContent = registeredUser ? registeredUser.email : '';
+                sessionEmail.classList.toggle('hidden', !registeredUser);
+                logoutButton.classList.toggle('hidden', !registeredUser);
+                if (!registeredUser) emailInput.focus();
+            });
+            window.addEventListener('pagehide', unsubscribeAuth, { once: true });
+        }
+
         // --- Funciones de Renderizado ---
 
         /**
@@ -149,20 +308,34 @@
          * @param {boolean} isExample - Indica si es un anuncio de ejemplo (para el banner informativo).
          * @returns {string} HTML de la tarjeta del anuncio.
          */
-        function renderAnuncioCard(data, isExample = false) {
-            const category = data.categoria || 'default';
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            })[character]);
+        }
+
+        function normalizeWhatsapp(value) {
+            const digits = String(value ?? '').replace(/\D/g, '');
+            return /^\d{10,15}$/.test(digits) ? digits : '';
+        }
+
+        function renderAnuncioCard(data) {
+            const category = String(data.categoria || 'default').toLowerCase();
             const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
+            const whatsapp = normalizeWhatsapp(data.whatsapp);
+            const contactLink = whatsapp ? `
+                    <a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
+                        <i class="fab fa-whatsapp text-2xl" aria-hidden="true"></i>
+                    </a>` : '';
 
             return `
                 <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center border-l-[6px] ${style.borderColorClass}">
                     <div>
-                        <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${category.toUpperCase()}</span>
-                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">${data.titulo}</h3>
-                        <p class="text-slate-500 mt-2">${data.descripcion}</p>
+                        <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${escapeHtml(category)}</span>
+                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
+                        <p class="text-slate-500 mt-2">${escapeHtml(data.descripcion)}</p>
                     </div>
-                    <a href="https://wa.me/${data.whatsapp}" target="_blank" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg">
-                        <i class="fab fa-whatsapp text-2xl"></i>
-                    </a>
+                    ${contactLink}
                 </div>
             `;
         }
@@ -210,12 +383,10 @@
             try {
                 // Inicializa Firebase si no se ha hecho ya
                 // Esta verificación evita errores si la función 'filtrar' se llama múltiples veces.
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
+                initializeFirebase();
                 const db = firebase.firestore();
                 
-                let queryRef = db.collection("anuncios").orderBy("fecha", "desc");
+                let queryRef = db.collection("anuncios");
                 if (cat) {
                     queryRef = queryRef.where("categoria", "==", cat);
                 }
@@ -228,8 +399,13 @@
                     return;
                 }
 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                const anuncios = snapshot.docs.map(doc => doc.data()).sort((a, b) => {
+                    const fechaA = a.fecha?.toMillis?.() ?? 0;
+                    const fechaB = b.fecha?.toMillis?.() ?? 0;
+                    return fechaB - fechaA;
+                });
+
+                anuncios.forEach(data => {
                     cont.innerHTML += renderAnuncioCard(data);
                 });
             } catch (error) {
@@ -239,7 +415,10 @@
         }
 
         // --- Event Listeners ---
-        window.onload = () => filtrar(); // Carga todos los anuncios al iniciar la página
+        window.addEventListener('load', () => {
+            setupAuthentication();
+            filtrar();
+        }); // Carga autenticación y anuncios al iniciar la página
     </script>
 </body>
 </html>

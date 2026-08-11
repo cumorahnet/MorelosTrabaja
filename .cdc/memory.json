@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "projectId": "morelostrabaja",
+  "updatedAt": "2026-08-10T21:22:19.906Z",
+  "entries": [
+    {
+      "id": "mem-20260810212214-ce7ac1",
+      "type": "decision",
+      "title": "Decisión registrada: justo hacer la migracion",
+      "content": "justo hacer la migracion",
+      "status": "active",
+      "tags": [
+        "sesión",
+        "decisión"
+      ],
+      "source": {
+        "type": "intelligent-closure",
+        "reference": "session-20260807235618-486ba8:memory-suggestion-20260807235618-486ba8-1"
+      },
+      "supersedes": null,
+      "supersededBy": null,
+      "createdAt": "2026-08-10T21:22:14.939Z",
+      "updatedAt": "2026-08-10T21:22:14.939Z",
+      "archivedAt": null
+    },
+    {
+      "id": "mem-20260810212219-87d664",
+      "type": "goal",
+      "title": "Objetivo pendiente: verificar los cambios en firebase",
+      "content": "verificar los cambios en firebase",
+      "status": "active",
+      "tags": [
+        "sesión",
+        "pendiente"
+      ],
+      "source": {
+        "type": "intelligent-closure",
+        "reference": "session-20260807235618-486ba8:memory-suggestion-20260807235618-486ba8-2"
+      },
+      "supersedes": null,
+      "supersededBy": null,
+      "createdAt": "2026-08-10T21:22:19.906Z",
+      "updatedAt": "2026-08-10T21:22:19.906Z",
+      "archivedAt": null
+    }
+  ]
+}
