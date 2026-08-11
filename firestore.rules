@@ -1,11 +1,40 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isSuperUser() {
+      return request.auth != null
+        && request.auth.token.email == 'cumorahnet@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
     // Regla actual mínima (segura): lectura pública de 'anuncios', escritura denegada.
     // Esto coincide con lo que compartiste y evita modificaciones desde el cliente.
     match /anuncios/{anuncioId} {
       allow read: if true;
       allow write: if false; // evita escrituras desde el cliente
+    }
+
+    match /calificaciones/{calificacionId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && request.resource.data.keys().hasOnly(['authorUid','raterUid','rating','updatedAt'])
+        && request.resource.data.authorUid is string
+        && request.resource.data.raterUid == request.auth.uid
+        && request.resource.data.authorUid != request.auth.uid
+        && calificacionId == request.resource.data.authorUid + '_' + request.auth.uid
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      allow delete: if false;
+    }
+
+    match /usuarios/{userId} {
+      allow read: if isSuperUser();
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['email', 'lastLogin'])
+        && request.resource.data.email == request.auth.token.email;
+      allow delete: if isSuperUser();
     }
 
     // Denegar el acceso por defecto al resto de colecciones
@@ -40,9 +69,12 @@ service cloud.firestore {
         && request.resource.data.whatsapp.matches('^[0-9]{10,15}$');
 
       // Actualizaciones/eliminaciones solo por el autor (authorUid coincide con auth.uid)
-      allow update, delete: if request.auth != null
+      allow update: if request.auth != null
         && request.auth.token.firebase.sign_in_provider != 'anonymous'
         && resource.data.authorUid == request.auth.uid;
+      allow delete: if isSuperUser() || (request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && resource.data.authorUid == request.auth.uid);
     }
 
     // OPCIÓN B - Público pero validado: permite creación desde cliente

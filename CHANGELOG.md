@@ -1,5 +1,31 @@
 # CHANGELOG
 
+<!-- cdc-session:session-20260811015758-fc3999 -->
+## Sesión 11/08/2026, 12:03 a.m.
+
+### Resumen
+
+Se cerró una sesión de trabajo del proyecto morelostrabaja. Se detectaron 7 cambio(s): 1 creado(s), 6 modificado(s) y 0 eliminado(s).
+
+### Cambios
+
+- .firebase/hosting..cache
+- firebase-debug.log
+- firestore.rules
+- index.html
+- index.html.backup
+- publicar.html
+- version.json
+
+### Riesgos
+
+- El análisis incluye archivos que ya tenían cambios al iniciar la sesión.
+- Se modificaron 1 archivo(s) de respaldo; verifica que no sustituyan a Git ni se publiquen como código activo.
+
+### Próximo paso
+
+- Revisar el diff y preparar un commit descriptivo.
+
 <!-- cdc-session:session-20260811011738-c50bda -->
 ## Sesión 10/08/2026, 07:25 p.m.
 

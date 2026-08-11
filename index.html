@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja | V2 — VERSION 36.13</title>
+    <title>Morelos Trabaja</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -231,20 +232,88 @@
         </section>
     </div>
 
-    <!-- Navegación -->
-    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 py-4 px-6">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-black text-blue-900 tracking-tighter uppercase">Morelos<span class="text-blue-500">Trabaja</span> — VERSION 36.13</h1>
-            <div class="flex items-center space-x-4">
-                <span id="session-email" class="hidden text-xs font-bold text-slate-600"></span>
-                <button id="logout-button" type="button" class="hidden text-xs font-black text-blue-800 hover:underline">SALIR</button>
+    <!-- Buscar anuncios -->
+    <div id="search-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl p-7 md:p-9 relative" aria-labelledby="search-title">
+            <button onclick="hideSearchOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar búsqueda"><i class="fas fa-times text-xl"></i></button>
+            <p class="text-xs font-black tracking-[0.25em] text-blue-600 uppercase">Buscar anuncios</p>
+            <h2 id="search-title" class="text-3xl font-black text-blue-950 mt-2">¿Qué quieres buscar?</h2>
+            <p class="text-slate-500 mt-2 mb-7">Selecciona una categoría para ver sus anuncios.</p>
+            <div id="search-category-selection" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="selectSearchCategory('empleo')" class="bg-blue-50 text-blue-800 p-4 rounded-xl font-bold hover:bg-blue-100"><i class="fas fa-briefcase text-2xl block mb-2"></i>Empleo</button>
+                <button onclick="selectSearchCategory('servicios')" class="bg-emerald-50 text-emerald-800 p-4 rounded-xl font-bold hover:bg-emerald-100"><i class="fas fa-tools text-2xl block mb-2"></i>Servicio</button>
+                <button onclick="selectSearchCategory('ventas')" class="bg-purple-50 text-purple-800 p-4 rounded-xl font-bold hover:bg-purple-100"><i class="fas fa-tag text-2xl block mb-2"></i>Venta</button>
+            </div>
+            <form id="search-criteria-form" class="hidden space-y-4">
+                <div id="search-fields"></div>
+                <button type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800"><i class="fas fa-search mr-2"></i>BUSCAR</button>
+                <button type="button" onclick="showSearchCategories()" class="w-full text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- About Us Overlay -->
+    <div id="about-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="about-title">
+            <button onclick="hideAboutOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar"><i class="fas fa-times text-xl"></i></button>
+            <h2 id="about-title" class="text-3xl font-black text-blue-950 mt-2">Acerca de Morelos Trabaja</h2>
+            <p class="text-slate-500 mt-2 mb-4">
+                Morelos Trabaja es un portal comunitario para conectar a personas que buscan empleo, ofrecen servicios o venden productos dentro del estado de Morelos. Nuestra misión es facilitar oportunidades y fortalecer la economía local.
+            </p>
+            <p class="text-slate-500 mb-4">
+                Si encuentras alguna discrepancia en una calificación o tienes alguna sugerencia, no dudes en contactarnos.
+            </p>
+            <button onclick="contactForGrading()" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 mb-4">
+                <i class="fas fa-envelope mr-2"></i> Contactar por calificaciones
+            </button>
+            <button onclick="hideAboutOverlay()" class="w-full block text-center rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
+                <i class="fas fa-newspaper mr-2"></i> Ver Artículos de Interés
+            </button>
+            <p class="text-xs text-slate-400 mt-4 text-center">Version 36.13 - Desarrollado con ❤️ en Morelos.</p>
+        </section>
+    </div>
+
+    <!-- Admin Tools Overlay -->
+    <div id="admin-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-3xl rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="admin-title">
+            <button onclick="hideAdminOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar"><i class="fas fa-times text-xl"></i></button>
+            <h2 id="admin-title" class="text-3xl font-black text-red-950 mt-2">Administrar usuarios</h2>
+            <p class="text-slate-500 mt-2 mb-5">Selecciona una o varias cuentas para eliminarlas de Authentication y borrar sus anuncios y calificaciones.</p>
+            <div class="flex flex-wrap gap-3 mb-4">
+                <button type="button" onclick="toggleAllUsers(true)" class="text-sm font-bold text-blue-700 hover:underline">Seleccionar todos</button>
+                <button type="button" onclick="toggleAllUsers(false)" class="text-sm font-bold text-slate-600 hover:underline">Limpiar selección</button>
+                <button id="delete-users-button" type="button" onclick="deleteSelectedUsers()" class="ml-auto rounded-xl bg-red-700 px-4 py-2 font-black text-white hover:bg-red-800 disabled:opacity-60">Eliminar seleccionados</button>
+            </div>
+            <div id="admin-users-list" class="space-y-2"><p class="text-slate-500">Cargando usuarios...</p></div>
+            <p id="admin-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold mt-4"></p>
+        </section>
+    </div>
+
+    <!-- Cabecera integrada en la página -->
+    <header class="hero-gradient min-h-[430px] px-6 py-6 text-white">
+        <!-- Top Bar Container -->
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8 mb-8">
+            <!-- Left: Session Info -->
+            <div class="order-2 md:order-1 text-center md:text-left min-w-0">
+                <button id="logout-button" type="button" class="hidden bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-3 rounded-xl text-xs transition-colors mb-1">SALIR</button>
+                <span id="session-email" class="hidden block truncate text-sm font-bold text-blue-100"></span>
+            </div>
+
+            <!-- Center: Title and Version -->
+            <div class="order-1 md:order-2 text-center flex-grow">
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight">Morelos Trabaja</h1>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200">Versión 36.15</p>
+            </div>
+
+            <!-- Right: Buttons -->
+            <div class="order-3 md:order-3 text-center md:text-right flex flex-col sm:flex-row items-center gap-2 md:gap-4 shrink-0">
+                <button id="about-us-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Acerca de nosotros</button>
+                <button id="articles-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Artículos de interés</button>
+                <button id="admin-tools-button" class="hidden bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Admin Tools</button>
             </div>
         </div>
-    </nav>
-
-    <!-- Cabecera Hero -->
-    <header class="hero-gradient py-24 px-6 text-center text-white">
-        <div class="max-w-3xl mx-auto">
+        <!-- Existing Hero Content (below the top bar) -->
+        <div class="max-w-3xl mx-auto pt-16 text-center">
             <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
                 El portal de empleos de Morelos.
             </h2>
@@ -253,32 +322,17 @@
             </p>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
                 <button onclick="showPublishOverlay()" class="bg-red-600 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-red-700 transition-all uppercase tracking-widest">
-                    📢 Publica Gratis
+                    <i class="fas fa-bullhorn mr-2"></i>Publicar
+                </button>
+                <button onclick="showSearchOverlay()" class="bg-white text-blue-950 px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-blue-50 transition-all uppercase tracking-widest">
+                    <i class="fas fa-search mr-2"></i>Buscar
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Botones de Categoría -->
-    <section class="max-w-5xl mx-auto -mt-14 px-6 relative z-10">
-        <div class="grid grid-cols-3 gap-4 md:gap-8">
-            <button onclick="filtrar('empleo')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-blue-500 flex flex-col items-center hover:scale-105 transition-all">
-                <span class="text-4xl mb-3">💼</span>
-                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Empleos</span>
-            </button>
-            <button onclick="filtrar('servicios')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-green-500 flex flex-col items-center hover:scale-105 transition-all">
-                <span class="text-4xl mb-3">🛠️</span>
-                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Servicios</span>
-            </button>
-            <button onclick="filtrar('ventas')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-purple-500 flex flex-col items-center hover:scale-105 transition-all">
-                <span class="text-4xl mb-3">🛍️</span>
-                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Ventas</span>
-            </button>
-        </div>
-    </section>
-
     <!-- Lista de Anuncios -->
-    <main class="max-w-2xl mx-auto p-6 mt-12" id="contenedor-anuncios">
+    <main class="max-w-6xl mx-auto p-6 mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="contenedor-anuncios">
         <!-- El contenido inicial se cargará aquí (spinner o anuncios) -->
     </main>
 
@@ -329,14 +383,20 @@
         `;
 
         const NO_ANUNCIOS_HTML = `
-            <div class="text-center py-20 text-slate-400 font-bold">No hay anuncios aquí todavía.</div>
+            <div class="text-center py-20 text-slate-400 font-bold col-span-full">No hay anuncios aquí todavía.</div>
         `;
 
         const PREVIEW_MODE_BANNER = `
-            <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700">
+            <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700 col-span-full">
                 <i class="fa fa-info-circle mr-2"></i> MODO VISTA PREVIA: Mostrando ejemplos locales.
             </div>
         `;
+
+        const SUPERUSER_EMAIL = 'cumorahnet@gmail.com';
+
+        function isSuperUser(user = firebase.auth().currentUser) {
+            return Boolean(user && user.emailVerified && String(user.email || '').toLowerCase() === SUPERUSER_EMAIL);
+        }
 
         function initializeFirebase() {
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -381,6 +441,7 @@
             const message = document.getElementById('auth-message');
             const sessionEmail = document.getElementById('session-email');
             const logoutButton = document.getElementById('logout-button');
+            const adminToolsButton = document.getElementById('admin-tools-button'); // Added reference
             let isRegistering = true;
             let loading = false;
 
@@ -516,7 +577,19 @@
                     sessionEmail.textContent = registeredUser ? registeredUser.email : '';
                     sessionEmail.classList.toggle('hidden', !registeredUser);
                     logoutButton.classList.toggle('hidden', !registeredUser);
+
+                    const isAdmin = isSuperUser(registeredUser);
+                    adminToolsButton.classList.toggle('hidden', !isAdmin);
+
+                    if (registeredUser) {
+                        firebase.firestore().collection('usuarios').doc(registeredUser.uid).set({
+                            email: registeredUser.email || '',
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true }).catch(error => console.warn('No fue posible registrar el perfil:', error.code || error));
+                    }
+
                     if (!registeredUser) emailInput.focus();
+                    else filtrar(activeCategory, activeCriteria);
                 },
                 error => {
                     console.error('Firebase Auth observer:', error.code, error);
@@ -546,7 +619,65 @@
             return /^\d{10,15}$/.test(digits) ? digits : '';
         }
 
-        function renderAnuncioCard(data) {
+        let activeCategory = null;
+        let activeCriteria = {};
+
+        function renderRating(authorUid, ratingInfo = {}) {
+            const average = Number(ratingInfo.average || 0);
+            const count = Number(ratingInfo.count || 0);
+            const ownRating = Number(ratingInfo.ownRating || 0);
+            const currentUid = firebase.apps.length && firebase.auth().currentUser?.uid;
+            const canRate = authorUid && currentUid && authorUid !== currentUid;
+            const encodedAuthor = encodeURIComponent(authorUid || '');
+            const stars = [1, 2, 3, 4, 5].map(value => {
+                const selected = value <= (ownRating || Math.round(average));
+                const color = selected ? 'text-amber-400' : 'text-slate-300';
+                return `<button type="button" ${canRate ? '' : 'disabled'} onclick="rateUser(decodeURIComponent('${encodedAuthor}'), ${value})" class="${color} text-xl leading-none disabled:cursor-default hover:text-amber-400" aria-label="Calificar con ${value} estrella${value === 1 ? '' : 's'}">★</button>`;
+            }).join('');
+            const summary = count ? `${average.toFixed(1)} de 5 · ${count} calificación${count === 1 ? '' : 'es'}` : 'Sin calificaciones';
+            return `<div class="mt-4" aria-label="Calificación del anunciante"><p class="text-xs font-bold text-slate-600 mb-1">Califica tu contacto</p><div class="flex gap-0.5">${stars}</div><p class="text-xs text-slate-500 mt-1">${summary}</p></div>`;
+        }
+
+        async function loadRatings(authorUids) {
+            const ratings = {};
+            const currentUid = firebase.auth().currentUser?.uid;
+            await Promise.all([...new Set(authorUids.filter(Boolean))].map(async authorUid => {
+                try {
+                    const snapshot = await firebase.firestore().collection('calificaciones').where('authorUid', '==', authorUid).get();
+                    let total = 0;
+                    let ownRating = 0;
+                    snapshot.forEach(doc => {
+                        const item = doc.data();
+                        total += Number(item.rating || 0);
+                        if (item.raterUid === currentUid) ownRating = Number(item.rating || 0);
+                    });
+                    ratings[authorUid] = { average: snapshot.size ? total / snapshot.size : 0, count: snapshot.size, ownRating };
+                } catch (error) {
+                    console.warn('No fue posible cargar calificaciones:', error.code || error);
+                }
+            }));
+            return ratings;
+        }
+
+        async function rateUser(authorUid, rating) {
+            const currentUser = firebase.auth().currentUser;
+            if (!currentUser || !authorUid || currentUser.uid === authorUid || rating < 1 || rating > 5) return;
+            try {
+                const ratingId = `${authorUid}_${currentUser.uid}`;
+                await firebase.firestore().collection('calificaciones').doc(ratingId).set({
+                    authorUid,
+                    raterUid: currentUser.uid,
+                    rating: Number(rating),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                await filtrar(activeCategory, activeCriteria);
+            } catch (error) {
+                console.error('Error al calificar:', error);
+                alert(GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible guardar tu calificación.');
+            }
+        }
+
+        function renderAnuncioCard(data, ratingInfo = {}) {
             const category = String(data.categoria || 'default').toLowerCase();
             const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
             const whatsapp = normalizeWhatsapp(data.whatsapp);
@@ -560,37 +691,40 @@
             const precio = data.precio ? `$${Number(data.precio).toLocaleString('es-MX')}` : '';
             const condicion = escapeHtml(data.condicion || '');
             const tipoProducto = escapeHtml(data.tipo_producto || '');
+            const adminDeleteButton = isSuperUser() && data.id ? `<button type="button" onclick="deleteAd('${encodeURIComponent(data.id)}')" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-black text-red-700 hover:bg-red-100"><i class="fas fa-trash mr-1"></i>ELIMINAR ANUNCIO</button>` : '';
 
             let specificFieldsHtml = '';
 
             if (category === 'empleo') {
-                if (empresa) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Empresa:</strong> ${empresa}</p>`;
-                if (tipoEmpleo) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Tipo:</strong> ${tipoEmpleo}</p>`;
-                if (areaTrabajo) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Área:</strong> ${areaTrabajo}</p>`;
-                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Zona:</strong> ${zona}</p>`;
+                if (empresa) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Empresa:</strong> ${empresa}</p>`;
+                if (tipoEmpleo) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Tipo:</strong> ${tipoEmpleo}</p>`;
+                if (areaTrabajo) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Área:</strong> ${areaTrabajo}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Zona:</strong> ${zona}</p>`;
             } else if (category === 'servicios') {
-                if (tipoServicio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Tipo:</strong> ${tipoServicio}</p>`;
-                if (experienciaServicio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Experiencia:</strong> ${experienciaServicio}</p>`;
-                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Zona de Servicio:</strong> ${zona}</p>`;
+                if (tipoServicio) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Tipo:</strong> ${tipoServicio}</p>`;
+                if (experienciaServicio) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Experiencia:</strong> ${experienciaServicio}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Zona de Servicio:</strong> ${zona}</p>`;
             } else if (category === 'ventas') {
-                if (precio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Precio:</strong> ${precio}</p>`;
-                if (condicion) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Condición:</strong> ${condicion}</p>`;
-                if (tipoProducto) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Producto:</strong> ${tipoProducto}</p>`;
-                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Ubicación:</strong> ${zona}</p>`;
+                if (precio) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Precio:</strong> ${precio}</p>`;
+                if (condicion) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Condición:</strong> ${condicion}</p>`;
+                if (tipoProducto) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Producto:</strong> ${tipoProducto}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Ubicación:</strong> ${zona}</p>`;
             }
 
             const contactLink = whatsapp ? `
-                    <a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
-                        <i class="fab fa-whatsapp text-2xl" aria-hidden="true"></i>
+                    <a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="bg-green-500 text-white p-3 rounded-xl shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 flex items-center justify-center">
+                        <i class="fab fa-whatsapp text-xl" aria-hidden="true"></i>
                     </a>` : '';
 
             return `
-                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center border-l-[6px] ${style.borderColorClass}">
-                    <div>
+                <div class="card-anuncio bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between gap-4 border-l-[6px] ${style.borderColorClass}">
+                    <div class="min-w-0 flex-grow">
                         <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${escapeHtml(category)}</span>
-                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
-                        <p class="text-slate-500 mt-2">${escapeHtml(data.descripcion)}</p>
+                        <h3 class="text-xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
+                        <p class="text-slate-500 text-sm mt-2">${escapeHtml(data.descripcion)}</p>
                         ${specificFieldsHtml}
+                        ${renderRating(data.authorUid, ratingInfo)}
+                        ${adminDeleteButton}
                     </div>
                     ${contactLink}
                 </div>
@@ -598,7 +732,7 @@
         }
 
         // Función para mostrar anuncios de ejemplo si falla la conexión o Firebase no está disponible.
-        function mostrarEjemplos() {
+        function mostrarEjemplos(cat = null, criteria = {}) {
             const cont = document.getElementById('contenedor-anuncios');
             cont.innerHTML = PREVIEW_MODE_BANNER; // Muestra el banner de modo vista previa
 
@@ -632,10 +766,39 @@
                     condicion: 'Usado - Excelente',
                     tipo_producto: 'Deportes',
                     zona: 'Cuernavaca'
+                },
+                {
+                    categoria: 'empleo',
+                    titulo: 'Mesero/a con experiencia',
+                    descripcion: 'Restaurante de comida italiana busca mesero con al menos 2 años de experiencia. Buen ambiente laboral y propinas.',
+                    whatsapp: '5217775551234',
+                    empresa: 'Trattoria del Sole',
+                    tipo_empleo: 'Permanente',
+                    area_trabajo: 'Alimentos y Bebidas',
+                    zona: 'Cuernavaca, Centro'
+                },
+                {
+                    categoria: 'servicios',
+                    titulo: 'Clases de Guitarra Acústica',
+                    descripcion: 'Clases particulares de guitarra para principiantes e intermedios. Aprende tus canciones favoritas.',
+                    whatsapp: '5217778889900',
+                    tipo_servicio: 'Clases Particulares',
+                    experiencia_servicio: 'Maestro con 10 años de experiencia',
+                    zona: 'Jiutepec y alrededores'
+                },
+                {
+                    categoria: 'ventas',
+                    titulo: 'Consola de Videojuegos Xbox One S',
+                    descripcion: 'Consola en perfecto estado, incluye dos controles y 5 juegos. Precio negociable.',
+                    whatsapp: '5217771112223',
+                    precio: 3500,
+                    condicion: 'Usado - Bueno',
+                    tipo_producto: 'Electrónica',
+                    zona: 'Temixco'
                 }
             ];
 
-            ejemplos.forEach(ejemplo => {
+            ejemplos.filter(ejemplo => (!cat || ejemplo.categoria === cat) && matchesCriteria(ejemplo, criteria)).forEach(ejemplo => {
                 cont.innerHTML += renderAnuncioCard(ejemplo);
             });
         }
@@ -644,13 +807,31 @@
          * Filtra y muestra anuncios de Firebase Firestore o ejemplos locales.
          * @param {string|null} cat - Categoría para filtrar (empleo, servicios, ventas) o null para todas.
          */
-        async function filtrar(cat = null) {
+        function normalizeSearchValue(value) {
+            return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        function matchesCriteria(anuncio, criteria) {
+            return Object.entries(criteria).every(([field, expected]) => {
+                if (!expected) return true;
+                if (field === '_keyword') {
+                    const searchable = [anuncio.titulo, anuncio.descripcion, anuncio.area_trabajo, anuncio.tipo_servicio, anuncio.tipo_producto].map(normalizeSearchValue).join(' ');
+                    return searchable.includes(normalizeSearchValue(expected));
+                }
+                const actual = normalizeSearchValue(anuncio[field]);
+                return actual.includes(normalizeSearchValue(expected));
+            });
+        }
+
+        async function filtrar(cat = null, criteria = {}) {
+            activeCategory = cat;
+            activeCriteria = criteria;
             const cont = document.getElementById('contenedor-anuncios');
             cont.innerHTML = LOADING_SPINNER_HTML; // Muestra el spinner de carga
 
             // Verifica si Firebase está cargado, si no, muestra ejemplos.
             if (typeof firebase === 'undefined' || typeof firebase.firestore === 'undefined') {
-                mostrarEjemplos();
+                mostrarEjemplos(cat, criteria);
                 return;
             }
 
@@ -672,18 +853,24 @@
                     return;
                 }
 
-                const anuncios = snapshot.docs.map(doc => doc.data()).sort((a, b) => {
+                const anuncios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(data => matchesCriteria(data, criteria)).sort((a, b) => {
                     const fechaA = a.fecha?.toMillis?.() ?? 0;
                     const fechaB = b.fecha?.toMillis?.() ?? 0;
                     return fechaB - fechaA;
                 });
 
+                if (!anuncios.length) {
+                    cont.innerHTML = NO_ANUNCIOS_HTML;
+                    return;
+                }
+
+                const ratings = await loadRatings(anuncios.map(data => data.authorUid));
                 anuncios.forEach(data => {
-                    cont.innerHTML += renderAnuncioCard(data);
+                    cont.innerHTML += renderAnuncioCard(data, ratings[data.authorUid] || {});
                 });
             } catch (error) {
                 console.error("Error al cargar anuncios de Firebase:", error);
-                mostrarEjemplos(); // En caso de error, muestra los ejemplos
+                mostrarEjemplos(cat, criteria); // En caso de error, muestra los ejemplos
             }
         }
 
@@ -695,6 +882,68 @@
         const publishFormsContainer = document.getElementById('publish-forms-container');
         const publishTitle = document.getElementById('publish-title');
         const publishSubtitle = document.getElementById('publish-subtitle');
+        const searchOverlay = document.getElementById('search-overlay');
+        const searchCategorySelection = document.getElementById('search-category-selection');
+        const searchCriteriaForm = document.getElementById('search-criteria-form');
+        const searchFields = document.getElementById('search-fields');
+        let selectedSearchCategory = null;
+
+        function searchInput(label, name, placeholder) {
+            return `<label class="block text-sm font-bold text-slate-700 mb-4">${label}<input name="${name}" type="text" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="${placeholder}"></label>`;
+        }
+
+        function searchSelect(label, name, sourceId) {
+            const options = document.getElementById(sourceId).innerHTML;
+            return `<label class="block text-sm font-bold text-slate-700 mb-4">${label}<select name="${name}" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">${options}</select></label>`;
+        }
+
+        function showSearchOverlay() {
+            searchOverlay.classList.remove('hidden');
+            showSearchCategories();
+        }
+
+        function hideSearchOverlay() {
+            searchOverlay.classList.add('hidden');
+        }
+
+        function showSearchCategories() {
+            selectedSearchCategory = null;
+            searchCategorySelection.classList.remove('hidden');
+            searchCriteriaForm.classList.add('hidden');
+            document.getElementById('search-title').textContent = '¿Qué quieres buscar?';
+        }
+
+        function selectSearchCategory(category) {
+            selectedSearchCategory = category;
+            searchCategorySelection.classList.add('hidden');
+            searchCriteriaForm.classList.remove('hidden');
+            const labels = { empleo: 'Buscar empleos', servicios: 'Buscar servicios', ventas: 'Buscar productos' };
+            document.getElementById('search-title').textContent = labels[category];
+
+            let fields = searchInput('Palabra clave', '_keyword', category === 'empleo' ? 'Ej: jardinero, cocinero' : category === 'servicios' ? 'Ej: jardinería, plomería' : 'Ej: juguetes, muebles');
+            if (category === 'empleo') {
+                fields += searchSelect('Tipo de empleo', 'tipo_empleo', 'empleo-tipo-empleo');
+                fields += searchSelect('Área de trabajo', 'area_trabajo', 'empleo-area-trabajo');
+                fields += searchInput('Zona de trabajo', 'zona', 'Ej: Cuernavaca');
+            } else if (category === 'servicios') {
+                fields += searchSelect('Tipo de servicio', 'tipo_servicio', 'servicios-tipo-servicio');
+                fields += searchInput('Zona de servicio', 'zona', 'Ej: Cuautla');
+            } else {
+                fields += searchInput('Tipo de producto', 'tipo_producto', 'Ej: Juguetes, electrónica, ropa');
+                fields += searchSelect('Condición', 'condicion', 'ventas-condicion');
+                fields += searchInput('Ubicación', 'zona', 'Ej: Jiutepec');
+            }
+            searchFields.innerHTML = fields;
+        }
+
+        searchCriteriaForm.addEventListener('submit', event => {
+            event.preventDefault();
+            if (!selectedSearchCategory) return;
+            const criteria = Object.fromEntries([...new FormData(searchCriteriaForm).entries()].filter(([, value]) => String(value).trim()));
+            hideSearchOverlay();
+            filtrar(selectedSearchCategory, criteria);
+            document.getElementById('contenedor-anuncios').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
 
         function showPublishOverlay() {
             publishOverlay.classList.remove('hidden');
@@ -821,10 +1070,116 @@
         document.getElementById('form-ventas').addEventListener('submit', (e) => submitPublishForm(e, 'ventas'));
 
 
+        // --- New Overlay Functions ---
+        function showAboutOverlay() {
+            document.getElementById('about-overlay').classList.remove('hidden');
+        }
+
+        function hideAboutOverlay() {
+            document.getElementById('about-overlay').classList.add('hidden');
+        }
+
+        function showAdminOverlay() {
+            if (!isSuperUser()) return;
+            document.getElementById('admin-overlay').classList.remove('hidden');
+            document.getElementById('admin-message').classList.add('hidden');
+            loadAdminUsers();
+        }
+
+        function hideAdminOverlay() {
+            document.getElementById('admin-overlay').classList.add('hidden');
+        }
+
+        function contactForGrading() {
+            // Reemplaza con la dirección de correo electrónico real
+            window.location.href = 'mailto:equipo.morelostrabaja@example.com?subject=Discrepancia%20en%20Calificación%20o%20Sugerencia&body=Hola%2C%0D%0A%0D%0Escribo%20para...';
+        }
+
+        // --- Administración segura ---
+        function adminMessage(text, type = 'error') {
+            const element = document.getElementById('admin-message');
+            element.textContent = text;
+            element.className = `rounded-xl px-4 py-3 text-sm font-bold mt-4 ${type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`;
+        }
+
+        function getAdminErrorMessage(error) {
+            const code = String(error?.code || '');
+            if (code.includes('not-found') || code.includes('unavailable')) {
+                return 'El servicio administrativo no está disponible temporalmente. Intenta nuevamente en unos minutos.';
+            }
+            if (code.includes('internal')) {
+                return 'El servidor encontró un error al procesar los usuarios. Intenta nuevamente; si continúa, revisa los registros de Functions.';
+            }
+            if (code.includes('permission-denied') || code.includes('unauthenticated')) {
+                return 'Acceso denegado. Inicia sesión con cumorahnet@gmail.com y verifica el correo.';
+            }
+            return error?.message || 'No fue posible completar la operación administrativa.';
+        }
+
+        async function loadAdminUsers() {
+            const list = document.getElementById('admin-users-list');
+            list.innerHTML = '<p class="text-slate-500">Cargando usuarios...</p>';
+            try {
+                const result = await firebase.app().functions().httpsCallable('adminListUsers')();
+                const users = result.data.users || [];
+                list.innerHTML = users.length ? users.map(user => {
+                    const isAdminAccount = String(user.email || '').toLowerCase() === SUPERUSER_EMAIL;
+                    return `<label class="flex items-center gap-3 rounded-xl border border-slate-200 p-3 ${isAdminAccount ? 'bg-amber-50' : ''}"><input class="admin-user-checkbox h-5 w-5" type="checkbox" value="${escapeHtml(user.uid)}" ${isAdminAccount ? 'disabled' : ''}><span class="min-w-0"><strong class="block truncate text-slate-800">${escapeHtml(user.email || 'Sin correo')}</strong><small class="text-slate-500">${user.disabled ? 'Cuenta deshabilitada' : 'Cuenta activa'}</small></span>${isAdminAccount ? '<span class="ml-auto text-xs font-black text-amber-700">SUPERUSUARIO</span>' : ''}</label>`;
+                }).join('') : '<p class="text-slate-500">No hay usuarios registrados.</p>';
+            } catch (error) {
+                console.error('Error al listar usuarios:', error);
+                list.innerHTML = '<p class="text-red-700">No fue posible cargar los usuarios.</p>';
+                adminMessage(getAdminErrorMessage(error));
+            }
+        }
+
+        function toggleAllUsers(checked) {
+            document.querySelectorAll('.admin-user-checkbox:not(:disabled)').forEach(input => { input.checked = checked; });
+        }
+
+        async function deleteSelectedUsers() {
+            const uids = [...document.querySelectorAll('.admin-user-checkbox:checked')].map(input => input.value);
+            if (!uids.length) return adminMessage('Selecciona al menos un usuario.');
+            if (!confirm(`¿Eliminar permanentemente ${uids.length} usuario(s), sus anuncios y calificaciones?`)) return;
+            const button = document.getElementById('delete-users-button');
+            button.disabled = true;
+            try {
+                const result = await firebase.app().functions().httpsCallable('adminDeleteUsers')({ uids });
+                const failedText = result.data.failed ? ` ${result.data.failed} no pudieron eliminarse.` : '';
+                adminMessage(`Se eliminaron ${result.data.deleted} usuario(s).${failedText}`, result.data.failed ? 'error' : 'success');
+                await loadAdminUsers();
+                await filtrar(activeCategory, activeCriteria);
+            } catch (error) {
+                console.error('Error al eliminar usuarios:', error);
+                adminMessage(getAdminErrorMessage(error));
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function deleteAd(encodedId) {
+            if (!isSuperUser() || !confirm('¿Eliminar este anuncio permanentemente?')) return;
+            try {
+                await firebase.firestore().collection('anuncios').doc(decodeURIComponent(encodedId)).delete();
+                await filtrar(activeCategory, activeCriteria);
+            } catch (error) {
+                console.error('Error al eliminar anuncio:', error);
+                alert('No fue posible eliminar el anuncio.');
+            }
+        }
+
+
         // --- Event Listeners ---
         window.addEventListener('load', () => {
             setupAuthentication();
             filtrar();
+            // Assign event listeners for new header buttons
+            document.getElementById('about-us-button').addEventListener('click', showAboutOverlay);
+            document.getElementById('articles-button').addEventListener('click', () => {
+                // For now, articles button also opens the about overlay, can be changed later
+                showAboutOverlay();
+            });
+            document.getElementById('admin-tools-button').addEventListener('click', showAdminOverlay);
         }); // Carga autenticación y anuncios al iniciar la página
     </script>
 </body>

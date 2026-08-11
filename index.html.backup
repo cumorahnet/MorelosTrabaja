@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja | V2</title>
+    <title>Morelos Trabaja VERSION 36.14</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -52,6 +52,12 @@
                     <p id="auth-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
                     <button id="auth-submit" type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">CREAR CUENTA</button>
                 </form>
+                <div class="my-5 flex items-center gap-3 text-xs font-bold text-slate-400">
+                    <span class="h-px flex-1 bg-slate-200"></span>O CONTINÚA CON<span class="h-px flex-1 bg-slate-200"></span>
+                </div>
+                <button id="google-login" type="button" class="w-full rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
+                    <i class="fab fa-google mr-2 text-red-500" aria-hidden="true"></i> GOOGLE
+                </button>
                 <div class="mt-5 flex flex-col items-center gap-3 text-sm">
                     <button id="auth-reset" type="button" class="font-bold text-blue-700 hover:underline disabled:opacity-60">Olvidé mi contraseña</button>
                     <button id="auth-toggle" type="button" class="text-slate-600 disabled:opacity-60">Ya tengo cuenta. <span class="font-black text-blue-700">Iniciar sesión</span></button>
@@ -60,25 +66,252 @@
         </section>
     </div>
 
-    <!-- Navegación -->
-    <nav class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 py-4 px-6">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-black text-blue-900 tracking-tighter uppercase">
-                Morelos<span class="text-blue-500">Trabaja</span>
-            </h1>
-            <div class="flex items-center space-x-4">
-                <span id="session-email" class="hidden text-xs font-bold text-slate-600"></span>
-                <button id="logout-button" type="button" class="hidden text-xs font-black text-blue-800 hover:underline">SALIR</button>
-                <a href="publicar.html" class="bg-red-600 text-white px-5 py-2 rounded-full font-black text-xs shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest">
-                    📢 Publicar Gratis
-                </a>
+    <!-- Nuevo Overlay para Publicar Anuncios -->
+    <div id="publish-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="publish-title">
+            <button onclick="hidePublishOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <p class="text-xs font-black tracking-[0.25em] text-red-600 uppercase">Publicar Anuncio</p>
+            <h2 id="publish-title" class="text-3xl font-black text-blue-950 mt-2">¿Qué quieres publicar?</h2>
+            <p id="publish-subtitle" class="text-slate-500 mt-2 mb-7">Selecciona la categoría de tu anuncio.</p>
+
+            <div id="category-selection" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <button onclick="showSpecificPublishForm('empleo')" class="bg-blue-50 text-blue-800 p-4 rounded-xl font-bold flex flex-col items-center hover:bg-blue-100 transition-all">
+                    <span class="text-3xl mb-2">💼</span>Empleo
+                </button>
+                <button onclick="showSpecificPublishForm('servicios')" class="bg-emerald-50 text-emerald-800 p-4 rounded-xl font-bold flex flex-col items-center hover:bg-emerald-100 transition-all">
+                    <span class="text-3xl mb-2">🛠️</span>Servicio
+                </button>
+                <button onclick="showSpecificPublishForm('ventas')" class="bg-purple-50 text-purple-800 p-4 rounded-xl font-bold flex flex-col items-center hover:bg-purple-100 transition-all">
+                    <span class="text-3xl mb-2">🛍️</span>Venta
+                </button>
+            </div>
+
+            <div id="publish-forms-container">
+                <!-- Empleo Form -->
+                <form id="form-empleo" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-black text-blue-950 mt-2">Publicar Empleo</h3>
+                    <p class="text-slate-500 mb-4">Ingresa los detalles del puesto que ofreces.</p>
+                    <label class="block text-sm font-bold text-slate-700">Título del Anuncio
+                        <input type="text" id="empleo-titulo" required minlength="4" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Chef para restaurante">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Descripción del Puesto
+                        <textarea id="empleo-descripcion" required minlength="10" maxlength="500" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Funciones, requisitos, beneficios..."></textarea>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">WhatsApp de Contacto (10-15 dígitos)
+                        <input type="tel" id="empleo-whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 5217771234567">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Zona de Trabajo
+                        <input type="text" id="empleo-zona" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Cuernavaca, Centro / Home Office">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Nombre de la Empresa (opcional)
+                        <input type="text" id="empleo-empresa" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Restaurante El Sabor">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Tipo de Empleo
+                        <select id="empleo-tipo-empleo" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecciona</option>
+                            <option value="permanente">Permanente</option>
+                            <option value="temporal">Temporal</option>
+                            <option value="por_contrato">Por Contrato</option>
+                            <option value="por_proyecto">Por Proyecto</option>
+                            <option value="freelance">Freelance</option>
+                            <option value="temporada">Temporada</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Área de Trabajo
+                        <select id="empleo-area-trabajo" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecciona</option>
+                            <option value="administracion">Administración</option>
+                            <option value="alimentos_bebidas">Alimentos y Bebidas</option>
+                            <option value="automotriz">Automotriz</option>
+                            <option value="contabilidad_finanzas">Contabilidad / Finanzas</option>
+                            <option value="construccion">Construcción</option>
+                            <option value="diseno">Diseño</option>
+                            <option value="educacion">Educación</option>
+                            <option value="informatica_it">Informática / IT</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="legal">Legal</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="manufactura">Manufactura</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="medicina_salud">Medicina / Salud</option>
+                            <option value="recursos_humanos">Recursos Humanos</option>
+                            <option value="restauracion">Restauración</option>
+                            <option value="servicio_cliente">Servicio al Cliente</option>
+                            <option value="ventas">Ventas</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </label>
+                    <p id="empleo-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+                    <button type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">PUBLICAR EMPLEO</button>
+                    <button type="button" onclick="showCategorySelection()" class="w-full mt-2 text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
+                </form>
+
+                <!-- Servicio Form -->
+                <form id="form-servicios" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-black text-emerald-950 mt-2">Publicar Servicio</h3>
+                    <p class="text-slate-500 mb-4">Ingresa los detalles del servicio que ofreces.</p>
+                    <label class="block text-sm font-bold text-slate-700">Título del Servicio
+                        <input type="text" id="servicios-titulo" required minlength="4" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ej: Plomero a domicilio 24/7">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Descripción del Servicio
+                        <textarea id="servicios-descripcion" required minlength="10" maxlength="500" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" rows="3" placeholder="Detalles de tu servicio, tarifas aproximadas, horarios..."></textarea>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">WhatsApp de Contacto (10-15 dígitos)
+                        <input type="tel" id="servicios-whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ej: 5217771234567">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Zona de Servicio
+                        <input type="text" id="servicios-zona" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ej: Cuautla y alrededores">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Tipo de Servicio
+                        <select id="servicios-tipo-servicio" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="">Selecciona</option>
+                            <option value="albanileria">Albañilería</option>
+                            <option value="carpinteria">Carpintería</option>
+                            <option value="clases_particulares">Clases Particulares</option>
+                            <option value="contaduria">Contaduría</option>
+                            <option value="diseno_grafico">Diseño Gráfico</option>
+                            <option value="electricidad">Electricidad</option>
+                            <option value="eventos">Eventos (Organización/Servicio)</option>
+                            <option value="jardineria">Jardinería</option>
+                            <option value="limpieza">Limpieza</option>
+                            <option value="mantenimiento">Mantenimiento (General)</option>
+                            <option value="plomeria">Plomería</option>
+                            <option value="reparacion_electronica">Reparación Electrónica</option>
+                            <option value="taxi_transporte">Taxi / Transporte</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Experiencia / Calificaciones (opcional)
+                        <textarea id="servicios-experiencia" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" rows="2" placeholder="Ej: 10 años de experiencia, certificaciones..."></textarea>
+                    </label>
+                    <p id="servicios-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+                    <button type="submit" class="w-full rounded-xl bg-green-700 py-3.5 font-black text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60">PUBLICAR SERVICIO</button>
+                    <button type="button" onclick="showCategorySelection()" class="w-full mt-2 text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
+                </form>
+
+                <!-- Venta Form -->
+                <form id="form-ventas" class="space-y-4 hidden">
+                    <h3 class="text-2xl font-black text-purple-950 mt-2">Publicar Venta</h3>
+                    <p class="text-slate-500 mb-4">Ingresa los detalles del artículo que deseas vender.</p>
+                    <label class="block text-sm font-bold text-slate-700">Título del Artículo
+                        <input type="text" id="ventas-titulo" required minlength="4" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: Bicicleta de montaña Rodada 29">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Descripción del Artículo
+                        <textarea id="ventas-descripcion" required minlength="10" maxlength="500" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" placeholder="Características, estado, detalles, motivos de venta..."></textarea>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">WhatsApp de Contacto (10-15 dígitos)
+                        <input type="tel" id="ventas-whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: 5217771234567">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Ubicación del Producto
+                        <input type="text" id="ventas-zona" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: Jiutepec, Colonia Zapata">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Precio ($ MXN)
+                        <input type="number" id="ventas-precio" required min="0" step="any" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: 1500">
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Condición
+                        <select id="ventas-condicion" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="">Selecciona</option>
+                            <option value="nuevo">Nuevo</option>
+                            <option value="usado_excelente">Usado - Excelente</option>
+                            <option value="usado_bueno">Usado - Bueno</option>
+                            <option value="usado_aceptable">Usado - Aceptable</option>
+                            <option value="para_partes">Para Partes</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-bold text-slate-700">Tipo de Producto
+                        <input type="text" id="ventas-tipo-producto" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: Electrónica, Muebles, Ropa, Vehículos, Servicios">
+                    </label>
+                    <p id="ventas-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+                    <button type="submit" class="w-full rounded-xl bg-purple-700 py-3.5 font-black text-white hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-60">PUBLICAR VENTA</button>
+                    <button type="button" onclick="showCategorySelection()" class="w-full mt-2 text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Buscar anuncios -->
+    <div id="search-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl p-7 md:p-9 relative" aria-labelledby="search-title">
+            <button onclick="hideSearchOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar búsqueda"><i class="fas fa-times text-xl"></i></button>
+            <p class="text-xs font-black tracking-[0.25em] text-blue-600 uppercase">Buscar anuncios</p>
+            <h2 id="search-title" class="text-3xl font-black text-blue-950 mt-2">¿Qué quieres buscar?</h2>
+            <p class="text-slate-500 mt-2 mb-7">Selecciona una categoría para ver sus anuncios.</p>
+            <div id="search-category-selection" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="selectSearchCategory('empleo')" class="bg-blue-50 text-blue-800 p-4 rounded-xl font-bold hover:bg-blue-100"><i class="fas fa-briefcase text-2xl block mb-2"></i>Empleo</button>
+                <button onclick="selectSearchCategory('servicios')" class="bg-emerald-50 text-emerald-800 p-4 rounded-xl font-bold hover:bg-emerald-100"><i class="fas fa-tools text-2xl block mb-2"></i>Servicio</button>
+                <button onclick="selectSearchCategory('ventas')" class="bg-purple-50 text-purple-800 p-4 rounded-xl font-bold hover:bg-purple-100"><i class="fas fa-tag text-2xl block mb-2"></i>Venta</button>
+            </div>
+            <form id="search-criteria-form" class="hidden space-y-4">
+                <div id="search-fields"></div>
+                <button type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800"><i class="fas fa-search mr-2"></i>BUSCAR</button>
+                <button type="button" onclick="showSearchCategories()" class="w-full text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- About Us Overlay -->
+    <div id="about-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="about-title">
+            <button onclick="hideAboutOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar"><i class="fas fa-times text-xl"></i></button>
+            <h2 id="about-title" class="text-3xl font-black text-blue-950 mt-2">Acerca de Morelos Trabaja</h2>
+            <p class="text-slate-500 mt-2 mb-4">
+                Morelos Trabaja es un portal comunitario para conectar a personas que buscan empleo, ofrecen servicios o venden productos dentro del estado de Morelos. Nuestra misión es facilitar oportunidades y fortalecer la economía local.
+            </p>
+            <p class="text-slate-500 mb-4">
+                Si encuentras alguna discrepancia en una calificación o tienes alguna sugerencia, no dudes en contactarnos.
+            </p>
+            <button onclick="contactForGrading()" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 mb-4">
+                <i class="fas fa-envelope mr-2"></i> Contactar por calificaciones
+            </button>
+            <button onclick="hideAboutOverlay()" class="w-full block text-center rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
+                <i class="fas fa-newspaper mr-2"></i> Ver Artículos de Interés
+            </button>
+            <p class="text-xs text-slate-400 mt-4 text-center">Version 36.13 - Desarrollado con ❤️ en Morelos.</p>
+        </section>
+    </div>
+
+    <!-- Admin Tools Overlay -->
+    <div id="admin-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="admin-title">
+            <button onclick="hideAdminOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar"><i class="fas fa-times text-xl"></i></button>
+            <h2 id="admin-title" class="text-3xl font-black text-red-950 mt-2">Herramientas de Administrador</h2>
+            <p class="text-slate-500 mt-2 mb-7">
+                <strong>¡ATENCIÓN!</strong> Estas acciones son permanentes y solo deben usarse durante la fase de prueba.
+            </p>
+            <button onclick="deleteAllTestData()" class="w-full rounded-xl bg-red-700 py-3.5 font-black text-white hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60">
+                <i class="fas fa-exclamation-triangle mr-2"></i> Borrar TODAS las bases de datos de prueba
+            </button>
+            <p id="admin-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold mt-4"></p>
+        </section>
+    </div>
+
+    <!-- Cabecera integrada en la página -->
+    <header class="hero-gradient min-h-[430px] px-6 py-6 text-white">
+        <!-- Top Bar Container -->
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8 mb-8">
+            <!-- Left: Session Info -->
+            <div class="order-2 md:order-1 text-center md:text-left min-w-0">
+                <span id="session-email" class="hidden block truncate text-sm font-bold text-blue-100"></span>
+                <button id="logout-button" type="button" class="hidden mt-1 text-[10px] font-black text-white/80 hover:underline">SALIR</button>
+            </div>
+
+            <!-- Center: Title and Version -->
+            <div class="order-1 md:order-2 text-center flex-grow">
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight">Morelos Trabaja — VERSION 36.14</h1>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200">Versión 36.13</p>
+            </div>
+
+            <!-- Right: Buttons -->
+            <div class="order-3 md:order-3 text-center md:text-right flex flex-col sm:flex-row items-center gap-2 md:gap-4 shrink-0">
+                <button id="about-us-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Acerca de nosotros</button>
+                <button id="articles-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Artículos de interés</button>
+                <button id="admin-tools-button" class="hidden bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Admin Tools</button>
             </div>
         </div>
-    </nav>
-
-    <!-- Cabecera Hero -->
-    <header class="hero-gradient py-24 px-6 text-center text-white">
-        <div class="max-w-3xl mx-auto">
+        <!-- Existing Hero Content (below the top bar) -->
+        <div class="max-w-3xl mx-auto pt-16 text-center">
             <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
                 El portal de empleos de Morelos.
             </h2>
@@ -86,33 +319,18 @@
                 "Oportunidades reales para Yautepec, Cuautla y todo el estado."
             </p>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <a href="publicar.html" class="bg-white text-blue-900 px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-blue-50 transition-all">
-                    COMENZAR AHORA
-                </a>
+                <button onclick="showPublishOverlay()" class="bg-red-600 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-red-700 transition-all uppercase tracking-widest">
+                    <i class="fas fa-bullhorn mr-2"></i>Publicar
+                </button>
+                <button onclick="showSearchOverlay()" class="bg-white text-blue-950 px-10 py-4 rounded-2xl font-black text-lg shadow-2xl hover:bg-blue-50 transition-all uppercase tracking-widest">
+                    <i class="fas fa-search mr-2"></i>Buscar
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Botones de Categoría -->
-    <section class="max-w-5xl mx-auto -mt-14 px-6 relative z-10">
-        <div class="grid grid-cols-3 gap-4 md:gap-8">
-            <button onclick="filtrar('empleo')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-blue-500 flex flex-col items-center hover:scale-105 transition-all">
-                <span class="text-4xl mb-3">💼</span>
-                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Empleos</span>
-            </button>
-            <button onclick="filtrar('servicios')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-green-500 flex flex-col items-center hover:scale-105 transition-all">
-                <span class="text-4xl mb-3">🛠️</span>
-                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Servicios</span>
-            </button>
-            <button onclick="filtrar('ventas')" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl border-b-8 border-purple-500 flex flex-col items-center hover:scale-105 transition-all">
-                <span class="text-4xl mb-3">🛍️</span>
-                <span class="font-black text-blue-900 text-[10px] md:text-sm tracking-widest uppercase">Ventas</span>
-            </button>
-        </div>
-    </section>
-
     <!-- Lista de Anuncios -->
-    <main class="max-w-2xl mx-auto p-6 mt-12" id="contenedor-anuncios">
+    <main class="max-w-2xl mx-auto p-6 mt-6" id="contenedor-anuncios">
         <!-- El contenido inicial se cargará aquí (spinner o anuncios) -->
     </main>
 
@@ -172,12 +390,19 @@
             </div>
         `;
 
+        // ADMIN_UIDS: Remplazar con los UIDs de administradores reales durante la fase de prueba
+        // Para obtener tu UID, inicia sesión y revisa `firebase.auth().currentUser.uid` en la consola del navegador.
+        const ADMIN_UIDS = [
+            // 'tu_uid_de_administrador_aqui', 
+            // 'otro_uid_de_administrador_aqui'
+        ];
+
         function initializeFirebase() {
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
             return firebase.app();
         }
 
-        const AUTH_ERROR_MESSAGES = {
+        const GENERIC_ERROR_MESSAGES = {
             'auth/email-already-in-use': 'Ese correo ya tiene una cuenta. Inicia sesión.',
             'auth/invalid-email': 'Escribe un correo electrónico válido.',
             'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
@@ -185,7 +410,16 @@
             'auth/user-not-found': 'El correo o la contraseña no son correctos.',
             'auth/invalid-login-credentials': 'El correo o la contraseña no son correctos.',
             'auth/too-many-requests': 'Demasiados intentos. Espera un momento e intenta de nuevo.',
-            'auth/network-request-failed': 'No hay conexión. Revisa tu red e intenta de nuevo.'
+            'auth/network-request-failed': 'No hay conexión. Revisa tu red e intenta de nuevo.',
+            'auth/operation-not-allowed': 'Activa el proveedor Correo/Contraseña en Firebase Authentication.',
+            'auth/configuration-not-found': 'Firebase Authentication aún no está configurado para este proyecto.',
+            'auth/popup-blocked': 'El navegador bloqueó la ventana de Google. Permite ventanas emergentes e intenta de nuevo.',
+            'auth/popup-closed-by-user': 'Se cerró la ventana de Google antes de completar el acceso.',
+            'auth/account-exists-with-different-credential': 'Ese correo ya está registrado con otro método de acceso.',
+            'auth/unauthorized-domain': 'Este dominio no está autorizado en Firebase para iniciar sesión con Google.',
+            'permission-denied': 'Permiso denegado. Revisa las Reglas de Seguridad de Firestore para permitir la escritura.',
+            'auth/requires-account': 'Inicia sesión con correo o Google para publicar.',
+            'form/invalid-ad': 'Revisa el título, la descripción y el WhatsApp antes de publicar.'
         };
 
         function setupAuthentication() {
@@ -200,11 +434,13 @@
             const submitButton = document.getElementById('auth-submit');
             const toggleButton = document.getElementById('auth-toggle');
             const resetButton = document.getElementById('auth-reset');
+            const googleButton = document.getElementById('google-login');
             const title = document.getElementById('auth-title');
             const subtitle = document.getElementById('auth-subtitle');
             const message = document.getElementById('auth-message');
             const sessionEmail = document.getElementById('session-email');
             const logoutButton = document.getElementById('logout-button');
+            const adminToolsButton = document.getElementById('admin-tools-button'); // Added reference
             let isRegistering = true;
             let loading = false;
 
@@ -220,7 +456,7 @@
             };
             const setLoading = value => {
                 loading = value;
-                [emailInput, passwordInput, submitButton, toggleButton, resetButton].forEach(control => control.disabled = value);
+                [emailInput, passwordInput, submitButton, toggleButton, resetButton, googleButton].forEach(control => control.disabled = value);
                 submitButton.textContent = value ? 'PROCESANDO...' : (isRegistering ? 'CREAR CUENTA' : 'INICIAR SESIÓN');
             };
             const renderMode = () => {
@@ -250,11 +486,54 @@
                     if (isRegistering) await auth.createUserWithEmailAndPassword(email, passwordInput.value);
                     else await auth.signInWithEmailAndPassword(email, passwordInput.value);
                 } catch (error) {
-                    console.error('Firebase Auth:', error.code);
-                    showMessage(AUTH_ERROR_MESSAGES[error.code] || 'No fue posible completar la operación. Intenta nuevamente.');
+                    console.error('Firebase Auth:', error.code, error);
+                    const errorMessage = GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible completar la operación. Intenta nuevamente.';
+                    showMessage(errorMessage);
                 } finally {
                     setLoading(false);
                 }
+            });
+
+            googleButton.addEventListener('click', async () => {
+                if (loading) return;
+                clearMessage();
+                setLoading(true);
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    provider.setCustomParameters({ prompt: 'select_account' });
+                    const prefersRedirect = window.matchMedia('(max-width: 767px)').matches;
+                    if (prefersRedirect) {
+                        await auth.signInWithRedirect(provider);
+                        return;
+                    }
+                    try {
+                        await auth.signInWithPopup(provider);
+                    } catch (error) {
+                        if (error.code === 'auth/popup-blocked') {
+                            await auth.signInWithRedirect(provider);
+                            return;
+                        }
+                        throw error;
+                    }
+                } catch (error) {
+                    console.error('Firebase Auth Google:', error.code, error);
+                    const errorMessage = error.code === 'auth/unauthorized-domain'
+                        ? `Autoriza el dominio ${window.location.hostname} en Firebase Authentication.`
+                        : (GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible acceder con Google. Intenta nuevamente.');
+                    showMessage(errorMessage);
+                } finally {
+                    setLoading(false);
+                }
+            });
+
+            auth.getRedirectResult().catch(error => {
+                console.error('Firebase Auth Google redirect:', error.code, error);
+                const errorMessage = error.code === 'auth/unauthorized-domain'
+                    ? `Autoriza el dominio ${window.location.hostname} en Firebase Authentication.`
+                    : (GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible completar el acceso con Google.');
+                resolving.classList.add('hidden');
+                content.classList.remove('hidden');
+                showMessage(errorMessage);
             });
 
             resetButton.addEventListener('click', async () => {
@@ -273,8 +552,9 @@
                     renderMode();
                     showMessage('Te enviamos un enlace para restablecer tu contraseña.', 'success');
                 } catch (error) {
-                    console.error('Firebase Auth reset:', error.code);
-                    showMessage(AUTH_ERROR_MESSAGES[error.code] || 'No fue posible enviar el enlace. Intenta nuevamente.');
+                    console.error('Firebase Auth reset:', error.code, error); // Log full error object
+                    const errorMessage = GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible enviar el enlace. Intenta nuevamente.';
+                    showMessage(errorMessage);
                 } finally {
                     setLoading(false);
                 }
@@ -283,29 +563,42 @@
             logoutButton.addEventListener('click', async () => {
                 logoutButton.disabled = true;
                 try { await auth.signOut(); }
-                catch (error) { console.error('Firebase Auth signOut:', error.code); }
+                catch (error) { console.error('Firebase Auth signOut:', error.code, error); } // Log full error object
                 finally { logoutButton.disabled = false; }
             });
 
-            const unsubscribeAuth = auth.onAuthStateChanged(user => {
-                resolving.classList.add('hidden');
-                const registeredUser = user && !user.isAnonymous ? user : null;
-                overlay.classList.toggle('hidden', Boolean(registeredUser));
-                content.classList.toggle('hidden', Boolean(registeredUser));
-                sessionEmail.textContent = registeredUser ? registeredUser.email : '';
-                sessionEmail.classList.toggle('hidden', !registeredUser);
-                logoutButton.classList.toggle('hidden', !registeredUser);
-                if (!registeredUser) emailInput.focus();
-            });
+            const unsubscribeAuth = auth.onAuthStateChanged(
+                user => {
+                    resolving.classList.add('hidden');
+                    const registeredUser = user && !user.isAnonymous ? user : null;
+                    overlay.classList.toggle('hidden', Boolean(registeredUser));
+                    content.classList.toggle('hidden', Boolean(registeredUser));
+                    sessionEmail.textContent = registeredUser ? registeredUser.email : '';
+                    sessionEmail.classList.toggle('hidden', !registeredUser);
+                    logoutButton.classList.toggle('hidden', !registeredUser);
+
+                    // Admin tools visibility
+                    const isAdmin = registeredUser && ADMIN_UIDS.includes(registeredUser.uid);
+                    adminToolsButton.classList.toggle('hidden', !isAdmin);
+
+                    if (!registeredUser) emailInput.focus();
+                    else filtrar(activeCategory, activeCriteria);
+                },
+                error => {
+                    console.error('Firebase Auth observer:', error.code, error);
+                    resolving.classList.add('hidden');
+                    content.classList.remove('hidden');
+                    showMessage(GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible comprobar tu sesión. Recarga la página.');
+                }
+            );
             window.addEventListener('pagehide', unsubscribeAuth, { once: true });
         }
 
-        // --- Funciones de Renderizado ---
+        // --- Funciones de Renderizado y Publicación ---
 
         /**
          * Genera el HTML para una tarjeta de anuncio.
-         * @param {object} data - Datos del anuncio (titulo, descripcion, categoria, whatsapp).
-         * @param {boolean} isExample - Indica si es un anuncio de ejemplo (para el banner informativo).
+         * @param {object} data - Datos del anuncio (titulo, descripcion, categoria, whatsapp, zona, empresa, tipo_empleo, area_trabajo, tipo_servicio, experiencia_servicio, precio, condicion, tipo_producto).
          * @returns {string} HTML de la tarjeta del anuncio.
          */
         function escapeHtml(value) {
@@ -319,21 +612,110 @@
             return /^\d{10,15}$/.test(digits) ? digits : '';
         }
 
-        function renderAnuncioCard(data) {
+        let activeCategory = null;
+        let activeCriteria = {};
+
+        function renderRating(authorUid, ratingInfo = {}) {
+            const average = Number(ratingInfo.average || 0);
+            const count = Number(ratingInfo.count || 0);
+            const ownRating = Number(ratingInfo.ownRating || 0);
+            const currentUid = firebase.apps.length && firebase.auth().currentUser?.uid;
+            const canRate = authorUid && currentUid && authorUid !== currentUid;
+            const encodedAuthor = encodeURIComponent(authorUid || '');
+            const stars = [1, 2, 3, 4, 5].map(value => {
+                const selected = value <= (ownRating || Math.round(average));
+                const color = selected ? 'text-amber-400' : 'text-slate-300';
+                return `<button type="button" ${canRate ? '' : 'disabled'} onclick="rateUser(decodeURIComponent('${encodedAuthor}'), ${value})" class="${color} text-xl leading-none disabled:cursor-default hover:text-amber-400" aria-label="Calificar con ${value} estrella${value === 1 ? '' : 's'}">★</button>`;
+            }).join('');
+            const summary = count ? `${average.toFixed(1)} de 5 · ${count} calificación${count === 1 ? '' : 'es'}` : 'Sin calificaciones';
+            return `<div class="mt-4" aria-label="Calificación del anunciante"><p class="text-xs font-bold text-slate-600 mb-1">Califica tu contacto</p><div class="flex gap-0.5">${stars}</div><p class="text-xs text-slate-500 mt-1">${summary}</p></div>`;
+        }
+
+        async function loadRatings(authorUids) {
+            const ratings = {};
+            const currentUid = firebase.auth().currentUser?.uid;
+            await Promise.all([...new Set(authorUids.filter(Boolean))].map(async authorUid => {
+                try {
+                    const snapshot = await firebase.firestore().collection('calificaciones').where('authorUid', '==', authorUid).get();
+                    let total = 0;
+                    let ownRating = 0;
+                    snapshot.forEach(doc => {
+                        const item = doc.data();
+                        total += Number(item.rating || 0);
+                        if (item.raterUid === currentUid) ownRating = Number(item.rating || 0);
+                    });
+                    ratings[authorUid] = { average: snapshot.size ? total / snapshot.size : 0, count: snapshot.size, ownRating };
+                } catch (error) {
+                    console.warn('No fue posible cargar calificaciones:', error.code || error);
+                }
+            }));
+            return ratings;
+        }
+
+        async function rateUser(authorUid, rating) {
+            const currentUser = firebase.auth().currentUser;
+            if (!currentUser || !authorUid || currentUser.uid === authorUid || rating < 1 || rating > 5) return;
+            try {
+                const ratingId = `${authorUid}_${currentUser.uid}`;
+                await firebase.firestore().collection('calificaciones').doc(ratingId).set({
+                    authorUid,
+                    raterUid: currentUser.uid,
+                    rating: Number(rating),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                await filtrar(activeCategory, activeCriteria);
+            } catch (error) {
+                console.error('Error al calificar:', error);
+                alert(GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible guardar tu calificación.');
+            }
+        }
+
+        function renderAnuncioCard(data, ratingInfo = {}) {
             const category = String(data.categoria || 'default').toLowerCase();
             const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
             const whatsapp = normalizeWhatsapp(data.whatsapp);
+
+            const zona = escapeHtml(data.zona || '');
+            const empresa = escapeHtml(data.empresa || '');
+            const tipoEmpleo = escapeHtml(data.tipo_empleo || '');
+            const areaTrabajo = escapeHtml(data.area_trabajo || '');
+            const tipoServicio = escapeHtml(data.tipo_servicio || '');
+            const experienciaServicio = escapeHtml(data.experiencia_servicio || '');
+            const precio = data.precio ? `$${Number(data.precio).toLocaleString('es-MX')}` : '';
+            const condicion = escapeHtml(data.condicion || '');
+            const tipoProducto = escapeHtml(data.tipo_producto || '');
+
+            let specificFieldsHtml = '';
+
+            if (category === 'empleo') {
+                if (empresa) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Empresa:</strong> ${empresa}</p>`;
+                if (tipoEmpleo) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Tipo:</strong> ${tipoEmpleo}</p>`;
+                if (areaTrabajo) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Área:</strong> ${areaTrabajo}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Zona:</strong> ${zona}</p>`;
+            } else if (category === 'servicios') {
+                if (tipoServicio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Tipo:</strong> ${tipoServicio}</p>`;
+                if (experienciaServicio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Experiencia:</strong> ${experienciaServicio}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Zona de Servicio:</strong> ${zona}</p>`;
+            } else if (category === 'ventas') {
+                if (precio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Precio:</strong> ${precio}</p>`;
+                if (condicion) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Condición:</strong> ${condicion}</p>`;
+                if (tipoProducto) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Producto:</strong> ${tipoProducto}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Ubicación:</strong> ${zona}</p>`;
+            }
+
             const contactLink = whatsapp ? `
                     <a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
                         <i class="fab fa-whatsapp text-2xl" aria-hidden="true"></i>
                     </a>` : '';
 
             return `
-                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex justify-between items-center border-l-[6px] ${style.borderColorClass}">
-                    <div>
+                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-5 border-l-[6px] ${style.borderColorClass}">
+                    <div class="min-w-0">
                         <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${escapeHtml(category)}</span>
                         <h3 class="text-2xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
                         <p class="text-slate-500 mt-2">${escapeHtml(data.descripcion)}</p>
+                        ${specificFieldsHtml}
+                        ${renderRating(data.authorUid, ratingInfo)}
                     </div>
                     ${contactLink}
                 </div>
@@ -341,7 +723,7 @@
         }
 
         // Función para mostrar anuncios de ejemplo si falla la conexión o Firebase no está disponible.
-        function mostrarEjemplos() {
+        function mostrarEjemplos(cat = null, criteria = {}) {
             const cont = document.getElementById('contenedor-anuncios');
             cont.innerHTML = PREVIEW_MODE_BANNER; // Muestra el banner de modo vista previa
 
@@ -351,18 +733,35 @@
                     categoria: 'empleo',
                     titulo: 'Cocinero(a) para restaurante',
                     descripcion: 'Se busca personal con experiencia en comida mexicana. Zona centro Yautepec.',
-                    whatsapp: '5217771234567' // Número de ejemplo
+                    whatsapp: '5217771234567', // Número de ejemplo
+                    empresa: 'Restaurante "El Sabor"',
+                    tipo_empleo: 'Permanente',
+                    area_trabajo: 'Alimentos y Bebidas',
+                    zona: 'Yautepec, Centro'
                 },
                 {
                     categoria: 'servicios',
                     titulo: 'Plomero 24 Horas',
                     descripcion: 'Reparación de fugas, tinacos y bombas. Servicio rápido en todo Cuautla.',
-                    whatsapp: '5217779876543' // Número de ejemplo
+                    whatsapp: '5217779876543', // Número de ejemplo
+                    tipo_servicio: 'Plomería',
+                    experiencia_servicio: '15 años de experiencia',
+                    zona: 'Cuautla y alrededores'
+                },
+                {
+                    categoria: 'ventas',
+                    titulo: 'Bicicleta de Montaña Seminueva',
+                    descripcion: 'Bicicleta rodada 29, frenos de disco, suspensión delantera. Poco uso.',
+                    whatsapp: '5217771122334',
+                    precio: 15000,
+                    condicion: 'Usado - Excelente',
+                    tipo_producto: 'Deportes',
+                    zona: 'Cuernavaca'
                 }
             ];
 
-            ejemplos.forEach(ejemplo => {
-                cont.innerHTML += renderAnuncioCard(ejemplo, true);
+            ejemplos.filter(ejemplo => (!cat || ejemplo.categoria === cat) && matchesCriteria(ejemplo, criteria)).forEach(ejemplo => {
+                cont.innerHTML += renderAnuncioCard(ejemplo);
             });
         }
 
@@ -370,19 +769,36 @@
          * Filtra y muestra anuncios de Firebase Firestore o ejemplos locales.
          * @param {string|null} cat - Categoría para filtrar (empleo, servicios, ventas) o null para todas.
          */
-        async function filtrar(cat = null) {
+        function normalizeSearchValue(value) {
+            return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        function matchesCriteria(anuncio, criteria) {
+            return Object.entries(criteria).every(([field, expected]) => {
+                if (!expected) return true;
+                if (field === '_keyword') {
+                    const searchable = [anuncio.titulo, anuncio.descripcion, anuncio.area_trabajo, anuncio.tipo_servicio, anuncio.tipo_producto].map(normalizeSearchValue).join(' ');
+                    return searchable.includes(normalizeSearchValue(expected));
+                }
+                const actual = normalizeSearchValue(anuncio[field]);
+                return actual.includes(normalizeSearchValue(expected));
+            });
+        }
+
+        async function filtrar(cat = null, criteria = {}) {
+            activeCategory = cat;
+            activeCriteria = criteria;
             const cont = document.getElementById('contenedor-anuncios');
             cont.innerHTML = LOADING_SPINNER_HTML; // Muestra el spinner de carga
 
             // Verifica si Firebase está cargado, si no, muestra ejemplos.
             if (typeof firebase === 'undefined' || typeof firebase.firestore === 'undefined') {
-                mostrarEjemplos();
+                mostrarEjemplos(cat, criteria);
                 return;
             }
 
             try {
                 // Inicializa Firebase si no se ha hecho ya
-                // Esta verificación evita errores si la función 'filtrar' se llama múltiples veces.
                 initializeFirebase();
                 const db = firebase.firestore();
                 
@@ -399,25 +815,334 @@
                     return;
                 }
 
-                const anuncios = snapshot.docs.map(doc => doc.data()).sort((a, b) => {
+                const anuncios = snapshot.docs.map(doc => doc.data()).filter(data => matchesCriteria(data, criteria)).sort((a, b) => {
                     const fechaA = a.fecha?.toMillis?.() ?? 0;
                     const fechaB = b.fecha?.toMillis?.() ?? 0;
                     return fechaB - fechaA;
                 });
 
+                if (!anuncios.length) {
+                    cont.innerHTML = NO_ANUNCIOS_HTML;
+                    return;
+                }
+
+                const ratings = await loadRatings(anuncios.map(data => data.authorUid));
                 anuncios.forEach(data => {
-                    cont.innerHTML += renderAnuncioCard(data);
+                    cont.innerHTML += renderAnuncioCard(data, ratings[data.authorUid] || {});
                 });
             } catch (error) {
                 console.error("Error al cargar anuncios de Firebase:", error);
-                mostrarEjemplos(); // En caso de error, muestra los ejemplos
+                mostrarEjemplos(cat, criteria); // En caso de error, muestra los ejemplos
             }
         }
+
+
+        // --- Funciones para el flujo de Publicación ---
+
+        const publishOverlay = document.getElementById('publish-overlay');
+        const categorySelection = document.getElementById('category-selection');
+        const publishFormsContainer = document.getElementById('publish-forms-container');
+        const publishTitle = document.getElementById('publish-title');
+        const publishSubtitle = document.getElementById('publish-subtitle');
+        const searchOverlay = document.getElementById('search-overlay');
+        const searchCategorySelection = document.getElementById('search-category-selection');
+        const searchCriteriaForm = document.getElementById('search-criteria-form');
+        const searchFields = document.getElementById('search-fields');
+        let selectedSearchCategory = null;
+
+        function searchInput(label, name, placeholder) {
+            return `<label class="block text-sm font-bold text-slate-700 mb-4">${label}<input name="${name}" type="text" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="${placeholder}"></label>`;
+        }
+
+        function searchSelect(label, name, sourceId) {
+            const options = document.getElementById(sourceId).innerHTML;
+            return `<label class="block text-sm font-bold text-slate-700 mb-4">${label}<select name="${name}" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">${options}</select></label>`;
+        }
+
+        function showSearchOverlay() {
+            searchOverlay.classList.remove('hidden');
+            showSearchCategories();
+        }
+
+        function hideSearchOverlay() {
+            searchOverlay.classList.add('hidden');
+        }
+
+        function showSearchCategories() {
+            selectedSearchCategory = null;
+            searchCategorySelection.classList.remove('hidden');
+            searchCriteriaForm.classList.add('hidden');
+            document.getElementById('search-title').textContent = '¿Qué quieres buscar?';
+        }
+
+        function selectSearchCategory(category) {
+            selectedSearchCategory = category;
+            searchCategorySelection.classList.add('hidden');
+            searchCriteriaForm.classList.remove('hidden');
+            const labels = { empleo: 'Buscar empleos', servicios: 'Buscar servicios', ventas: 'Buscar productos' };
+            document.getElementById('search-title').textContent = labels[category];
+
+            let fields = searchInput('Palabra clave', '_keyword', category === 'empleo' ? 'Ej: jardinero, cocinero' : category === 'servicios' ? 'Ej: jardinería, plomería' : 'Ej: juguetes, muebles');
+            if (category === 'empleo') {
+                fields += searchSelect('Tipo de empleo', 'tipo_empleo', 'empleo-tipo-empleo');
+                fields += searchSelect('Área de trabajo', 'area_trabajo', 'empleo-area-trabajo');
+                fields += searchInput('Zona de trabajo', 'zona', 'Ej: Cuernavaca');
+            } else if (category === 'servicios') {
+                fields += searchSelect('Tipo de servicio', 'tipo_servicio', 'servicios-tipo-servicio');
+                fields += searchInput('Zona de servicio', 'zona', 'Ej: Cuautla');
+            } else {
+                fields += searchInput('Tipo de producto', 'tipo_producto', 'Ej: Juguetes, electrónica, ropa');
+                fields += searchSelect('Condición', 'condicion', 'ventas-condicion');
+                fields += searchInput('Ubicación', 'zona', 'Ej: Jiutepec');
+            }
+            searchFields.innerHTML = fields;
+        }
+
+        searchCriteriaForm.addEventListener('submit', event => {
+            event.preventDefault();
+            if (!selectedSearchCategory) return;
+            const criteria = Object.fromEntries([...new FormData(searchCriteriaForm).entries()].filter(([, value]) => String(value).trim()));
+            hideSearchOverlay();
+            filtrar(selectedSearchCategory, criteria);
+            document.getElementById('contenedor-anuncios').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        function showPublishOverlay() {
+            publishOverlay.classList.remove('hidden');
+            showCategorySelection();
+        }
+
+        function hidePublishOverlay() {
+            publishOverlay.classList.add('hidden');
+        }
+
+        function showCategorySelection() {
+            publishTitle.textContent = '¿Qué quieres publicar?';
+            publishSubtitle.textContent = 'Selecciona la categoría de tu anuncio.';
+            categorySelection.classList.remove('hidden');
+            Array.from(publishFormsContainer.children).forEach(form => form.classList.add('hidden'));
+        }
+
+        function showSpecificPublishForm(category) {
+            categorySelection.classList.add('hidden');
+            Array.from(publishFormsContainer.children).forEach(form => form.classList.add('hidden')); // Hide all forms
+
+            let formToShow;
+            let formTitle = '';
+            let formSubtitle = '';
+
+            if (category === 'empleo') {
+                formToShow = document.getElementById('form-empleo');
+                formTitle = 'Publicar Empleo';
+                formSubtitle = 'Ingresa los detalles del puesto que ofreces.';
+            } else if (category === 'servicios') {
+                formToShow = document.getElementById('form-servicios');
+                formTitle = 'Publicar Servicio';
+                formSubtitle = 'Ingresa los detalles del servicio que ofreces.';
+            } else if (category === 'ventas') {
+                formToShow = document.getElementById('form-ventas');
+                formTitle = 'Publicar Venta';
+                formSubtitle = 'Ingresa los detalles del artículo que deseas vender.';
+            }
+
+            if (formToShow) {
+                publishTitle.textContent = formTitle;
+                publishSubtitle.textContent = formSubtitle;
+                formToShow.classList.remove('hidden');
+            }
+        }
+
+        async function submitPublishForm(event, category) {
+            event.preventDefault();
+            const form = event.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const messageElement = form.querySelector('[role="status"]');
+
+            if (!form.reportValidity()) return;
+
+            submitButton.disabled = true;
+            messageElement.textContent = 'Publicando...';
+            messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-blue-50 text-blue-700'; // Neutral message
+            messageElement.classList.remove('hidden'); // Ensure message is visible
+
+            try {
+                initializeFirebase();
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser || currentUser.isAnonymous) {
+                    const authError = new Error('Se requiere una cuenta registrada.');
+                    authError.code = 'auth/requires-account';
+                    throw authError;
+                }
+                const db = firebase.firestore();
+                const titulo = form.querySelector(`#${category}-titulo`).value.trim();
+                const descripcion = form.querySelector(`#${category}-descripcion`).value.trim();
+                const whatsapp = normalizeWhatsapp(form.querySelector(`#${category}-whatsapp`).value);
+                if (titulo.length < 4 || titulo.length > 80 || descripcion.length < 10 || descripcion.length > 500 || !whatsapp) {
+                    const validationError = new Error('Los datos del anuncio no cumplen las validaciones.');
+                    validationError.code = 'form/invalid-ad';
+                    throw validationError;
+                }
+                const anuncioData = {
+                    categoria: category,
+                    titulo,
+                    descripcion,
+                    whatsapp,
+                    zona: form.querySelector(`#${category}-zona`).value.trim(),
+                    authorUid: currentUser.uid,
+                    fecha: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (category === 'empleo') {
+                    anuncioData.empresa = form.querySelector('#empleo-empresa').value.trim();
+                    anuncioData.tipo_empleo = form.querySelector('#empleo-tipo-empleo').value;
+                    anuncioData.area_trabajo = form.querySelector('#empleo-area-trabajo').value;
+                } else if (category === 'servicios') {
+                    anuncioData.tipo_servicio = form.querySelector('#servicios-tipo-servicio').value;
+                    anuncioData.experiencia_servicio = form.querySelector('#servicios-experiencia').value.trim();
+                } else if (category === 'ventas') {
+                    anuncioData.precio = parseFloat(form.querySelector('#ventas-precio').value);
+                    anuncioData.condicion = form.querySelector('#ventas-condicion').value;
+                    anuncioData.tipo_producto = form.querySelector('#ventas-tipo-producto').value.trim();
+                }
+
+                await db.collection("anuncios").add(anuncioData);
+
+                messageElement.textContent = '¡Anuncio publicado con éxito!';
+                messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700';
+                form.reset(); // Limpia el formulario
+                filtrar(); // Recarga los anuncios en la página principal
+                setTimeout(() => {
+                    hidePublishOverlay(); // Cierra el modal después de un éxito
+                    showCategorySelection(); // Vuelve a la selección de categoría para el próximo anuncio
+                }, 2000);
+
+            } catch (error) {
+                console.error("Error al publicar anuncio:", error);
+                const errorMessage = GENERIC_ERROR_MESSAGES[error.code] || 'Error al publicar. Revisa la consola para más detalles.';
+                messageElement.textContent = errorMessage;
+                messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-red-50 text-red-700';
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
+        // Asignar event listeners a los formularios de publicación
+        document.getElementById('form-empleo').addEventListener('submit', (e) => submitPublishForm(e, 'empleo'));
+        document.getElementById('form-servicios').addEventListener('submit', (e) => submitPublishForm(e, 'servicios'));
+        document.getElementById('form-ventas').addEventListener('submit', (e) => submitPublishForm(e, 'ventas'));
+
+
+        // --- New Overlay Functions ---
+        function showAboutOverlay() {
+            document.getElementById('about-overlay').classList.remove('hidden');
+        }
+
+        function hideAboutOverlay() {
+            document.getElementById('about-overlay').classList.add('hidden');
+        }
+
+        function showAdminOverlay() {
+            document.getElementById('admin-overlay').classList.remove('hidden');
+            document.getElementById('admin-message').classList.add('hidden'); // Clear message on open
+        }
+
+        function hideAdminOverlay() {
+            document.getElementById('admin-overlay').classList.add('hidden');
+        }
+
+        function contactForGrading() {
+            // Reemplaza con la dirección de correo electrónico real
+            window.location.href = 'mailto:equipo.morelostrabaja@example.com?subject=Discrepancia%20en%20Calificación%20o%20Sugerencia&body=Hola%2C%0D%0A%0D%0Escribo%20para...';
+        }
+
+        // --- Admin Tools Logic ---
+        async function deleteAllCollection(db, collectionName, messageElement) {
+            messageElement.textContent = `Borrando colección "${collectionName}"...`;
+            messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-amber-50 text-amber-700';
+            messageElement.classList.remove('hidden');
+
+            const collectionRef = db.collection(collectionName);
+            const query = collectionRef.limit(50); // Delete in batches of 50
+
+            return new Promise((resolve, reject) => {
+                deleteQueryBatch(db, query, resolve, reject, messageElement, collectionName);
+            });
+        }
+
+        function deleteQueryBatch(db, query, resolve, reject, messageElement, collectionName) {
+            query.get()
+                .then((snapshot) => {
+                    if (snapshot.size === 0) {
+                        return 0;
+                    }
+
+                    const batch = db.batch();
+                    snapshot.docs.forEach((doc) => {
+                        batch.delete(doc.ref);
+                    });
+
+                    return batch.commit().then(() => snapshot.size);
+                })
+                .then((numDeleted) => {
+                    if (numDeleted === 0) {
+                        messageElement.textContent = `Colección "${collectionName}" borrada.`;
+                        messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700';
+                        resolve();
+                        return;
+                    }
+                    // Recursively call itself to delete the next batch
+                    messageElement.textContent = `Borrados ${numDeleted} documentos de "${collectionName}". Continuar...`;
+                    setTimeout(() => deleteQueryBatch(db, query, resolve, reject, messageElement, collectionName), 10);
+                })
+                .catch(reject);
+        }
+
+        async function deleteAllTestData() {
+            if (!confirm('¿Estás SEGURO de que quieres borrar TODA la base de datos de prueba (anuncios y calificaciones)? Esta acción es IRREVERSIBLE.')) {
+                return;
+            }
+
+            const adminMessage = document.getElementById('admin-message');
+            const deleteButton = document.querySelector('#admin-overlay button[onclick="deleteAllTestData()"]');
+            deleteButton.disabled = true;
+
+            try {
+                initializeFirebase();
+                const db = firebase.firestore();
+
+                adminMessage.textContent = 'Iniciando eliminación de datos...';
+                adminMessage.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-amber-50 text-amber-700';
+                adminMessage.classList.remove('hidden');
+
+                await deleteAllCollection(db, 'anuncios', adminMessage);
+                await deleteAllCollection(db, 'calificaciones', adminMessage);
+
+                adminMessage.textContent = '¡Todas las bases de datos de prueba han sido borradas con éxito!';
+                adminMessage.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700';
+                // Reload ads on main page after deletion
+                filtrar();
+            } catch (error) {
+                console.error("Error al borrar datos de prueba:", error);
+                adminMessage.textContent = `Error al borrar datos: ${error.message}`;
+                adminMessage.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-red-50 text-red-700';
+            } finally {
+                deleteButton.disabled = false;
+                setTimeout(() => adminMessage.classList.add('hidden'), 5000); // Hide message after 5 seconds
+            }
+        }
+
 
         // --- Event Listeners ---
         window.addEventListener('load', () => {
             setupAuthentication();
             filtrar();
+            // Assign event listeners for new header buttons
+            document.getElementById('about-us-button').addEventListener('click', showAboutOverlay);
+            document.getElementById('articles-button').addEventListener('click', () => {
+                // For now, articles button also opens the about overlay, can be changed later
+                showAboutOverlay(); 
+            });
+            document.getElementById('admin-tools-button').addEventListener('click', showAdminOverlay);
         }); // Carga autenticación y anuncios al iniciar la página
     </script>
 </body>
