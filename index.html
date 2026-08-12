@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja — VERSION 36.23</title>
+    <title>Morelos Trabaja — VERSION 36.24</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -513,7 +513,7 @@
         <!-- Main Hero Content -->
         <div class="max-w-3xl mx-auto pt-16 text-center">
             <h1 class="text-4xl md:text-6xl font-black mb-2 leading-tight">Morelos Trabaja</h1>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-6" data-app-version>Versión 36.23</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-6" data-app-version>Versión 36.24</p>
             <h2 class="text-2xl md:text-3xl font-black mb-6 leading-tight">
                 El portal de empleos, servicios y ventas en Morelos.
             </h2>
@@ -1001,7 +1001,7 @@
             const fallbackName = authenticatedUser?.displayName || String(authenticatedUser?.email || '').split('@')[0] || 'usuario de Morelos Trabaja';
             const name = normalizeProfileText(currentUserProfile?.nombreCompleto || fallbackName);
             const offerType = { empleo: 'empleo', servicios: 'servicio', ventas: 'venta' }[category] || 'anuncio';
-            return `Hola soy ${name}, encontré tu oferta de ${offerType} en el portal morelostrabaja.com, estoy interesado, ¿puedes contactarme?`;
+            return `Hola soy ${name}, encontré tu oferta de ${offerType} en el portal morelostrabaja.com, estoy interesado. ¿Podrías brindarme más información, por favor?`;
         }
 
         function getWhatsappUrl(whatsapp, category) {
