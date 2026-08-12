@@ -6,57 +6,34 @@ service cloud.firestore {
         && request.auth.token.email == 'cumorahnet@gmail.com'
         && request.auth.token.email_verified == true;
     }
-    // Regla actual mínima (segura): lectura pública de 'anuncios', escritura denegada.
-    // Esto coincide con lo que compartiste y evita modificaciones desde el cliente.
-    match /anuncios/{anuncioId} {
-      allow read: if true;
-      allow write: if false; // evita escrituras desde el cliente
-    }
-
     match /calificaciones/{calificacionId} {
       allow read: if true;
-      allow create, update: if request.auth != null
-        && request.auth.token.firebase.sign_in_provider != 'anonymous'
-        && request.resource.data.keys().hasOnly(['authorUid','raterUid','rating','updatedAt'])
-        && request.resource.data.authorUid is string
-        && request.resource.data.raterUid == request.auth.uid
-        && request.resource.data.authorUid != request.auth.uid
-        && calificacionId == request.resource.data.authorUid + '_' + request.auth.uid
-        && request.resource.data.rating is int
-        && request.resource.data.rating >= 1
-        && request.resource.data.rating <= 5;
-      allow delete: if false;
+      // Las evaluaciones sólo se publican mediante Cloud Functions después
+      // de validar el contacto y el plazo de cinco días.
+      allow write: if false;
+    }
+
+    match /contactos/{contactoId} {
+      // Contiene interacciones privadas. Todo acceso pasa por funciones callable.
+      allow read, write: if false;
     }
 
     match /usuarios/{userId} {
-      allow read: if isSuperUser();
+      allow read: if isSuperUser() || (request.auth != null && request.auth.uid == userId);
       allow create, update: if request.auth != null
         && request.auth.uid == userId
-        && request.resource.data.keys().hasOnly(['email', 'lastLogin'])
+        && request.resource.data.keys().hasOnly(['email', 'lastLogin', 'nombreCompleto', 'municipio', 'whatsappContacto', 'updatedAt'])
+        && request.resource.data.email is string
         && request.resource.data.email == request.auth.token.email;
       allow delete: if isSuperUser();
     }
 
-    // Denegar el acceso por defecto al resto de colecciones
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // -------------------------
-    // Opciones recomendadas
-    // -------------------------
-    // A continuación se incluyen dos variantes comentadas que puedes usar
-    // según tu estrategia de seguridad. Descomenta y adapta UNA de ellas
-    // si decides permitir publicaciones desde el cliente.
-
-    // OPCIÓN A - Recomendado: exigir autenticación para crear anuncios
     match /anuncios/{anuncioId} {
       allow read: if true;
 
-      // Solo usuarios autenticados pueden crear y deben incluir authorUid == request.auth.uid
       allow create: if request.auth != null
         && request.auth.token.firebase.sign_in_provider != 'anonymous'
-        && request.resource.data.keys().hasAll(['categoria','titulo','descripcion','whatsapp','fecha','authorUid'])
+        && request.resource.data.keys().hasAll(['categoria','titulo','descripcion','whatsapp','fecha','expiresAt','estado','authorUid'])
         && request.resource.data.authorUid == request.auth.uid
         && request.resource.data.categoria in ['empleo','servicios','ventas']
         && request.resource.data.titulo is string
@@ -66,39 +43,30 @@ service cloud.firestore {
         && request.resource.data.descripcion.size() >= 10
         && request.resource.data.descripcion.size() <= 500
         && request.resource.data.whatsapp is string
-        && request.resource.data.whatsapp.matches('^[0-9]{10,15}$');
+        && request.resource.data.whatsapp.matches('^[0-9]{10,15}$')
+        && (request.resource.data.categoria != 'empleo' || (
+          request.resource.data.prestaciones is string
+          && request.resource.data.prestaciones.size() >= 3
+          && request.resource.data.prestaciones.size() <= 300
+          && request.resource.data.sueldo_minimo is number
+          && request.resource.data.sueldo_minimo >= 0
+          && request.resource.data.sueldo_maximo is number
+          && request.resource.data.sueldo_maximo >= request.resource.data.sueldo_minimo
+          && request.resource.data.periodo_sueldo in ['hora','dia','semana','quincena','mes']
+        ))
+        && request.resource.data.fecha == request.time
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time + duration.value(7, 'd')
+        && request.resource.data.expiresAt <= request.time + duration.value(8, 'd') + duration.value(10, 'm')
+        && request.resource.data.estado == 'activo';
 
-      // Actualizaciones/eliminaciones solo por el autor (authorUid coincide con auth.uid)
-      allow update: if request.auth != null
-        && request.auth.token.firebase.sign_in_provider != 'anonymous'
-        && resource.data.authorUid == request.auth.uid;
-      allow delete: if isSuperUser() || (request.auth != null
-        && request.auth.token.firebase.sign_in_provider != 'anonymous'
-        && resource.data.authorUid == request.auth.uid);
-    }
-
-    // OPCIÓN B - Público pero validado: permite creación desde cliente
-    // Nota: esta opción es más vulnerable a spam; reforzar con App Check y
-    // moderación (Cloud Function) es muy recomendable.
-    /*
-    match /anuncios/{anuncioId} {
-      allow read: if true;
-
-      // Permite crear documentos si cumplen validaciones básicas de campos
-      allow create: if request.resource.data.keys().hasAll(['categoria','titulo','descripcion','whatsapp','fecha'])
-        && request.resource.data.categoria in ['empleo','servicios','ventas']
-        && request.resource.data.titulo is string
-        && request.resource.data.titulo.size() >= 4
-        && request.resource.data.titulo.size() <= 80
-        && request.resource.data.descripcion is string
-        && request.resource.data.descripcion.size() >= 10
-        && request.resource.data.descripcion.size() <= 500
-        && request.resource.data.whatsapp is string
-        && request.resource.data.whatsapp.matches('^[0-9]{10,15}$');
-
-      // No permitir update/delete desde el cliente
+      // Cierres, vencimientos y eliminaciones se procesan en Cloud Functions.
       allow update, delete: if false;
     }
-    */
+
+    // Denegar el acceso por defecto al resto de colecciones, incluida _sistema.
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }

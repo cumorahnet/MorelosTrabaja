@@ -32,6 +32,29 @@
                 <label class="block font-bold text-slate-700">WhatsApp (con lada)
                     <input name="whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full border rounded-xl p-3" placeholder="777 123 4567">
                 </label>
+                <div id="employment-fields" class="space-y-5">
+                    <label class="block font-bold text-slate-700">Prestaciones
+                        <textarea name="prestaciones" required minlength="3" maxlength="300" rows="3" class="mt-2 w-full border rounded-xl p-3" placeholder="Ej: Seguro social, aguinaldo, vacaciones y bonos"></textarea>
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="block font-bold text-slate-700">Sueldo mínimo ($ MXN)
+                            <input name="sueldo_minimo" type="number" required min="0" max="10000000" step="1" class="mt-2 w-full border rounded-xl p-3">
+                        </label>
+                        <label class="block font-bold text-slate-700">Sueldo máximo ($ MXN)
+                            <input name="sueldo_maximo" type="number" required min="0" max="10000000" step="1" class="mt-2 w-full border rounded-xl p-3">
+                        </label>
+                    </div>
+                    <label class="block font-bold text-slate-700">Periodo del sueldo
+                        <select name="periodo_sueldo" required class="mt-2 w-full border rounded-xl p-3 bg-white">
+                            <option value="">Selecciona</option>
+                            <option value="hora">Por hora</option>
+                            <option value="dia">Por día</option>
+                            <option value="semana">Por semana</option>
+                            <option value="quincena">Por quincena</option>
+                            <option value="mes">Por mes</option>
+                        </select>
+                    </label>
+                </div>
                 <button id="enviar" disabled class="w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white rounded-xl p-4 font-black" type="submit">COMPROBANDO SESIÓN...</button>
                 <p id="estado" role="status" aria-live="polite" class="text-sm font-bold"></p>
             </form>
@@ -52,7 +75,21 @@
         const estado = document.getElementById('estado');
         const enviar = document.getElementById('enviar');
         const auth = firebase.auth();
+        const categoryInput = form.elements.categoria;
+        const employmentFields = document.getElementById('employment-fields');
         let authenticatedUser = null;
+
+        function updateEmploymentFields() {
+            const employmentSelected = categoryInput.value === 'empleo';
+            employmentFields.classList.toggle('hidden', !employmentSelected);
+            employmentFields.querySelectorAll('input, textarea, select').forEach(input => {
+                input.disabled = !employmentSelected;
+                input.required = employmentSelected;
+            });
+        }
+
+        categoryInput.addEventListener('change', updateEmploymentFields);
+        updateEmploymentFields();
 
         // Intentar autenticación anónima en carga para permitir creaciones seguras
         const unsubscribeAuth = auth.onAuthStateChanged(async user => {
@@ -89,21 +126,41 @@
                 estado.className = 'text-sm font-bold text-red-700';
                 return;
             }
+            const category = String(values.get('categoria'));
+            const salaryMinimum = Number(values.get('sueldo_minimo'));
+            const salaryMaximum = Number(values.get('sueldo_maximo'));
+            if (category === 'empleo' && (!Number.isFinite(salaryMinimum) || !Number.isFinite(salaryMaximum) || salaryMinimum < 0 || salaryMaximum < salaryMinimum)) {
+                estado.textContent = 'El sueldo máximo debe ser igual o mayor que el sueldo mínimo.';
+                estado.className = 'text-sm font-bold text-red-700';
+                return;
+            }
 
             enviar.disabled = true;
             estado.textContent = 'Publicando…';
             estado.className = 'text-sm font-bold text-slate-500';
 
             try {
-                await firebase.firestore().collection('anuncios').add({
-                    categoria: values.get('categoria'),
+                const ad = {
+                    categoria: category,
                     titulo: String(values.get('titulo')).trim(),
                     descripcion: String(values.get('descripcion')).trim(),
                     whatsapp,
                     authorUid: authenticatedUser.uid,
-                    fecha: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: firebase.firestore.Timestamp.fromMillis(Date.now() + (8 * 24 * 60 * 60 * 1000)),
+                    estado: 'activo'
+                };
+                if (category === 'empleo') {
+                    Object.assign(ad, {
+                        prestaciones: String(values.get('prestaciones')).trim(),
+                        sueldo_minimo: salaryMinimum,
+                        sueldo_maximo: salaryMaximum,
+                        periodo_sueldo: String(values.get('periodo_sueldo'))
+                    });
+                }
+                await firebase.firestore().collection('anuncios').add(ad);
                 form.reset();
+                updateEmploymentFields();
                 estado.textContent = 'Anuncio publicado. Ya puedes verlo en la página principal.';
                 estado.className = 'text-sm font-bold text-green-700';
             } catch (error) {

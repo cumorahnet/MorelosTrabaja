@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja VERSION 36.14</title>
+    <title>MORELOS TRABAJA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -28,6 +29,29 @@
             transform: translateY(-4px); 
             box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
         }
+        .article-content h3 {
+            color: #172554;
+            font-size: 1.25rem;
+            font-weight: 900;
+            line-height: 1.35;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        .article-content p,
+        .article-content li {
+            color: #475569;
+            line-height: 1.75;
+        }
+        .article-content p + p { margin-top: 1rem; }
+        .article-content ul,
+        .article-content ol {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        .article-content ul { list-style: disc; }
+        .article-content ol { list-style: decimal; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -265,24 +289,115 @@
             <button onclick="contactForGrading()" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 mb-4">
                 <i class="fas fa-envelope mr-2"></i> Contactar por calificaciones
             </button>
-            <button onclick="hideAboutOverlay()" class="w-full block text-center rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
+            <button onclick="hideAboutOverlay(); showArticlesOverlay()" class="w-full block text-center rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
                 <i class="fas fa-newspaper mr-2"></i> Ver Artículos de Interés
             </button>
-            <p class="text-xs text-slate-400 mt-4 text-center">Version 36.13 - Desarrollado con ❤️ en Morelos.</p>
+            <p class="text-xs text-slate-400 mt-4 text-center">Versión 36.17 - Desarrollado con ❤️ en Morelos.</p>
+        </section>
+    </div>
+
+    <!-- Artículos de interés -->
+    <div id="articles-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl relative max-h-[94vh] overflow-y-auto" aria-labelledby="articles-title">
+            <button onclick="hideArticlesOverlay()" class="sticky top-4 z-10 float-right mr-4 md:mr-6 mt-4 h-11 w-11 rounded-full bg-white/95 text-slate-500 shadow-lg ring-1 ring-slate-200 hover:text-blue-700" aria-label="Cerrar artículos de interés">
+                <i class="fas fa-times text-xl" aria-hidden="true"></i>
+            </button>
+
+            <article class="overflow-hidden">
+                <header class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-700 px-6 py-10 md:px-12 md:py-14 text-white">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-200 uppercase">Artículos de interés · Búsqueda de empleo</p>
+                    <h2 id="articles-title" class="mt-4 max-w-3xl text-3xl md:text-5xl font-black leading-tight">Cómo crear un currículum que te ayude a conseguir entrevistas</h2>
+                    <p class="mt-5 max-w-2xl text-base md:text-lg leading-relaxed text-blue-100">Una guía sencilla para presentar tu experiencia, destacar tus habilidades y enviar un CV claro y profesional.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-blue-100">
+                        <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>7 min de lectura</span>
+                        <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>11 de agosto de 2026</span>
+                    </div>
+                </header>
+
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">Tu currículum es la primera impresión que una empresa recibe de ti. No necesita tener un diseño complicado: debe explicar con rapidez quién eres, qué sabes hacer y por qué eres una buena opción para el puesto.</p>
+
+                    <aside class="my-8 rounded-2xl border border-blue-100 bg-blue-50 p-5 md:p-6">
+                        <p class="font-black text-blue-950"><i class="fas fa-lightbulb mr-2 text-amber-500" aria-hidden="true"></i>La regla más importante</p>
+                        <p class="mt-2 text-blue-900">Adapta tu currículum a cada vacante. Revisa qué experiencia y habilidades pide la empresa y coloca primero la información que demuestra que cumples con esos requisitos.</p>
+                    </aside>
+
+                    <h3>1. Comienza con tus datos de contacto</h3>
+                    <p>En la parte superior escribe tu nombre completo, municipio o ciudad, teléfono y correo electrónico. Puedes agregar el enlace a tu portafolio o perfil profesional si es relevante.</p>
+                    <p>No incluyas datos sensibles como CURP, RFC, número de seguridad social, domicilio completo o copias de identificaciones. Una empresa seria puede solicitar algunos documentos más adelante, durante el proceso formal de contratación.</p>
+
+                    <h3>2. Escribe un perfil profesional breve</h3>
+                    <p>Resume en tres o cuatro líneas tu experiencia, tus principales habilidades y el tipo de oportunidad que buscas. Evita frases genéricas y menciona algo concreto que te diferencie.</p>
+                    <div class="my-5 rounded-2xl border-l-4 border-emerald-500 bg-emerald-50 p-5">
+                        <p class="text-sm font-black uppercase tracking-wide text-emerald-800">Ejemplo</p>
+                        <p class="mt-2 text-emerald-950">Auxiliar administrativo con tres años de experiencia en atención a clientes, control de documentos y manejo de Excel. Organizado, puntual y con facilidad para resolver problemas. Busco integrarme a una empresa de Cuernavaca o Jiutepec.</p>
+                    </div>
+
+                    <h3>3. Ordena tu experiencia laboral</h3>
+                    <p>Empieza por tu empleo más reciente. Para cada puesto incluye nombre de la empresa o negocio, cargo, fechas y entre tres y cinco actividades o logros. Usa verbos directos como atendí, organicé, vendí, coordiné, reparé o mejoré.</p>
+                    <p>Siempre que sea posible, agrega resultados medibles: “atendí a 30 clientes al día”, “reduje los tiempos de entrega” o “superé la meta mensual de ventas”. Si trabajaste por tu cuenta, en un negocio familiar o por proyecto, esa experiencia también cuenta.</p>
+
+                    <h3>4. Incluye tu formación</h3>
+                    <p>Escribe primero el nivel de estudios más reciente: carrera, especialidad, bachillerato o secundaria, según corresponda. Indica la institución y el periodo. Si todavía estudias, utiliza “en curso” y tu semestre o fecha estimada de término.</p>
+                    <p>Agrega cursos y certificaciones relacionados con la vacante, especialmente si fortalecen habilidades técnicas, digitales, de seguridad, ventas, idiomas u oficio.</p>
+
+                    <h3>5. Destaca habilidades relevantes</h3>
+                    <p>Combina conocimientos técnicos con habilidades personales que puedas demostrar. Elige entre seis y diez y evita llenar el documento con cualidades que no se relacionan con el empleo.</p>
+                    <ul>
+                        <li><strong class="text-slate-800">Habilidades técnicas:</strong> Excel, manejo de caja, inventarios, soldadura, cocina, redes sociales, conducción o mantenimiento.</li>
+                        <li><strong class="text-slate-800">Habilidades personales:</strong> comunicación, organización, trabajo en equipo, puntualidad, iniciativa o atención al detalle.</li>
+                        <li><strong class="text-slate-800">Idiomas:</strong> menciona tu nivel de forma honesta: básico, intermedio o avanzado.</li>
+                    </ul>
+
+                    <h3>6. Cuida la presentación</h3>
+                    <ol>
+                        <li>Procura que tenga una página si cuentas con poca experiencia y no más de dos si tu trayectoria es amplia.</li>
+                        <li>Usa una tipografía fácil de leer, títulos claros, espacios suficientes y el mismo estilo en todo el documento.</li>
+                        <li>Revisa ortografía, teléfono y correo. Pide a otra persona que lo lea antes de enviarlo.</li>
+                        <li>Guárdalo en PDF para que el formato no cambie y nómbralo de manera profesional: <strong class="text-slate-800">CV_Nombre_Apellido.pdf</strong>.</li>
+                    </ol>
+
+                    <h3>7. Si aún no tienes experiencia</h3>
+                    <p>Da prioridad a tu formación, servicio social, prácticas, voluntariado, proyectos escolares, trabajos temporales y habilidades. Explica qué hiciste y qué aprendiste. Un proyecto bien descrito puede demostrar responsabilidad, conocimientos y capacidad para colaborar.</p>
+
+                    <h3>Errores que debes evitar</h3>
+                    <ul>
+                        <li>Enviar el mismo currículum a todas las vacantes sin adaptarlo.</li>
+                        <li>Incluir información falsa o exagerar el nivel de una habilidad.</li>
+                        <li>Usar fotografías informales, correos poco profesionales o demasiados colores.</li>
+                        <li>Escribir párrafos muy largos o dejar fechas y datos de contacto desactualizados.</li>
+                        <li>Compartir documentos personales antes de verificar a la empresa y la oferta.</li>
+                    </ul>
+
+                    <div class="mt-10 rounded-3xl bg-slate-950 p-6 md:p-8 text-white">
+                        <h3 class="!mt-0 !text-white">Lista final antes de enviarlo</h3>
+                        <ul class="!mb-0 marker:text-emerald-400">
+                            <li class="!text-slate-200">Mis datos de contacto están actualizados.</li>
+                            <li class="!text-slate-200">El perfil y las habilidades corresponden a la vacante.</li>
+                            <li class="!text-slate-200">La experiencia está ordenada de la más reciente a la más antigua.</li>
+                            <li class="!text-slate-200">El documento no tiene faltas de ortografía.</li>
+                            <li class="!text-slate-200">El archivo está guardado en PDF con un nombre profesional.</li>
+                        </ul>
+                    </div>
+
+                    <p class="mt-8 text-sm border-t border-slate-200 pt-6">Un currículum claro facilita que la persona reclutadora encuentre lo importante. Actualízalo cada vez que aprendas una habilidad, termines un curso o consigas un nuevo logro.</p>
+                </div>
+            </article>
         </section>
     </div>
 
     <!-- Admin Tools Overlay -->
     <div id="admin-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
-        <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="admin-title">
+        <section class="bg-white w-full max-w-3xl rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="admin-title">
             <button onclick="hideAdminOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar"><i class="fas fa-times text-xl"></i></button>
-            <h2 id="admin-title" class="text-3xl font-black text-red-950 mt-2">Herramientas de Administrador</h2>
-            <p class="text-slate-500 mt-2 mb-7">
-                <strong>¡ATENCIÓN!</strong> Estas acciones son permanentes y solo deben usarse durante la fase de prueba.
-            </p>
-            <button onclick="deleteAllTestData()" class="w-full rounded-xl bg-red-700 py-3.5 font-black text-white hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60">
-                <i class="fas fa-exclamation-triangle mr-2"></i> Borrar TODAS las bases de datos de prueba
-            </button>
+            <h2 id="admin-title" class="text-3xl font-black text-red-950 mt-2">Administrar usuarios</h2>
+            <p class="text-slate-500 mt-2 mb-5">Selecciona una o varias cuentas para eliminarlas de Authentication y borrar sus anuncios y calificaciones.</p>
+            <div class="flex flex-wrap gap-3 mb-4">
+                <button type="button" onclick="toggleAllUsers(true)" class="text-sm font-bold text-blue-700 hover:underline">Seleccionar todos</button>
+                <button type="button" onclick="toggleAllUsers(false)" class="text-sm font-bold text-slate-600 hover:underline">Limpiar selección</button>
+                <button id="delete-users-button" type="button" onclick="deleteSelectedUsers()" class="ml-auto rounded-xl bg-red-700 px-4 py-2 font-black text-white hover:bg-red-800 disabled:opacity-60">Eliminar seleccionados</button>
+            </div>
+            <div id="admin-users-list" class="space-y-2"><p class="text-slate-500">Cargando usuarios...</p></div>
             <p id="admin-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold mt-4"></p>
         </section>
     </div>
@@ -290,30 +405,26 @@
     <!-- Cabecera integrada en la página -->
     <header class="hero-gradient min-h-[430px] px-6 py-6 text-white">
         <!-- Top Bar Container -->
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8 mb-8">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
             <!-- Left: Session Info -->
-            <div class="order-2 md:order-1 text-center md:text-left min-w-0">
+            <div class="flex items-center gap-2 min-w-0">
+                <button id="logout-button" type="button" class="hidden bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-3 rounded-xl text-xs transition-colors">SALIR</button>
                 <span id="session-email" class="hidden block truncate text-sm font-bold text-blue-100"></span>
-                <button id="logout-button" type="button" class="hidden mt-1 text-[10px] font-black text-white/80 hover:underline">SALIR</button>
-            </div>
-
-            <!-- Center: Title and Version -->
-            <div class="order-1 md:order-2 text-center flex-grow">
-                <h1 class="text-2xl md:text-3xl font-black tracking-tight">Morelos Trabaja — VERSION 36.14</h1>
-                <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200">Versión 36.13</p>
             </div>
 
             <!-- Right: Buttons -->
-            <div class="order-3 md:order-3 text-center md:text-right flex flex-col sm:flex-row items-center gap-2 md:gap-4 shrink-0">
+            <div class="flex flex-col sm:flex-row items-center gap-2 shrink-0">
                 <button id="about-us-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Acerca de nosotros</button>
                 <button id="articles-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Artículos de interés</button>
                 <button id="admin-tools-button" class="hidden bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Admin Tools</button>
             </div>
         </div>
-        <!-- Existing Hero Content (below the top bar) -->
+        <!-- Main Hero Content -->
         <div class="max-w-3xl mx-auto pt-16 text-center">
-            <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
-                El portal de empleos de Morelos.
+            <h1 class="text-4xl md:text-6xl font-black mb-2 leading-tight">Morelos Trabaja — VERSION 36.18</h1>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-6">Versión 36.17</p>
+            <h2 class="text-2xl md:text-3xl font-black mb-6 leading-tight">
+                El portal de empleos, servicios y ventas en Morelos.
             </h2>
             <p class="text-blue-100 text-lg mb-10 font-medium italic opacity-80">
                 "Oportunidades reales para Yautepec, Cuautla y todo el estado."
@@ -330,7 +441,7 @@
     </header>
 
     <!-- Lista de Anuncios -->
-    <main class="max-w-2xl mx-auto p-6 mt-6" id="contenedor-anuncios">
+    <main class="max-w-6xl mx-auto p-6 mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="contenedor-anuncios">
         <!-- El contenido inicial se cargará aquí (spinner o anuncios) -->
     </main>
 
@@ -381,21 +492,20 @@
         `;
 
         const NO_ANUNCIOS_HTML = `
-            <div class="text-center py-20 text-slate-400 font-bold">No hay anuncios aquí todavía.</div>
+            <div class="text-center py-20 text-slate-400 font-bold col-span-full">No hay anuncios aquí todavía.</div>
         `;
 
         const PREVIEW_MODE_BANNER = `
-            <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700">
+            <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700 col-span-full">
                 <i class="fa fa-info-circle mr-2"></i> MODO VISTA PREVIA: Mostrando ejemplos locales.
             </div>
         `;
 
-        // ADMIN_UIDS: Remplazar con los UIDs de administradores reales durante la fase de prueba
-        // Para obtener tu UID, inicia sesión y revisa `firebase.auth().currentUser.uid` en la consola del navegador.
-        const ADMIN_UIDS = [
-            // 'tu_uid_de_administrador_aqui', 
-            // 'otro_uid_de_administrador_aqui'
-        ];
+        const SUPERUSER_EMAIL = 'cumorahnet@gmail.com';
+
+        function isSuperUser(user = firebase.auth().currentUser) {
+            return Boolean(user && user.emailVerified && String(user.email || '').toLowerCase() === SUPERUSER_EMAIL);
+        }
 
         function initializeFirebase() {
             if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -577,9 +687,15 @@
                     sessionEmail.classList.toggle('hidden', !registeredUser);
                     logoutButton.classList.toggle('hidden', !registeredUser);
 
-                    // Admin tools visibility
-                    const isAdmin = registeredUser && ADMIN_UIDS.includes(registeredUser.uid);
+                    const isAdmin = isSuperUser(registeredUser);
                     adminToolsButton.classList.toggle('hidden', !isAdmin);
+
+                    if (registeredUser) {
+                        firebase.firestore().collection('usuarios').doc(registeredUser.uid).set({
+                            email: registeredUser.email || '',
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true }).catch(error => console.warn('No fue posible registrar el perfil:', error.code || error));
+                    }
 
                     if (!registeredUser) emailInput.focus();
                     else filtrar(activeCategory, activeCriteria);
@@ -684,38 +800,40 @@
             const precio = data.precio ? `$${Number(data.precio).toLocaleString('es-MX')}` : '';
             const condicion = escapeHtml(data.condicion || '');
             const tipoProducto = escapeHtml(data.tipo_producto || '');
+            const adminDeleteButton = isSuperUser() && data.id ? `<button type="button" onclick="deleteAd('${encodeURIComponent(data.id)}')" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-black text-red-700 hover:bg-red-100"><i class="fas fa-trash mr-1"></i>ELIMINAR ANUNCIO</button>` : '';
 
             let specificFieldsHtml = '';
 
             if (category === 'empleo') {
-                if (empresa) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Empresa:</strong> ${empresa}</p>`;
-                if (tipoEmpleo) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Tipo:</strong> ${tipoEmpleo}</p>`;
-                if (areaTrabajo) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Área:</strong> ${areaTrabajo}</p>`;
-                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Zona:</strong> ${zona}</p>`;
+                if (empresa) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Empresa:</strong> ${empresa}</p>`;
+                if (tipoEmpleo) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Tipo:</strong> ${tipoEmpleo}</p>`;
+                if (areaTrabajo) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Área:</strong> ${areaTrabajo}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Zona:</strong> ${zona}</p>`;
             } else if (category === 'servicios') {
-                if (tipoServicio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Tipo:</strong> ${tipoServicio}</p>`;
-                if (experienciaServicio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Experiencia:</strong> ${experienciaServicio}</p>`;
-                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Zona de Servicio:</strong> ${zona}</p>`;
+                if (tipoServicio) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Tipo:</strong> ${tipoServicio}</p>`;
+                if (experienciaServicio) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Experiencia:</strong> ${experienciaServicio}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Zona de Servicio:</strong> ${zona}</p>`;
             } else if (category === 'ventas') {
-                if (precio) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Precio:</strong> ${precio}</p>`;
-                if (condicion) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Condición:</strong> ${condicion}</p>`;
-                if (tipoProducto) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Producto:</strong> ${tipoProducto}</p>`;
-                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-sm mt-1"><strong>Ubicación:</strong> ${zona}</p>`;
+                if (precio) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Precio:</strong> ${precio}</p>`;
+                if (condicion) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Condición:</strong> ${condicion}</p>`;
+                if (tipoProducto) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Producto:</strong> ${tipoProducto}</p>`;
+                if (zona) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Ubicación:</strong> ${zona}</p>`;
             }
 
             const contactLink = whatsapp ? `
-                    <a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="bg-green-500 text-white p-4 rounded-2xl shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
-                        <i class="fab fa-whatsapp text-2xl" aria-hidden="true"></i>
+                    <a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="bg-green-500 text-white p-3 rounded-xl shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 flex items-center justify-center">
+                        <i class="fab fa-whatsapp text-xl" aria-hidden="true"></i>
                     </a>` : '';
 
             return `
-                <div class="card-anuncio bg-white p-8 rounded-3xl shadow-sm mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-5 border-l-[6px] ${style.borderColorClass}">
-                    <div class="min-w-0">
+                <div class="card-anuncio bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between gap-4 border-l-[6px] ${style.borderColorClass}">
+                    <div class="min-w-0 flex-grow">
                         <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${escapeHtml(category)}</span>
-                        <h3 class="text-2xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
-                        <p class="text-slate-500 mt-2">${escapeHtml(data.descripcion)}</p>
+                        <h3 class="text-xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
+                        <p class="text-slate-500 text-sm mt-2">${escapeHtml(data.descripcion)}</p>
                         ${specificFieldsHtml}
                         ${renderRating(data.authorUid, ratingInfo)}
+                        ${adminDeleteButton}
                     </div>
                     ${contactLink}
                 </div>
@@ -757,6 +875,35 @@
                     condicion: 'Usado - Excelente',
                     tipo_producto: 'Deportes',
                     zona: 'Cuernavaca'
+                },
+                {
+                    categoria: 'empleo',
+                    titulo: 'Mesero/a con experiencia',
+                    descripcion: 'Restaurante de comida italiana busca mesero con al menos 2 años de experiencia. Buen ambiente laboral y propinas.',
+                    whatsapp: '5217775551234',
+                    empresa: 'Trattoria del Sole',
+                    tipo_empleo: 'Permanente',
+                    area_trabajo: 'Alimentos y Bebidas',
+                    zona: 'Cuernavaca, Centro'
+                },
+                {
+                    categoria: 'servicios',
+                    titulo: 'Clases de Guitarra Acústica',
+                    descripcion: 'Clases particulares de guitarra para principiantes e intermedios. Aprende tus canciones favoritas.',
+                    whatsapp: '5217778889900',
+                    tipo_servicio: 'Clases Particulares',
+                    experiencia_servicio: 'Maestro con 10 años de experiencia',
+                    zona: 'Jiutepec y alrededores'
+                },
+                {
+                    categoria: 'ventas',
+                    titulo: 'Consola de Videojuegos Xbox One S',
+                    descripcion: 'Consola en perfecto estado, incluye dos controles y 5 juegos. Precio negociable.',
+                    whatsapp: '5217771112223',
+                    precio: 3500,
+                    condicion: 'Usado - Bueno',
+                    tipo_producto: 'Electrónica',
+                    zona: 'Temixco'
                 }
             ];
 
@@ -815,7 +962,7 @@
                     return;
                 }
 
-                const anuncios = snapshot.docs.map(doc => doc.data()).filter(data => matchesCriteria(data, criteria)).sort((a, b) => {
+                const anuncios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(data => matchesCriteria(data, criteria)).sort((a, b) => {
                     const fechaA = a.fecha?.toMillis?.() ?? 0;
                     const fechaB = b.fecha?.toMillis?.() ?? 0;
                     return fechaB - fechaA;
@@ -1041,9 +1188,21 @@
             document.getElementById('about-overlay').classList.add('hidden');
         }
 
+        function showArticlesOverlay() {
+            const overlay = document.getElementById('articles-overlay');
+            overlay.classList.remove('hidden');
+            overlay.querySelector('section').scrollTop = 0;
+        }
+
+        function hideArticlesOverlay() {
+            document.getElementById('articles-overlay').classList.add('hidden');
+        }
+
         function showAdminOverlay() {
+            if (!isSuperUser()) return;
             document.getElementById('admin-overlay').classList.remove('hidden');
-            document.getElementById('admin-message').classList.add('hidden'); // Clear message on open
+            document.getElementById('admin-message').classList.add('hidden');
+            loadAdminUsers();
         }
 
         function hideAdminOverlay() {
@@ -1051,83 +1210,79 @@
         }
 
         function contactForGrading() {
-            // Reemplaza con la dirección de correo electrónico real
             window.location.href = 'mailto:equipo.morelostrabaja@example.com?subject=Discrepancia%20en%20Calificación%20o%20Sugerencia&body=Hola%2C%0D%0A%0D%0Escribo%20para...';
         }
 
-        // --- Admin Tools Logic ---
-        async function deleteAllCollection(db, collectionName, messageElement) {
-            messageElement.textContent = `Borrando colección "${collectionName}"...`;
-            messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-amber-50 text-amber-700';
-            messageElement.classList.remove('hidden');
-
-            const collectionRef = db.collection(collectionName);
-            const query = collectionRef.limit(50); // Delete in batches of 50
-
-            return new Promise((resolve, reject) => {
-                deleteQueryBatch(db, query, resolve, reject, messageElement, collectionName);
-            });
+        // --- Administración segura ---
+        function adminMessage(text, type = 'error') {
+            const element = document.getElementById('admin-message');
+            element.textContent = text;
+            element.className = `rounded-xl px-4 py-3 text-sm font-bold mt-4 ${type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`;
         }
 
-        function deleteQueryBatch(db, query, resolve, reject, messageElement, collectionName) {
-            query.get()
-                .then((snapshot) => {
-                    if (snapshot.size === 0) {
-                        return 0;
-                    }
-
-                    const batch = db.batch();
-                    snapshot.docs.forEach((doc) => {
-                        batch.delete(doc.ref);
-                    });
-
-                    return batch.commit().then(() => snapshot.size);
-                })
-                .then((numDeleted) => {
-                    if (numDeleted === 0) {
-                        messageElement.textContent = `Colección "${collectionName}" borrada.`;
-                        messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700';
-                        resolve();
-                        return;
-                    }
-                    // Recursively call itself to delete the next batch
-                    messageElement.textContent = `Borrados ${numDeleted} documentos de "${collectionName}". Continuar...`;
-                    setTimeout(() => deleteQueryBatch(db, query, resolve, reject, messageElement, collectionName), 10);
-                })
-                .catch(reject);
-        }
-
-        async function deleteAllTestData() {
-            if (!confirm('¿Estás SEGURO de que quieres borrar TODA la base de datos de prueba (anuncios y calificaciones)? Esta acción es IRREVERSIBLE.')) {
-                return;
+        function getAdminErrorMessage(error) {
+            const code = String(error?.code || '');
+            if (code.includes('not-found') || code.includes('unavailable')) {
+                return 'El servicio administrativo no está disponible temporalmente. Intenta nuevamente en unos minutos.';
             }
+            if (code.includes('internal')) {
+                return 'El servidor encontró un error al procesar los usuarios. Intenta nuevamente; si continúa, revisa los registros de Functions.';
+            }
+            if (code.includes('permission-denied') || code.includes('unauthenticated')) {
+                return 'Acceso denegado. Inicia sesión con cumorahnet@gmail.com y verifica el correo.';
+            }
+            return error?.message || 'No fue posible completar la operación administrativa.';
+        }
 
-            const adminMessage = document.getElementById('admin-message');
-            const deleteButton = document.querySelector('#admin-overlay button[onclick="deleteAllTestData()"]');
-            deleteButton.disabled = true;
-
+        async function loadAdminUsers() {
+            const list = document.getElementById('admin-users-list');
+            list.innerHTML = '<p class="text-slate-500">Cargando usuarios...</p>';
             try {
-                initializeFirebase();
-                const db = firebase.firestore();
-
-                adminMessage.textContent = 'Iniciando eliminación de datos...';
-                adminMessage.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-amber-50 text-amber-700';
-                adminMessage.classList.remove('hidden');
-
-                await deleteAllCollection(db, 'anuncios', adminMessage);
-                await deleteAllCollection(db, 'calificaciones', adminMessage);
-
-                adminMessage.textContent = '¡Todas las bases de datos de prueba han sido borradas con éxito!';
-                adminMessage.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700';
-                // Reload ads on main page after deletion
-                filtrar();
+                const result = await firebase.app().functions().httpsCallable('adminListUsers')();
+                const users = result.data.users || [];
+                list.innerHTML = users.length ? users.map(user => {
+                    const isAdminAccount = String(user.email || '').toLowerCase() === SUPERUSER_EMAIL;
+                    return `<label class="flex items-center gap-3 rounded-xl border border-slate-200 p-3 ${isAdminAccount ? 'bg-amber-50' : ''}"><input class="admin-user-checkbox h-5 w-5" type="checkbox" value="${escapeHtml(user.uid)}" ${isAdminAccount ? 'disabled' : ''}><span class="min-w-0"><strong class="block truncate text-slate-800">${escapeHtml(user.email || 'Sin correo')}</strong><small class="text-slate-500">${user.disabled ? 'Cuenta deshabilitada' : 'Cuenta activa'}</small></span>${isAdminAccount ? '<span class="ml-auto text-xs font-black text-amber-700">SUPERUSUARIO</span>' : ''}</label>`;
+                }).join('') : '<p class="text-slate-500">No hay usuarios registrados.</p>';
             } catch (error) {
-                console.error("Error al borrar datos de prueba:", error);
-                adminMessage.textContent = `Error al borrar datos: ${error.message}`;
-                adminMessage.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-red-50 text-red-700';
+                console.error('Error al listar usuarios:', error);
+                list.innerHTML = '<p class="text-red-700">No fue posible cargar los usuarios.</p>';
+                adminMessage(getAdminErrorMessage(error));
+            }
+        }
+
+        function toggleAllUsers(checked) {
+            document.querySelectorAll('.admin-user-checkbox:not(:disabled)').forEach(input => { input.checked = checked; });
+        }
+
+        async function deleteSelectedUsers() {
+            const uids = [...document.querySelectorAll('.admin-user-checkbox:checked')].map(input => input.value);
+            if (!uids.length) return adminMessage('Selecciona al menos un usuario.');
+            if (!confirm(`¿Eliminar permanentemente ${uids.length} usuario(s), sus anuncios y calificaciones?`)) return;
+            const button = document.getElementById('delete-users-button');
+            button.disabled = true;
+            try {
+                const result = await firebase.app().functions().httpsCallable('adminDeleteUsers')({ uids });
+                const failedText = result.data.failed ? ` ${result.data.failed} no pudieron eliminarse.` : '';
+                adminMessage(`Se eliminaron ${result.data.deleted} usuario(s).${failedText}`, result.data.failed ? 'error' : 'success');
+                await loadAdminUsers();
+                await filtrar(activeCategory, activeCriteria);
+            } catch (error) {
+                console.error('Error al eliminar usuarios:', error);
+                adminMessage(getAdminErrorMessage(error));
             } finally {
-                deleteButton.disabled = false;
-                setTimeout(() => adminMessage.classList.add('hidden'), 5000); // Hide message after 5 seconds
+                button.disabled = false;
+            }
+        }
+
+        async function deleteAd(encodedId) {
+            if (!isSuperUser() || !confirm('¿Eliminar este anuncio permanentemente?')) return;
+            try {
+                await firebase.firestore().collection('anuncios').doc(decodeURIComponent(encodedId)).delete();
+                await filtrar(activeCategory, activeCriteria);
+            } catch (error) {
+                console.error('Error al eliminar anuncio:', error);
+                alert('No fue posible eliminar el anuncio.');
             }
         }
 
@@ -1138,10 +1293,7 @@
             filtrar();
             // Assign event listeners for new header buttons
             document.getElementById('about-us-button').addEventListener('click', showAboutOverlay);
-            document.getElementById('articles-button').addEventListener('click', () => {
-                // For now, articles button also opens the about overlay, can be changed later
-                showAboutOverlay(); 
-            });
+            document.getElementById('articles-button').addEventListener('click', showArticlesOverlay);
             document.getElementById('admin-tools-button').addEventListener('click', showAdminOverlay);
         }); // Carga autenticación y anuncios al iniciar la página
     </script>

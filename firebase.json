@@ -4,7 +4,8 @@
     "runtime": "nodejs22"
   },
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "hosting": {
     "public": ".",
@@ -15,6 +16,10 @@
       ".cdc/**",
       ".firebase/**",
       "*.backup",
+      "firebase-debug.log",
+      "firestore.indexes.json",
+      "firestore.rules",
+      "functions/**",
       "CHANGELOG.md",
       "DECISIONS.md",
       "NEXT.md",

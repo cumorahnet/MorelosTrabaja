@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja</title>
+    <title>Morelos Trabaja — VERSION 36.23</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -29,6 +29,29 @@
             transform: translateY(-4px); 
             box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
         }
+        .article-content h3 {
+            color: #172554;
+            font-size: 1.25rem;
+            font-weight: 900;
+            line-height: 1.35;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        .article-content p,
+        .article-content li {
+            color: #475569;
+            line-height: 1.75;
+        }
+        .article-content p + p { margin-top: 1rem; }
+        .article-content ul,
+        .article-content ol {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        .article-content ul { list-style: disc; }
+        .article-content ol { list-style: decimal; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -44,11 +67,27 @@
                 <h2 id="auth-title" class="text-3xl font-black text-blue-950 mt-2">Crea tu cuenta</h2>
                 <p id="auth-subtitle" class="text-slate-500 mt-2 mb-7">Regístrate para continuar.</p>
                 <form id="auth-form" class="space-y-4">
+                    <div id="registration-profile-fields" class="space-y-4">
+                        <label class="block text-sm font-bold text-slate-700">Nombre completo
+                            <input id="auth-name" type="text" autocomplete="name" required minlength="2" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nombre y apellidos">
+                        </label>
+                        <label class="block text-sm font-bold text-slate-700">Municipio
+                            <input id="auth-municipality" type="text" autocomplete="address-level2" required minlength="2" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Cuernavaca">
+                        </label>
+                        <label class="block text-sm font-bold text-slate-700">WhatsApp de contacto
+                            <input id="auth-whatsapp" type="tel" autocomplete="tel" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 5217771234567">
+                        </label>
+                    </div>
                     <label class="block text-sm font-bold text-slate-700">Correo electrónico
                         <input id="auth-email" type="email" autocomplete="email" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="tu@correo.com">
                     </label>
                     <label class="block text-sm font-bold text-slate-700">Contraseña
-                        <input id="auth-password" type="password" autocomplete="new-password" required minlength="6" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Mínimo 6 caracteres">
+                        <div class="relative">
+                            <input id="auth-password" type="password" autocomplete="new-password" required minlength="6" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Mínimo 6 caracteres">
+                            <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center px-4 mt-2 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Mostrar/ocultar contraseña">
+                                <i class="fas fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     </label>
                     <p id="auth-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
                     <button id="auth-submit" type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">CREAR CUENTA</button>
@@ -64,6 +103,28 @@
                     <button id="auth-toggle" type="button" class="text-slate-600 disabled:opacity-60">Ya tengo cuenta. <span class="font-black text-blue-700">Iniciar sesión</span></button>
                 </div>
             </div>
+        </section>
+    </div>
+
+    <!-- Perfil requerido para cuentas existentes o acceso con Google -->
+    <div id="profile-overlay" class="fixed inset-0 z-[102] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9" aria-labelledby="profile-title">
+            <p class="text-xs font-black tracking-[0.25em] text-blue-600 uppercase">Tu perfil</p>
+            <h2 id="profile-title" class="text-3xl font-black text-blue-950 mt-2">Completa tus datos</h2>
+            <p class="text-slate-500 mt-2 mb-7">Los usaremos para identificarte al contactar una publicación.</p>
+            <form id="profile-form" class="space-y-4">
+                <label class="block text-sm font-bold text-slate-700">Nombre completo
+                    <input id="profile-name" type="text" autocomplete="name" required minlength="2" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </label>
+                <label class="block text-sm font-bold text-slate-700">Municipio
+                    <input id="profile-municipality" type="text" autocomplete="address-level2" required minlength="2" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Cuernavaca">
+                </label>
+                <label class="block text-sm font-bold text-slate-700">WhatsApp de contacto
+                    <input id="profile-whatsapp" type="tel" autocomplete="tel" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 5217771234567">
+                </label>
+                <p id="profile-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+                <button id="profile-submit" type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-wait disabled:opacity-60">GUARDAR PERFIL</button>
+            </form>
         </section>
     </div>
 
@@ -144,6 +205,30 @@
                             <option value="otros">Otros</option>
                         </select>
                     </label>
+                    <label class="block text-sm font-bold text-slate-700">Prestaciones
+                        <textarea id="empleo-prestaciones" required minlength="3" maxlength="300" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Ej: Seguro social, aguinaldo, vacaciones y bonos"></textarea>
+                    </label>
+                    <fieldset class="rounded-2xl border border-slate-200 p-4">
+                        <legend class="px-2 text-sm font-bold text-slate-700">Rango de sueldo</legend>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="block text-sm font-bold text-slate-700">Mínimo ($ MXN)
+                                <input type="number" id="empleo-sueldo-minimo" required min="0" max="10000000" step="1" inputmode="numeric" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 8000">
+                            </label>
+                            <label class="block text-sm font-bold text-slate-700">Máximo ($ MXN)
+                                <input type="number" id="empleo-sueldo-maximo" required min="0" max="10000000" step="1" inputmode="numeric" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 12000">
+                            </label>
+                        </div>
+                        <label class="block text-sm font-bold text-slate-700 mt-4">Periodo
+                            <select id="empleo-periodo-sueldo" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Selecciona</option>
+                                <option value="hora">Por hora</option>
+                                <option value="dia">Por día</option>
+                                <option value="semana">Por semana</option>
+                                <option value="quincena">Por quincena</option>
+                                <option value="mes">Por mes</option>
+                            </select>
+                        </label>
+                    </fieldset>
                     <p id="empleo-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
                     <button type="submit" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60">PUBLICAR EMPLEO</button>
                     <button type="button" onclick="showCategorySelection()" class="w-full mt-2 text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
@@ -261,15 +346,132 @@
                 Morelos Trabaja es un portal comunitario para conectar a personas que buscan empleo, ofrecen servicios o venden productos dentro del estado de Morelos. Nuestra misión es facilitar oportunidades y fortalecer la economía local.
             </p>
             <p class="text-slate-500 mb-4">
-                Si encuentras alguna discrepancia en una calificación o tienes alguna sugerencia, no dudes en contactarnos.
+                Tus sugerencias y comentarios nos ayudan a mejorar Morelos Trabaja. No dudes en contactarnos.
             </p>
-            <button onclick="contactForGrading()" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 mb-4">
-                <i class="fas fa-envelope mr-2"></i> Contactar por calificaciones
+            <button onclick="contactForFeedback()" class="w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 mb-4">
+                <i class="fas fa-envelope mr-2"></i> Enviar sugerencia o comentario
             </button>
-            <button onclick="hideAboutOverlay()" class="w-full block text-center rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
+            <button onclick="hideAboutOverlay(); showArticlesOverlay()" class="w-full block text-center rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
                 <i class="fas fa-newspaper mr-2"></i> Ver Artículos de Interés
             </button>
-            <p class="text-xs text-slate-400 mt-4 text-center">Version 36.13 - Desarrollado con ❤️ en Morelos.</p>
+            <p class="text-xs text-slate-400 mt-4 text-center"><span data-app-version>Versión 36.22</span> - Desarrollado con ❤️ en Morelos.</p>
+        </section>
+    </div>
+
+    <!-- Artículos de interés -->
+    <div id="articles-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl relative max-h-[94vh] overflow-y-auto" aria-labelledby="articles-title">
+            <button onclick="hideArticlesOverlay()" class="sticky top-4 z-10 float-right mr-4 md:mr-6 mt-4 h-11 w-11 rounded-full bg-white/95 text-slate-500 shadow-lg ring-1 ring-slate-200 hover:text-blue-700" aria-label="Cerrar artículos de interés">
+                <i class="fas fa-times text-xl" aria-hidden="true"></i>
+            </button>
+
+            <article class="overflow-hidden">
+                <header class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-700 px-6 py-10 md:px-12 md:py-14 text-white">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-200 uppercase">Artículos de interés · Búsqueda de empleo</p>
+                    <h2 id="articles-title" class="mt-4 max-w-3xl text-3xl md:text-5xl font-black leading-tight">Cómo crear un currículum que te ayude a conseguir entrevistas</h2>
+                    <p class="mt-5 max-w-2xl text-base md:text-lg leading-relaxed text-blue-100">Una guía sencilla para presentar tu experiencia, destacar tus habilidades y enviar un CV claro y profesional.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-blue-100">
+                        <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>7 min de lectura</span>
+                        <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>11 de agosto de 2026</span>
+                    </div>
+                </header>
+
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">Tu currículum es la primera impresión que una empresa recibe de ti. No necesita tener un diseño complicado: debe explicar con rapidez quién eres, qué sabes hacer y por qué eres una buena opción para el puesto.</p>
+
+                    <aside class="my-8 rounded-2xl border border-blue-100 bg-blue-50 p-5 md:p-6">
+                        <p class="font-black text-blue-950"><i class="fas fa-lightbulb mr-2 text-amber-500" aria-hidden="true"></i>La regla más importante</p>
+                        <p class="mt-2 text-blue-900">Adapta tu currículum a cada vacante. Revisa qué experiencia y habilidades pide la empresa y coloca primero la información que demuestra que cumples con esos requisitos.</p>
+                    </aside>
+
+                    <h3>1. Comienza con tus datos de contacto</h3>
+                    <p>En la parte superior escribe tu nombre completo, municipio o ciudad, teléfono y correo electrónico. Puedes agregar el enlace a tu portafolio o perfil profesional si es relevante.</p>
+                    <p>No incluyas datos sensibles como CURP, RFC, número de seguridad social, domicilio completo o copias de identificaciones. Una empresa seria puede solicitar algunos documentos más adelante, durante el proceso formal de contratación.</p>
+
+                    <h3>2. Escribe un perfil profesional breve</h3>
+                    <p>Resume en tres o cuatro líneas tu experiencia, tus principales habilidades y el tipo de oportunidad que buscas. Evita frases genéricas y menciona algo concreto que te diferencie.</p>
+                    <div class="my-5 rounded-2xl border-l-4 border-emerald-500 bg-emerald-50 p-5">
+                        <p class="text-sm font-black uppercase tracking-wide text-emerald-800">Ejemplo</p>
+                        <p class="mt-2 text-emerald-950">Auxiliar administrativo con tres años de experiencia en atención a clientes, control de documentos y manejo de Excel. Organizado, puntual y con facilidad para resolver problemas. Busco integrarme a una empresa de Cuernavaca o Jiutepec.</p>
+                    </div>
+
+                    <h3>3. Ordena tu experiencia laboral</h3>
+                    <p>Empieza por tu empleo más reciente. Para cada puesto incluye nombre de la empresa o negocio, cargo, fechas y entre tres y cinco actividades o logros. Usa verbos directos como atendí, organicé, vendí, coordiné, reparé o mejoré.</p>
+                    <p>Siempre que sea posible, agrega resultados medibles: “atendí a 30 clientes al día”, “reduje los tiempos de entrega” o “superé la meta mensual de ventas”. Si trabajaste por tu cuenta, en un negocio familiar o por proyecto, esa experiencia también cuenta.</p>
+
+                    <h3>4. Incluye tu formación</h3>
+                    <p>Escribe primero el nivel de estudios más reciente: carrera, especialidad, bachillerato o secundaria, según corresponda. Indica la institución y el periodo. Si todavía estudias, utiliza “en curso” y tu semestre o fecha estimada de término.</p>
+                    <p>Agrega cursos y certificaciones relacionados con la vacante, especialmente si fortalecen habilidades técnicas, digitales, de seguridad, ventas, idiomas u oficio.</p>
+
+                    <h3>5. Destaca habilidades relevantes</h3>
+                    <p>Combina conocimientos técnicos con habilidades personales que puedas demostrar. Elige entre seis y diez y evita llenar el documento con cualidades que no se relacionan con el empleo.</p>
+                    <ul>
+                        <li><strong class="text-slate-800">Habilidades técnicas:</strong> Excel, manejo de caja, inventarios, soldadura, cocina, redes sociales, conducción o mantenimiento.</li>
+                        <li><strong class="text-slate-800">Habilidades personales:</strong> comunicación, organización, trabajo en equipo, puntualidad, iniciativa o atención al detalle.</li>
+                        <li><strong class="text-slate-800">Idiomas:</strong> menciona tu nivel de forma honesta: básico, intermedio o avanzado.</li>
+                    </ul>
+
+                    <h3>6. Cuida la presentación</h3>
+                    <ol>
+                        <li>Procura que tenga una página si cuentas con poca experiencia y no más de dos si tu trayectoria es amplia.</li>
+                        <li>Usa una tipografía fácil de leer, títulos claros, espacios suficientes y el mismo estilo en todo el documento.</li>
+                        <li>Revisa ortografía, teléfono y correo. Pide a otra persona que lo lea antes de enviarlo.</li>
+                        <li>Guárdalo en PDF para que el formato no cambie y nómbralo de manera profesional: <strong class="text-slate-800">CV_Nombre_Apellido.pdf</strong>.</li>
+                    </ol>
+
+                    <h3>7. Si aún no tienes experiencia</h3>
+                    <p>Da prioridad a tu formación, servicio social, prácticas, voluntariado, proyectos escolares, trabajos temporales y habilidades. Explica qué hiciste y qué aprendiste. Un proyecto bien descrito puede demostrar responsabilidad, conocimientos y capacidad para colaborar.</p>
+
+                    <h3>Errores que debes evitar</h3>
+                    <ul>
+                        <li>Enviar el mismo currículum a todas las vacantes sin adaptarlo.</li>
+                        <li>Incluir información falsa o exagerar el nivel de una habilidad.</li>
+                        <li>Usar fotografías informales, correos poco profesionales o demasiados colores.</li>
+                        <li>Escribir párrafos muy largos o dejar fechas y datos de contacto desactualizados.</li>
+                        <li>Compartir documentos personales antes de verificar a la empresa y la oferta.</li>
+                    </ul>
+
+                    <div class="mt-10 rounded-3xl bg-slate-950 p-6 md:p-8 text-white">
+                        <h3 class="!mt-0 !text-white">Lista final antes de enviarlo</h3>
+                        <ul class="!mb-0 marker:text-emerald-400">
+                            <li class="!text-slate-200">Mis datos de contacto están actualizados.</li>
+                            <li class="!text-slate-200">El perfil y las habilidades corresponden a la vacante.</li>
+                            <li class="!text-slate-200">La experiencia está ordenada de la más reciente a la más antigua.</li>
+                            <li class="!text-slate-200">El documento no tiene faltas de ortografía.</li>
+                            <li class="!text-slate-200">El archivo está guardado en PDF con un nombre profesional.</li>
+                        </ul>
+                    </div>
+
+                    <p class="mt-8 text-sm border-t border-slate-200 pt-6">Un currículum claro facilita que la persona reclutadora encuentre lo importante. Actualízalo cada vez que aprendas una habilidad, termines un curso o consigas un nuevo logro.</p>
+                </div>
+            </article>
+        </section>
+    </div>
+
+    <!-- Mis anuncios -->
+    <div id="my-ads-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="my-ads-title">
+            <button onclick="hideMyAdsOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar"><i class="fas fa-times text-xl"></i></button>
+            <h2 id="my-ads-title" class="text-3xl font-black text-blue-950 mt-2">Mis anuncios</h2>
+            <p class="text-slate-500 mt-2 mb-5">Aquí sólo aparecen tus publicaciones. Puedes retirar las activas y consultar el historial de las cerradas o vencidas.</p>
+            <div id="my-ads-tabs" class="flex flex-wrap gap-2 mb-5" role="tablist" aria-label="Estados de mis anuncios">
+                <button type="button" data-my-ads-tab="activos" onclick="setMyAdsTab('activos')" class="rounded-full bg-blue-700 px-4 py-2 text-sm font-black text-white" role="tab" aria-selected="true">Activos <span id="my-ads-count-activos">0</span></button>
+                <button type="button" data-my-ads-tab="cerrados" onclick="setMyAdsTab('cerrados')" class="rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-slate-600" role="tab" aria-selected="false">Cerrados <span id="my-ads-count-cerrados">0</span></button>
+                <button type="button" data-my-ads-tab="vencidos" onclick="setMyAdsTab('vencidos')" class="rounded-full bg-slate-100 px-4 py-2 text-sm font-black text-slate-600" role="tab" aria-selected="false">Vencidos <span id="my-ads-count-vencidos">0</span></button>
+            </div>
+            <div id="my-ads-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-slate-500">Cargando anuncios...</p></div>
+            <p id="my-ads-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold mt-4"></p>
+        </section>
+    </div>
+
+    <!-- Contactos y evaluaciones -->
+    <div id="contacts-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
+        <section class="bg-white w-full max-w-3xl rounded-[2rem] shadow-2xl p-7 md:p-9 relative max-h-[90vh] overflow-y-auto" aria-labelledby="contacts-title">
+            <button onclick="hideContactsOverlay()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-700" aria-label="Cerrar"><i class="fas fa-times text-xl"></i></button>
+            <h2 id="contacts-title" class="text-3xl font-black text-blue-950 mt-2">Mis contactos y evaluaciones</h2>
+            <p class="text-slate-500 mt-2 mb-5">Después de contactar tienes 5 días para evaluar. Si no evalúas, no se asignan estrellas automáticamente.</p>
+            <div id="contacts-list" class="space-y-4"><p class="text-slate-500">Cargando contactos...</p></div>
+            <p id="contacts-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold mt-4"></p>
         </section>
     </div>
 
@@ -292,30 +494,28 @@
     <!-- Cabecera integrada en la página -->
     <header class="hero-gradient min-h-[430px] px-6 py-6 text-white">
         <!-- Top Bar Container -->
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8 mb-8">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
             <!-- Left: Session Info -->
-            <div class="order-2 md:order-1 text-center md:text-left min-w-0">
-                <button id="logout-button" type="button" class="hidden bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-3 rounded-xl text-xs transition-colors mb-1">SALIR</button>
+            <div class="flex items-center gap-2 min-w-0">
+                <button id="logout-button" type="button" class="hidden bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-3 rounded-xl text-xs transition-colors">SALIR</button>
                 <span id="session-email" class="hidden block truncate text-sm font-bold text-blue-100"></span>
             </div>
 
-            <!-- Center: Title and Version -->
-            <div class="order-1 md:order-2 text-center flex-grow">
-                <h1 class="text-2xl md:text-3xl font-black tracking-tight">Morelos Trabaja</h1>
-                <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200">Versión 36.15</p>
-            </div>
-
             <!-- Right: Buttons -->
-            <div class="order-3 md:order-3 text-center md:text-right flex flex-col sm:flex-row items-center gap-2 md:gap-4 shrink-0">
+            <div class="flex flex-col sm:flex-row items-center gap-2 shrink-0">
+                <button id="my-ads-button" class="bg-cyan-700 hover:bg-cyan-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap"><i class="fas fa-list-alt mr-1"></i> Mis anuncios</button>
+                <button id="contacts-button" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap"><i class="fas fa-star mr-1"></i> Mis contactos</button>
                 <button id="about-us-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Acerca de nosotros</button>
                 <button id="articles-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Artículos de interés</button>
                 <button id="admin-tools-button" class="hidden bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Admin Tools</button>
             </div>
         </div>
-        <!-- Existing Hero Content (below the top bar) -->
+        <!-- Main Hero Content -->
         <div class="max-w-3xl mx-auto pt-16 text-center">
-            <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
-                El portal de empleos de Morelos.
+            <h1 class="text-4xl md:text-6xl font-black mb-2 leading-tight">Morelos Trabaja</h1>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-6" data-app-version>Versión 36.23</p>
+            <h2 class="text-2xl md:text-3xl font-black mb-6 leading-tight">
+                El portal de empleos, servicios y ventas en Morelos.
             </h2>
             <p class="text-blue-100 text-lg mb-10 font-medium italic opacity-80">
                 "Oportunidades reales para Yautepec, Cuautla y todo el estado."
@@ -332,7 +532,12 @@
     </header>
 
     <!-- Lista de Anuncios -->
-    <main class="max-w-6xl mx-auto p-6 mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="contenedor-anuncios">
+    <section class="max-w-6xl mx-auto px-6 pt-10">
+        <p class="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Explorar</p>
+        <h2 class="mt-1 text-3xl font-black text-blue-950">Anuncios de otras personas</h2>
+        <p class="mt-2 text-sm text-slate-500">Tus propias publicaciones están separadas en <button type="button" onclick="showMyAdsOverlay()" class="font-black text-cyan-700 hover:underline">Mis anuncios</button> para evitar confusiones.</p>
+    </section>
+    <main class="max-w-6xl mx-auto p-6 mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="contenedor-anuncios">
         <!-- El contenido inicial se cargará aquí (spinner o anuncios) -->
     </main>
 
@@ -383,7 +588,7 @@
         `;
 
         const NO_ANUNCIOS_HTML = `
-            <div class="text-center py-20 text-slate-400 font-bold col-span-full">No hay anuncios aquí todavía.</div>
+            <div class="text-center py-20 text-slate-400 font-bold col-span-full">No hay anuncios de otras personas que coincidan con esta búsqueda.</div>
         `;
 
         const PREVIEW_MODE_BANNER = `
@@ -393,6 +598,22 @@
         `;
 
         const SUPERUSER_EMAIL = 'cumorahnet@gmail.com';
+
+        async function loadAppVersion() {
+            try {
+                const response = await fetch('/version.json', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const { mayor, menor } = await response.json();
+                const version = `${Number(mayor)}.${Number(menor)}`;
+                if (!/^\d+\.\d+$/.test(version)) throw new Error('Formato de versión inválido');
+                document.querySelectorAll('[data-app-version]').forEach(element => {
+                    element.textContent = `Versión ${version}`;
+                });
+                document.title = `Morelos Trabaja — VERSION ${version}`;
+            } catch (error) {
+                console.warn('No fue posible cargar la versión de la aplicación:', error);
+            }
+        }
 
         function isSuperUser(user = firebase.auth().currentUser) {
             return Boolean(user && user.emailVerified && String(user.email || '').toLowerCase() === SUPERUSER_EMAIL);
@@ -420,8 +641,118 @@
             'auth/unauthorized-domain': 'Este dominio no está autorizado en Firebase para iniciar sesión con Google.',
             'permission-denied': 'Permiso denegado. Revisa las Reglas de Seguridad de Firestore para permitir la escritura.',
             'auth/requires-account': 'Inicia sesión con correo o Google para publicar.',
-            'form/invalid-ad': 'Revisa el título, la descripción y el WhatsApp antes de publicar.'
+            'form/invalid-ad': 'Revisa el título, la descripción y el WhatsApp antes de publicar.',
+            'form/invalid-profile': 'Revisa tu nombre, municipio y WhatsApp de contacto.',
+            'form/invalid-salary': 'El sueldo máximo debe ser igual o mayor que el sueldo mínimo.'
         };
+
+        let currentUserProfile = null;
+        let pendingRegistrationProfile = null;
+
+        function normalizeProfileText(value) {
+            return String(value || '').trim().replace(/\s+/g, ' ');
+        }
+
+        function buildProfile(name, municipality, whatsapp) {
+            const profile = {
+                nombreCompleto: normalizeProfileText(name),
+                municipio: normalizeProfileText(municipality),
+                whatsappContacto: normalizeWhatsapp(whatsapp)
+            };
+            return isCompleteProfile(profile) ? profile : null;
+        }
+
+        function isCompleteProfile(profile) {
+            return Boolean(profile
+                && profile.nombreCompleto?.length >= 2
+                && profile.nombreCompleto.length <= 80
+                && profile.municipio?.length >= 2
+                && profile.municipio.length <= 80
+                && normalizeWhatsapp(profile.whatsappContacto));
+        }
+
+        async function syncUserProfile(user) {
+            const profileRef = firebase.firestore().collection('usuarios').doc(user.uid);
+            const update = {
+                email: user.email || '',
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if (pendingRegistrationProfile) {
+                Object.assign(update, pendingRegistrationProfile, {
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                if (user.displayName !== pendingRegistrationProfile.nombreCompleto) {
+                    await user.updateProfile({ displayName: pendingRegistrationProfile.nombreCompleto });
+                }
+            }
+            await profileRef.set(update, { merge: true });
+            const snapshot = await profileRef.get();
+            const stored = snapshot.data() || {};
+            currentUserProfile = {
+                nombreCompleto: normalizeProfileText(stored.nombreCompleto || user.displayName || ''),
+                municipio: normalizeProfileText(stored.municipio || ''),
+                whatsappContacto: normalizeWhatsapp(stored.whatsappContacto)
+            };
+            pendingRegistrationProfile = null;
+            return currentUserProfile;
+        }
+
+        function showProfileOverlay(profile = {}) {
+            document.getElementById('profile-name').value = profile.nombreCompleto || firebase.auth().currentUser?.displayName || '';
+            document.getElementById('profile-municipality').value = profile.municipio || '';
+            document.getElementById('profile-whatsapp').value = profile.whatsappContacto || '';
+            document.getElementById('profile-message').classList.add('hidden');
+            document.getElementById('profile-overlay').classList.remove('hidden');
+        }
+
+        function hideProfileOverlay() {
+            document.getElementById('profile-overlay').classList.add('hidden');
+        }
+
+        function setupProfileForm() {
+            const form = document.getElementById('profile-form');
+            const submitButton = document.getElementById('profile-submit');
+            const message = document.getElementById('profile-message');
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                if (!form.reportValidity()) return;
+                const user = firebase.auth().currentUser;
+                const profile = buildProfile(
+                    document.getElementById('profile-name').value,
+                    document.getElementById('profile-municipality').value,
+                    document.getElementById('profile-whatsapp').value
+                );
+                if (!user || !profile) {
+                    message.textContent = GENERIC_ERROR_MESSAGES['form/invalid-profile'];
+                    message.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-red-50 text-red-700';
+                    return;
+                }
+                submitButton.disabled = true;
+                submitButton.textContent = 'GUARDANDO...';
+                message.classList.add('hidden');
+                try {
+                    await firebase.firestore().collection('usuarios').doc(user.uid).set({
+                        email: user.email || '',
+                        ...profile,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    if (user.displayName !== profile.nombreCompleto) {
+                        await user.updateProfile({ displayName: profile.nombreCompleto });
+                    }
+                    currentUserProfile = profile;
+                    document.getElementById('session-email').textContent = `${profile.nombreCompleto} · ${profile.municipio}`;
+                    hideProfileOverlay();
+                    await filtrar(activeCategory, activeCriteria);
+                } catch (error) {
+                    console.error('No fue posible guardar el perfil:', error);
+                    message.textContent = GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible guardar tu perfil. Intenta nuevamente.';
+                    message.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-red-50 text-red-700';
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'GUARDAR PERFIL';
+                }
+            });
+        }
 
         function setupAuthentication() {
             initializeFirebase();
@@ -430,8 +761,13 @@
             const resolving = document.getElementById('auth-resolving');
             const content = document.getElementById('auth-content');
             const form = document.getElementById('auth-form');
+            const registrationFields = document.getElementById('registration-profile-fields');
+            const nameInput = document.getElementById('auth-name');
+            const municipalityInput = document.getElementById('auth-municipality');
+            const whatsappInput = document.getElementById('auth-whatsapp');
             const emailInput = document.getElementById('auth-email');
             const passwordInput = document.getElementById('auth-password');
+            const togglePasswordButton = document.getElementById('toggle-password'); // Get the new toggle button
             const submitButton = document.getElementById('auth-submit');
             const toggleButton = document.getElementById('auth-toggle');
             const resetButton = document.getElementById('auth-reset');
@@ -457,7 +793,7 @@
             };
             const setLoading = value => {
                 loading = value;
-                [emailInput, passwordInput, submitButton, toggleButton, resetButton, googleButton].forEach(control => control.disabled = value);
+                [nameInput, municipalityInput, whatsappInput, emailInput, passwordInput, submitButton, toggleButton, resetButton, googleButton].forEach(control => control.disabled = value);
                 submitButton.textContent = value ? 'PROCESANDO...' : (isRegistering ? 'CREAR CUENTA' : 'INICIAR SESIÓN');
             };
             const renderMode = () => {
@@ -469,6 +805,11 @@
                     ? 'Ya tengo cuenta. <span class="font-black text-blue-700">Iniciar sesión</span>'
                     : 'No tengo cuenta. <span class="font-black text-blue-700">Registrarme</span>';
                 passwordInput.autocomplete = isRegistering ? 'new-password' : 'current-password';
+                registrationFields.classList.toggle('hidden', !isRegistering);
+                [nameInput, municipalityInput, whatsappInput].forEach(input => {
+                    input.required = isRegistering;
+                    input.disabled = !isRegistering;
+                });
             };
 
             toggleButton.addEventListener('click', () => {
@@ -477,6 +818,15 @@
                 renderMode();
             });
 
+            // Toggle password visibility
+            togglePasswordButton.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePasswordButton.querySelector('i').classList.toggle('fa-eye');
+                togglePasswordButton.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+
+
             form.addEventListener('submit', async event => {
                 event.preventDefault();
                 if (loading || !form.reportValidity()) return;
@@ -484,9 +834,20 @@
                 setLoading(true);
                 try {
                     const email = emailInput.value.trim();
-                    if (isRegistering) await auth.createUserWithEmailAndPassword(email, passwordInput.value);
-                    else await auth.signInWithEmailAndPassword(email, passwordInput.value);
+                    if (isRegistering) {
+                        pendingRegistrationProfile = buildProfile(nameInput.value, municipalityInput.value, whatsappInput.value);
+                        if (!pendingRegistrationProfile) {
+                            const profileError = new Error(GENERIC_ERROR_MESSAGES['form/invalid-profile']);
+                            profileError.code = 'form/invalid-profile';
+                            throw profileError;
+                        }
+                        await auth.createUserWithEmailAndPassword(email, passwordInput.value);
+                    } else {
+                        pendingRegistrationProfile = null;
+                        await auth.signInWithEmailAndPassword(email, passwordInput.value);
+                    }
                 } catch (error) {
+                    pendingRegistrationProfile = null;
                     console.error('Firebase Auth:', error.code, error);
                     const errorMessage = GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible completar la operación. Intenta nuevamente.';
                     showMessage(errorMessage);
@@ -569,7 +930,7 @@
             });
 
             const unsubscribeAuth = auth.onAuthStateChanged(
-                user => {
+                async user => {
                     resolving.classList.add('hidden');
                     const registeredUser = user && !user.isAnonymous ? user : null;
                     overlay.classList.toggle('hidden', Boolean(registeredUser));
@@ -582,10 +943,26 @@
                     adminToolsButton.classList.toggle('hidden', !isAdmin);
 
                     if (registeredUser) {
-                        firebase.firestore().collection('usuarios').doc(registeredUser.uid).set({
-                            email: registeredUser.email || '',
-                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                        }, { merge: true }).catch(error => console.warn('No fue posible registrar el perfil:', error.code || error));
+                        try {
+                            const profile = await syncUserProfile(registeredUser);
+                            if (isCompleteProfile(profile)) {
+                                sessionEmail.textContent = `${profile.nombreCompleto} · ${profile.municipio}`;
+                                hideProfileOverlay();
+                            } else {
+                                showProfileOverlay(profile);
+                            }
+                        } catch (error) {
+                            console.warn('No fue posible cargar el perfil:', error.code || error);
+                            currentUserProfile = null;
+                            showProfileOverlay({ nombreCompleto: registeredUser.displayName || '' });
+                        }
+                    } else {
+                        currentUserProfile = null;
+                        pendingRegistrationProfile = null;
+                        myAdsCache = [];
+                        hideMyAdsOverlay();
+                        hideContactsOverlay();
+                        hideProfileOverlay();
                     }
 
                     if (!registeredUser) emailInput.focus();
@@ -605,7 +982,7 @@
 
         /**
          * Genera el HTML para una tarjeta de anuncio.
-         * @param {object} data - Datos del anuncio (titulo, descripcion, categoria, whatsapp, zona, empresa, tipo_empleo, area_trabajo, tipo_servicio, experiencia_servicio, precio, condicion, tipo_producto).
+         * @param {object} data - Datos del anuncio, incluidos los campos específicos de empleo, servicio o venta.
          * @returns {string} HTML de la tarjeta del anuncio.
          */
         function escapeHtml(value) {
@@ -619,62 +996,52 @@
             return /^\d{10,15}$/.test(digits) ? digits : '';
         }
 
+        function getWhatsappMessage(category) {
+            const authenticatedUser = firebase.apps.length ? firebase.auth().currentUser : null;
+            const fallbackName = authenticatedUser?.displayName || String(authenticatedUser?.email || '').split('@')[0] || 'usuario de Morelos Trabaja';
+            const name = normalizeProfileText(currentUserProfile?.nombreCompleto || fallbackName);
+            const offerType = { empleo: 'empleo', servicios: 'servicio', ventas: 'venta' }[category] || 'anuncio';
+            return `Hola soy ${name}, encontré tu oferta de ${offerType} en el portal morelostrabaja.com, estoy interesado, ¿puedes contactarme?`;
+        }
+
+        function getWhatsappUrl(whatsapp, category) {
+            return `https://wa.me/${whatsapp}?text=${encodeURIComponent(getWhatsappMessage(category))}`;
+        }
+
         let activeCategory = null;
         let activeCriteria = {};
+        let adsLoadRequestId = 0;
+        let myAdsCache = [];
+        let activeMyAdsTab = 'activos';
 
         function renderRating(authorUid, ratingInfo = {}) {
             const average = Number(ratingInfo.average || 0);
             const count = Number(ratingInfo.count || 0);
-            const ownRating = Number(ratingInfo.ownRating || 0);
-            const currentUid = firebase.apps.length && firebase.auth().currentUser?.uid;
-            const canRate = authorUid && currentUid && authorUid !== currentUid;
-            const encodedAuthor = encodeURIComponent(authorUid || '');
             const stars = [1, 2, 3, 4, 5].map(value => {
-                const selected = value <= (ownRating || Math.round(average));
+                const selected = value <= Math.round(average);
                 const color = selected ? 'text-amber-400' : 'text-slate-300';
-                return `<button type="button" ${canRate ? '' : 'disabled'} onclick="rateUser(decodeURIComponent('${encodedAuthor}'), ${value})" class="${color} text-xl leading-none disabled:cursor-default hover:text-amber-400" aria-label="Calificar con ${value} estrella${value === 1 ? '' : 's'}">★</button>`;
+                return `<span class="${color} text-xl leading-none" aria-hidden="true">★</span>`;
             }).join('');
             const summary = count ? `${average.toFixed(1)} de 5 · ${count} calificación${count === 1 ? '' : 'es'}` : 'Sin calificaciones';
-            return `<div class="mt-4" aria-label="Calificación del anunciante"><p class="text-xs font-bold text-slate-600 mb-1">Califica tu contacto</p><div class="flex gap-0.5">${stars}</div><p class="text-xs text-slate-500 mt-1">${summary}</p></div>`;
+            return `<div class="mt-4" aria-label="Reputación del anunciante"><p class="text-xs font-bold text-slate-600 mb-1">Reputación</p><div class="flex gap-0.5">${stars}</div><p class="text-xs text-slate-500 mt-1">${summary}</p></div>`;
         }
 
         async function loadRatings(authorUids) {
             const ratings = {};
-            const currentUid = firebase.auth().currentUser?.uid;
             await Promise.all([...new Set(authorUids.filter(Boolean))].map(async authorUid => {
                 try {
                     const snapshot = await firebase.firestore().collection('calificaciones').where('authorUid', '==', authorUid).get();
                     let total = 0;
-                    let ownRating = 0;
                     snapshot.forEach(doc => {
                         const item = doc.data();
                         total += Number(item.rating || 0);
-                        if (item.raterUid === currentUid) ownRating = Number(item.rating || 0);
                     });
-                    ratings[authorUid] = { average: snapshot.size ? total / snapshot.size : 0, count: snapshot.size, ownRating };
+                    ratings[authorUid] = { average: snapshot.size ? total / snapshot.size : 0, count: snapshot.size };
                 } catch (error) {
                     console.warn('No fue posible cargar calificaciones:', error.code || error);
                 }
             }));
             return ratings;
-        }
-
-        async function rateUser(authorUid, rating) {
-            const currentUser = firebase.auth().currentUser;
-            if (!currentUser || !authorUid || currentUser.uid === authorUid || rating < 1 || rating > 5) return;
-            try {
-                const ratingId = `${authorUid}_${currentUser.uid}`;
-                await firebase.firestore().collection('calificaciones').doc(ratingId).set({
-                    authorUid,
-                    raterUid: currentUser.uid,
-                    rating: Number(rating),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                await filtrar(activeCategory, activeCriteria);
-            } catch (error) {
-                console.error('Error al calificar:', error);
-                alert(GENERIC_ERROR_MESSAGES[error.code] || 'No fue posible guardar tu calificación.');
-            }
         }
 
         function renderAnuncioCard(data, ratingInfo = {}) {
@@ -686,12 +1053,23 @@
             const empresa = escapeHtml(data.empresa || '');
             const tipoEmpleo = escapeHtml(data.tipo_empleo || '');
             const areaTrabajo = escapeHtml(data.area_trabajo || '');
+            const prestaciones = escapeHtml(data.prestaciones || '');
+            const sueldoMinimo = Number(data.sueldo_minimo);
+            const sueldoMaximo = Number(data.sueldo_maximo);
+            const periodoSueldo = String(data.periodo_sueldo || 'mes');
             const tipoServicio = escapeHtml(data.tipo_servicio || '');
             const experienciaServicio = escapeHtml(data.experiencia_servicio || '');
             const precio = data.precio ? `$${Number(data.precio).toLocaleString('es-MX')}` : '';
             const condicion = escapeHtml(data.condicion || '');
             const tipoProducto = escapeHtml(data.tipo_producto || '');
-            const adminDeleteButton = isSuperUser() && data.id ? `<button type="button" onclick="deleteAd('${encodeURIComponent(data.id)}')" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-black text-red-700 hover:bg-red-100"><i class="fas fa-trash mr-1"></i>ELIMINAR ANUNCIO</button>` : '';
+            const currentUid = firebase.apps.length ? firebase.auth().currentUser?.uid : null;
+            const isOwner = Boolean(data.id && currentUid && currentUid === data.authorUid);
+            const expirationMillis = data.expiresAt?.toMillis?.() || (data.fecha?.toMillis?.() ? data.fecha.toMillis() + (8 * 24 * 60 * 60 * 1000) : null);
+            const expirationText = expirationMillis ? `<p class="mt-3 text-xs font-bold text-slate-500"><i class="far fa-clock mr-1"></i>Disponible hasta ${escapeHtml(new Date(expirationMillis).toLocaleDateString('es-MX', { dateStyle: 'medium' }))}</p>` : '';
+            const adminDeleteButton = isSuperUser() && data.id ? `<button type="button" onclick="deleteAd('${encodeURIComponent(data.id)}', this)" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-black text-red-700 hover:bg-red-100 disabled:cursor-wait disabled:opacity-60"><i class="fas fa-trash mr-1"></i>ELIMINAR ANUNCIO</button>` : '';
+            const closeReason = category === 'empleo' ? 'cubierto' : (category === 'ventas' ? 'vendido' : 'retirado');
+            const closeLabel = category === 'empleo' ? 'VACANTE CUBIERTA' : (category === 'ventas' ? 'PRODUCTO VENDIDO' : 'RETIRAR SERVICIO');
+            const ownerCloseButton = isOwner ? `<button type="button" onclick="closeOwnAd('${encodeURIComponent(data.id)}', '${closeReason}', this)" class="mt-3 mr-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"><i class="fas fa-check-circle mr-1"></i>${closeLabel}</button>` : '';
 
             let specificFieldsHtml = '';
 
@@ -699,6 +1077,11 @@
                 if (empresa) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Empresa:</strong> ${empresa}</p>`;
                 if (tipoEmpleo) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Tipo:</strong> ${tipoEmpleo}</p>`;
                 if (areaTrabajo) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Área:</strong> ${areaTrabajo}</p>`;
+                if (Number.isFinite(sueldoMinimo) && Number.isFinite(sueldoMaximo) && sueldoMaximo >= sueldoMinimo) {
+                    const periodLabels = { hora: 'hora', dia: 'día', semana: 'semana', quincena: 'quincena', mes: 'mes' };
+                    specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Sueldo:</strong> $${sueldoMinimo.toLocaleString('es-MX')} a $${sueldoMaximo.toLocaleString('es-MX')} MXN por ${escapeHtml(periodLabels[periodoSueldo] || periodoSueldo)}</p>`;
+                }
+                if (prestaciones) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Prestaciones:</strong> ${prestaciones}</p>`;
                 if (zona) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Zona:</strong> ${zona}</p>`;
             } else if (category === 'servicios') {
                 if (tipoServicio) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Tipo:</strong> ${tipoServicio}</p>`;
@@ -711,10 +1094,15 @@
                 if (zona) specificFieldsHtml += `<p class="text-slate-600 text-xs mt-1"><strong>Ubicación:</strong> ${zona}</p>`;
             }
 
-            const contactLink = whatsapp ? `
-                    <a href="https://wa.me/${whatsapp}" target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="bg-green-500 text-white p-3 rounded-xl shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 flex items-center justify-center">
+            const trackedContact = data.id && data.authorUid && !isOwner;
+            const whatsappUrl = getWhatsappUrl(whatsapp, category);
+            const contactLink = whatsapp && !isOwner ? `
+                <div class="flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
+                    ${trackedContact ? '<p class="text-xs text-slate-500">Al contactar tendrás 5 días para evaluar.</p>' : '<span></span>'}
+                    <a href="${whatsappUrl}" ${trackedContact ? `onclick="contactByWhatsapp(event, '${encodeURIComponent(data.id)}', this)"` : 'target="_blank"'} rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="shrink-0 bg-green-500 text-white p-3 rounded-xl shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 flex items-center justify-center">
                         <i class="fab fa-whatsapp text-xl" aria-hidden="true"></i>
-                    </a>` : '';
+                    </a>
+                </div>` : '';
 
             return `
                 <div class="card-anuncio bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between gap-4 border-l-[6px] ${style.borderColorClass}">
@@ -723,7 +1111,9 @@
                         <h3 class="text-xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
                         <p class="text-slate-500 text-sm mt-2">${escapeHtml(data.descripcion)}</p>
                         ${specificFieldsHtml}
+                        ${expirationText}
                         ${renderRating(data.authorUid, ratingInfo)}
+                        ${ownerCloseButton}
                         ${adminDeleteButton}
                     </div>
                     ${contactLink}
@@ -798,9 +1188,11 @@
                 }
             ];
 
-            ejemplos.filter(ejemplo => (!cat || ejemplo.categoria === cat) && matchesCriteria(ejemplo, criteria)).forEach(ejemplo => {
-                cont.innerHTML += renderAnuncioCard(ejemplo);
-            });
+            const cards = ejemplos
+                .filter(ejemplo => (!cat || ejemplo.categoria === cat) && matchesCriteria(ejemplo, criteria))
+                .map(ejemplo => renderAnuncioCard(ejemplo))
+                .join('');
+            cont.innerHTML = PREVIEW_MODE_BANNER + (cards || NO_ANUNCIOS_HTML);
         }
 
         /**
@@ -823,7 +1215,138 @@
             });
         }
 
+        function isAdCurrentlyActive(anuncio) {
+            if (anuncio.estado && anuncio.estado !== 'activo') return false;
+            const expiresAt = anuncio.expiresAt?.toMillis?.();
+            const createdAt = anuncio.fecha?.toMillis?.();
+            const expiration = expiresAt || (createdAt ? createdAt + (8 * 24 * 60 * 60 * 1000) : null);
+            return !expiration || expiration > Date.now();
+        }
+
+        function getAdExpirationMillis(anuncio) {
+            const expiresAt = anuncio.expiresAt?.toMillis?.();
+            const createdAt = anuncio.fecha?.toMillis?.();
+            return expiresAt || (createdAt ? createdAt + (8 * 24 * 60 * 60 * 1000) : null);
+        }
+
+        function getAdLifecycle(anuncio) {
+            const expiration = getAdExpirationMillis(anuncio);
+            if (anuncio.estado === 'vencido' || ((!anuncio.estado || anuncio.estado === 'activo') && expiration && expiration <= Date.now())) return 'vencidos';
+            if (!anuncio.estado || anuncio.estado === 'activo') return 'activos';
+            return 'cerrados';
+        }
+
+        function getAdStateLabel(anuncio) {
+            const lifecycle = getAdLifecycle(anuncio);
+            if (lifecycle === 'vencidos') return 'Vencido';
+            const labels = { activo: 'Activo', cubierto: 'Vacante cubierta', vendido: 'Producto vendido', retirado: 'Retirado' };
+            return labels[anuncio.estado] || (lifecycle === 'activos' ? 'Activo' : 'Cerrado');
+        }
+
+        function formatAdDate(timestamp) {
+            const date = timestamp?.toDate?.();
+            return date ? new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date) : 'Fecha no disponible';
+        }
+
+        function renderMyAdCard(anuncio) {
+            const category = String(anuncio.categoria || 'anuncio').toLowerCase();
+            const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
+            const lifecycle = getAdLifecycle(anuncio);
+            const stateClasses = lifecycle === 'activos' ? 'bg-emerald-50 text-emerald-700' : lifecycle === 'vencidos' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600';
+            const expiration = getAdExpirationMillis(anuncio);
+            const closeReason = category === 'empleo' ? 'cubierto' : (category === 'ventas' ? 'vendido' : 'retirado');
+            const closeLabel = category === 'empleo' ? 'Vacante cubierta' : (category === 'ventas' ? 'Producto vendido' : 'Retirar servicio');
+            const closeButton = lifecycle === 'activos' && anuncio.id
+                ? `<button type="button" onclick="closeOwnAd('${encodeURIComponent(anuncio.id)}', '${closeReason}', this)" class="rounded-xl bg-blue-700 px-4 py-2 text-xs font-black text-white hover:bg-blue-800 disabled:cursor-wait disabled:opacity-60"><i class="fas fa-check-circle mr-1"></i>${closeLabel}</button>`
+                : '';
+            const deleteButton = isSuperUser() && anuncio.id
+                ? `<button type="button" onclick="deleteAd('${encodeURIComponent(anuncio.id)}', this)" class="rounded-xl bg-red-50 px-4 py-2 text-xs font-black text-red-700 hover:bg-red-100 disabled:cursor-wait disabled:opacity-60"><i class="fas fa-trash mr-1"></i>Eliminar definitivamente</button>`
+                : '';
+
+            return `<article class="rounded-2xl border border-slate-200 border-l-[6px] ${style.borderColorClass} bg-white p-5 shadow-sm">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic">${escapeHtml(category)}</span>
+                        <h3 class="mt-2 text-lg font-black text-slate-800">${escapeHtml(anuncio.titulo || 'Anuncio')}</h3>
+                    </div>
+                    <span class="rounded-full px-3 py-1 text-xs font-black ${stateClasses}">${escapeHtml(getAdStateLabel(anuncio))}</span>
+                </div>
+                <p class="mt-3 text-sm text-slate-500">${escapeHtml(anuncio.descripcion || '')}</p>
+                <div class="mt-4 space-y-1 text-xs text-slate-500">
+                    <p><strong>Publicado:</strong> ${escapeHtml(formatAdDate(anuncio.fecha))}</p>
+                    ${expiration ? `<p><strong>${lifecycle === 'vencidos' ? 'Venció' : 'Vigencia'}:</strong> ${escapeHtml(new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(new Date(expiration)))}</p>` : ''}
+                </div>
+                ${(closeButton || deleteButton) ? `<div class="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">${closeButton}${deleteButton}</div>` : ''}
+            </article>`;
+        }
+
+        function renderMyAds() {
+            const list = document.getElementById('my-ads-list');
+            const filteredAds = myAdsCache.filter(anuncio => getAdLifecycle(anuncio) === activeMyAdsTab);
+            list.innerHTML = filteredAds.length
+                ? filteredAds.map(renderMyAdCard).join('')
+                : `<div class="md:col-span-2 rounded-2xl bg-slate-50 p-8 text-center text-slate-500">No tienes anuncios ${activeMyAdsTab}.</div>`;
+        }
+
+        function updateMyAdsTabs() {
+            const counts = { activos: 0, cerrados: 0, vencidos: 0 };
+            myAdsCache.forEach(anuncio => { counts[getAdLifecycle(anuncio)] += 1; });
+            Object.entries(counts).forEach(([tab, count]) => {
+                document.getElementById(`my-ads-count-${tab}`).textContent = count;
+            });
+            document.querySelectorAll('[data-my-ads-tab]').forEach(button => {
+                const selected = button.dataset.myAdsTab === activeMyAdsTab;
+                button.setAttribute('aria-selected', String(selected));
+                button.className = `rounded-full px-4 py-2 text-sm font-black ${selected ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+            });
+        }
+
+        function setMyAdsTab(tab) {
+            if (!['activos', 'cerrados', 'vencidos'].includes(tab)) return;
+            activeMyAdsTab = tab;
+            updateMyAdsTabs();
+            renderMyAds();
+        }
+
+        async function loadMyAds() {
+            const list = document.getElementById('my-ads-list');
+            const message = document.getElementById('my-ads-message');
+            const currentUser = firebase.auth().currentUser;
+            if (!currentUser || currentUser.isAnonymous) return;
+            message.classList.add('hidden');
+            list.innerHTML = '<p class="text-slate-500 md:col-span-2">Cargando tus anuncios...</p>';
+            try {
+                const snapshot = await firebase.firestore().collection('anuncios').where('authorUid', '==', currentUser.uid).get();
+                myAdsCache = snapshot.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .sort((a, b) => (b.fecha?.toMillis?.() ?? 0) - (a.fecha?.toMillis?.() ?? 0));
+                updateMyAdsTabs();
+                renderMyAds();
+            } catch (error) {
+                console.error('Error al cargar anuncios propios:', error);
+                list.innerHTML = '<p class="text-red-700 md:col-span-2">No fue posible cargar tus anuncios.</p>';
+                message.textContent = error.message || 'Intenta nuevamente.';
+                message.className = 'rounded-xl px-4 py-3 text-sm font-bold mt-4 bg-red-50 text-red-700';
+            }
+        }
+
+        function showMyAdsOverlay() {
+            activeMyAdsTab = 'activos';
+            document.getElementById('my-ads-overlay').classList.remove('hidden');
+            loadMyAds();
+        }
+
+        function hideMyAdsOverlay() {
+            document.getElementById('my-ads-overlay').classList.add('hidden');
+        }
+
+        async function refreshMyAdsIfOpen() {
+            const overlay = document.getElementById('my-ads-overlay');
+            if (!overlay.classList.contains('hidden')) await loadMyAds();
+        }
+
         async function filtrar(cat = null, criteria = {}) {
+            const requestId = ++adsLoadRequestId;
             activeCategory = cat;
             activeCriteria = criteria;
             const cont = document.getElementById('contenedor-anuncios');
@@ -846,14 +1369,18 @@
                 }
 
                 const snapshot = await queryRef.get();
-                cont.innerHTML = ''; // Limpia el spinner
+                if (requestId !== adsLoadRequestId) return;
 
                 if (snapshot.empty) {
                     cont.innerHTML = NO_ANUNCIOS_HTML;
                     return;
                 }
 
-                const anuncios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(data => matchesCriteria(data, criteria)).sort((a, b) => {
+                const currentUid = firebase.auth().currentUser?.uid;
+                const anuncios = snapshot.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .filter(data => data.authorUid !== currentUid && isAdCurrentlyActive(data) && matchesCriteria(data, criteria))
+                    .sort((a, b) => {
                     const fechaA = a.fecha?.toMillis?.() ?? 0;
                     const fechaB = b.fecha?.toMillis?.() ?? 0;
                     return fechaB - fechaA;
@@ -865,10 +1392,12 @@
                 }
 
                 const ratings = await loadRatings(anuncios.map(data => data.authorUid));
-                anuncios.forEach(data => {
-                    cont.innerHTML += renderAnuncioCard(data, ratings[data.authorUid] || {});
-                });
+                if (requestId !== adsLoadRequestId) return;
+                cont.innerHTML = anuncios
+                    .map(data => renderAnuncioCard(data, ratings[data.authorUid] || {}))
+                    .join('');
             } catch (error) {
+                if (requestId !== adsLoadRequestId) return;
                 console.error("Error al cargar anuncios de Firebase:", error);
                 mostrarEjemplos(cat, criteria); // En caso de error, muestra los ejemplos
             }
@@ -1027,13 +1556,26 @@
                     whatsapp,
                     zona: form.querySelector(`#${category}-zona`).value.trim(),
                     authorUid: currentUser.uid,
-                    fecha: firebase.firestore.FieldValue.serverTimestamp()
+                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: firebase.firestore.Timestamp.fromMillis(Date.now() + (8 * 24 * 60 * 60 * 1000)),
+                    estado: 'activo'
                 };
 
                 if (category === 'empleo') {
+                    const sueldoMinimo = Number(form.querySelector('#empleo-sueldo-minimo').value);
+                    const sueldoMaximo = Number(form.querySelector('#empleo-sueldo-maximo').value);
+                    if (!Number.isFinite(sueldoMinimo) || !Number.isFinite(sueldoMaximo) || sueldoMinimo < 0 || sueldoMaximo < sueldoMinimo) {
+                        const salaryError = new Error(GENERIC_ERROR_MESSAGES['form/invalid-salary']);
+                        salaryError.code = 'form/invalid-salary';
+                        throw salaryError;
+                    }
                     anuncioData.empresa = form.querySelector('#empleo-empresa').value.trim();
                     anuncioData.tipo_empleo = form.querySelector('#empleo-tipo-empleo').value;
                     anuncioData.area_trabajo = form.querySelector('#empleo-area-trabajo').value;
+                    anuncioData.prestaciones = form.querySelector('#empleo-prestaciones').value.trim();
+                    anuncioData.sueldo_minimo = sueldoMinimo;
+                    anuncioData.sueldo_maximo = sueldoMaximo;
+                    anuncioData.periodo_sueldo = form.querySelector('#empleo-periodo-sueldo').value;
                 } else if (category === 'servicios') {
                     anuncioData.tipo_servicio = form.querySelector('#servicios-tipo-servicio').value;
                     anuncioData.experiencia_servicio = form.querySelector('#servicios-experiencia').value.trim();
@@ -1045,10 +1587,10 @@
 
                 await db.collection("anuncios").add(anuncioData);
 
-                messageElement.textContent = '¡Anuncio publicado con éxito!';
+                messageElement.textContent = '¡Anuncio publicado! Puedes consultarlo en Mis anuncios.';
                 messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700';
                 form.reset(); // Limpia el formulario
-                filtrar(); // Recarga los anuncios en la página principal
+                await filtrar(); // Recarga los anuncios en la página principal
                 setTimeout(() => {
                     hidePublishOverlay(); // Cierra el modal después de un éxito
                     showCategorySelection(); // Vuelve a la selección de categoría para el próximo anuncio
@@ -1079,6 +1621,139 @@
             document.getElementById('about-overlay').classList.add('hidden');
         }
 
+        function showArticlesOverlay() {
+            const overlay = document.getElementById('articles-overlay');
+            overlay.classList.remove('hidden');
+            overlay.querySelector('section').scrollTop = 0;
+        }
+
+        function hideArticlesOverlay() {
+            document.getElementById('articles-overlay').classList.add('hidden');
+        }
+
+        function showContactsOverlay() {
+            document.getElementById('contacts-overlay').classList.remove('hidden');
+            loadMyContacts();
+        }
+
+        function hideContactsOverlay() {
+            document.getElementById('contacts-overlay').classList.add('hidden');
+        }
+
+        function contactsMessage(text, type = 'error') {
+            const element = document.getElementById('contacts-message');
+            element.textContent = text;
+            element.className = `rounded-xl px-4 py-3 text-sm font-bold mt-4 ${type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`;
+        }
+
+        function formatContactDate(value) {
+            if (!value) return 'Fecha no disponible';
+            return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+        }
+
+        function renderContactCard(contact) {
+            const roleText = contact.role === 'contactor' ? 'Tú iniciaste el contacto' : 'Te contactaron por este anuncio';
+            const ownRatingText = contact.ownRating
+                ? `<p class="mt-3 text-sm font-bold text-amber-700">Tu evaluación: ${contact.ownRating} de 5 estrellas</p>`
+                : '';
+            const ratingButtons = contact.canRate
+                ? `<div class="mt-4"><p class="text-sm font-bold text-slate-700 mb-2">Evalúa a tu contraparte:</p><div class="flex gap-2">${[1, 2, 3, 4, 5].map(value => `<button type="button" onclick="submitContactRating('${encodeURIComponent(contact.id)}', ${value}, this)" class="text-2xl text-slate-300 hover:text-amber-400 disabled:cursor-wait disabled:opacity-60" aria-label="Enviar ${value} estrella${value === 1 ? '' : 's'}">★</button>`).join('')}</div><p class="mt-2 text-xs text-slate-500">Tienes hasta ${escapeHtml(formatContactDate(contact.ratingDeadline))}. La evaluación no se puede modificar.</p></div>`
+                : '';
+            let counterpartStatus = '<p class="mt-2 text-xs text-slate-500">La contraparte todavía no ha evaluado.</p>';
+            if (contact.counterpartRating) {
+                counterpartStatus = `<p class="mt-2 text-xs font-bold text-emerald-700">Evaluación de la contraparte: ${contact.counterpartRating} de 5.</p>`;
+            } else if (contact.counterpartRated) {
+                counterpartStatus = '<p class="mt-2 text-xs font-bold text-blue-700">La contraparte ya evaluó. Su calificación se mostrará cuando evalúes o termine el plazo.</p>';
+            } else if (!contact.canRate && !contact.ownRating) {
+                counterpartStatus = '<p class="mt-2 text-xs text-slate-500">El plazo terminó sin evaluación; no se asignaron estrellas automáticas.</p>';
+            }
+
+            return `<article class="rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-wider text-blue-700">${escapeHtml(roleText)}</p>
+                        <h3 class="mt-1 text-lg font-black text-slate-800">${escapeHtml(contact.adTitle || 'Anuncio')}</h3>
+                        <p class="text-sm text-slate-500">Con ${escapeHtml(contact.counterpart)} · ${escapeHtml(formatContactDate(contact.createdAt))}</p>
+                    </div>
+                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">${escapeHtml(contact.category || 'anuncio')}</span>
+                </div>
+                ${ownRatingText}
+                ${counterpartStatus}
+                ${ratingButtons}
+            </article>`;
+        }
+
+        async function loadMyContacts() {
+            const list = document.getElementById('contacts-list');
+            const message = document.getElementById('contacts-message');
+            message.classList.add('hidden');
+            list.innerHTML = '<p class="text-slate-500">Cargando contactos...</p>';
+            try {
+                const result = await firebase.app().functions().httpsCallable('listMyContacts')();
+                const contacts = result.data.contacts || [];
+                list.innerHTML = contacts.length
+                    ? contacts.map(renderContactCard).join('')
+                    : '<div class="rounded-2xl bg-slate-50 p-6 text-center text-slate-500">Cuando contactes o recibas un contacto, aparecerá aquí.</div>';
+            } catch (error) {
+                console.error('Error al cargar contactos:', error);
+                list.innerHTML = '<p class="text-red-700">No fue posible cargar tus contactos.</p>';
+                contactsMessage(error.message || 'Intenta nuevamente.');
+            }
+        }
+
+        async function contactByWhatsapp(event, encodedAdId, link) {
+            event.preventDefault();
+            if (!link || link.dataset.loading === 'true') return;
+            link.dataset.loading = 'true';
+            link.setAttribute('aria-disabled', 'true');
+            const icon = link.querySelector('i');
+            const originalClass = icon?.className || '';
+            if (icon) icon.className = 'fas fa-spinner fa-spin text-xl';
+            try {
+                await firebase.app().functions().httpsCallable('registerContact')({ adId: decodeURIComponent(encodedAdId) });
+                window.location.assign(link.href);
+            } catch (error) {
+                console.error('No fue posible registrar el contacto para evaluación:', error);
+                alert(error.message || 'No fue posible registrar el contacto. Intenta nuevamente para poder calificarlo después.');
+                link.dataset.loading = 'false';
+                link.removeAttribute('aria-disabled');
+                if (icon) icon.className = originalClass;
+            }
+        }
+
+        async function submitContactRating(encodedContactId, rating, button) {
+            if (!confirm(`¿Enviar ${rating} estrella${rating === 1 ? '' : 's'}? No podrás modificar la evaluación.`)) return;
+            document.querySelectorAll('#contacts-list button').forEach(control => { control.disabled = true; });
+            try {
+                await firebase.app().functions().httpsCallable('submitContactRating')({
+                    contactId: decodeURIComponent(encodedContactId),
+                    rating
+                });
+                contactsMessage('Evaluación guardada correctamente.', 'success');
+                await loadMyContacts();
+                await filtrar(activeCategory, activeCriteria);
+            } catch (error) {
+                console.error('Error al evaluar contacto:', error);
+                contactsMessage(error.message || 'No fue posible guardar la evaluación.');
+                if (button) button.disabled = false;
+            }
+        }
+
+        async function closeOwnAd(encodedAdId, reason, button) {
+            const labels = { cubierto: 'marcar la vacante como cubierta', vendido: 'marcar el producto como vendido', retirado: 'retirar el anuncio' };
+            if (!confirm(`¿Deseas ${labels[reason] || 'retirar el anuncio'}? Dejará de mostrarse inmediatamente.`)) return;
+            if (button) button.disabled = true;
+            try {
+                await firebase.app().functions().httpsCallable('closeAd')({ adId: decodeURIComponent(encodedAdId), reason });
+                await filtrar(activeCategory, activeCriteria);
+                await refreshMyAdsIfOpen();
+            } catch (error) {
+                console.error('Error al cerrar anuncio:', error);
+                alert(error.message || 'No fue posible retirar el anuncio.');
+                if (button) button.disabled = false;
+            }
+        }
+
         function showAdminOverlay() {
             if (!isSuperUser()) return;
             document.getElementById('admin-overlay').classList.remove('hidden');
@@ -1090,9 +1765,8 @@
             document.getElementById('admin-overlay').classList.add('hidden');
         }
 
-        function contactForGrading() {
-            // Reemplaza con la dirección de correo electrónico real
-            window.location.href = 'mailto:equipo.morelostrabaja@example.com?subject=Discrepancia%20en%20Calificación%20o%20Sugerencia&body=Hola%2C%0D%0A%0D%0Escribo%20para...';
+        function contactForFeedback() {
+            window.location.href = 'mailto:equipo.morelostrabaja@example.com?subject=Sugerencia%20o%20comentario%20para%20Morelos%20Trabaja&body=Hola%2C%0D%0A%0D%0AQuiero%20compartir%20la%20siguiente%20sugerencia%20o%20comentario%3A%0D%0A';
         }
 
         // --- Administración segura ---
@@ -1145,8 +1819,8 @@
             button.disabled = true;
             try {
                 const result = await firebase.app().functions().httpsCallable('adminDeleteUsers')({ uids });
-                const failedText = result.data.failed ? ` ${result.data.failed} no pudieron eliminarse.` : '';
-                adminMessage(`Se eliminaron ${result.data.deleted} usuario(s).${failedText}`, result.data.failed ? 'error' : 'success');
+                const failedText = result.data.failed ? ` ${result.data.failed} no pudieron eliminarse por completo.` : '';
+                adminMessage(`Se eliminaron ${result.data.deleted} usuario(s) y sus datos asociados.${failedText}`, result.data.failed ? 'error' : 'success');
                 await loadAdminUsers();
                 await filtrar(activeCategory, activeCriteria);
             } catch (error) {
@@ -1157,28 +1831,34 @@
             }
         }
 
-        async function deleteAd(encodedId) {
+        async function deleteAd(encodedId, button) {
             if (!isSuperUser() || !confirm('¿Eliminar este anuncio permanentemente?')) return;
+            if (button) button.disabled = true;
             try {
-                await firebase.firestore().collection('anuncios').doc(decodeURIComponent(encodedId)).delete();
+                const adId = decodeURIComponent(encodedId);
+                const result = await firebase.app().functions().httpsCallable('adminDeleteAd')({ adId });
+                if (!result.data.deleted && !result.data.notFound) throw new Error('El servidor no confirmó la eliminación.');
                 await filtrar(activeCategory, activeCriteria);
+                await refreshMyAdsIfOpen();
             } catch (error) {
                 console.error('Error al eliminar anuncio:', error);
-                alert('No fue posible eliminar el anuncio.');
+                alert(getAdminErrorMessage(error));
+            } finally {
+                if (button && button.isConnected) button.disabled = false;
             }
         }
 
 
         // --- Event Listeners ---
         window.addEventListener('load', () => {
+            loadAppVersion();
+            setupProfileForm();
             setupAuthentication();
-            filtrar();
             // Assign event listeners for new header buttons
+            document.getElementById('my-ads-button').addEventListener('click', showMyAdsOverlay);
+            document.getElementById('contacts-button').addEventListener('click', showContactsOverlay);
             document.getElementById('about-us-button').addEventListener('click', showAboutOverlay);
-            document.getElementById('articles-button').addEventListener('click', () => {
-                // For now, articles button also opens the about overlay, can be changed later
-                showAboutOverlay();
-            });
+            document.getElementById('articles-button').addEventListener('click', showArticlesOverlay);
             document.getElementById('admin-tools-button').addEventListener('click', showAdminOverlay);
         }); // Carga autenticación y anuncios al iniciar la página
     </script>
