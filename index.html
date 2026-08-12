@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja — VERSION 36.24</title>
+    <title>Morelos Trabaja — VERSION 36.25</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -108,10 +108,11 @@
 
     <!-- Perfil requerido para cuentas existentes o acceso con Google -->
     <div id="profile-overlay" class="fixed inset-0 z-[102] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
-        <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9" aria-labelledby="profile-title">
+        <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9 relative" aria-labelledby="profile-title">
+            <button id="profile-close" type="button" onclick="hideProfileOverlay()" class="hidden absolute top-5 right-5 text-slate-400 hover:text-slate-700" aria-label="Cerrar edición de perfil"><i class="fas fa-times text-xl"></i></button>
             <p class="text-xs font-black tracking-[0.25em] text-blue-600 uppercase">Tu perfil</p>
             <h2 id="profile-title" class="text-3xl font-black text-blue-950 mt-2">Completa tus datos</h2>
-            <p class="text-slate-500 mt-2 mb-7">Los usaremos para identificarte al contactar una publicación.</p>
+            <p id="profile-subtitle" class="text-slate-500 mt-2 mb-7">Los usaremos para identificarte al contactar una publicación.</p>
             <form id="profile-form" class="space-y-4">
                 <label class="block text-sm font-bold text-slate-700">Nombre completo
                     <input id="profile-name" type="text" autocomplete="name" required minlength="2" maxlength="80" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -494,26 +495,21 @@
     <!-- Cabecera integrada en la página -->
     <header class="hero-gradient min-h-[430px] px-6 py-6 text-white">
         <!-- Top Bar Container -->
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-            <!-- Left: Session Info -->
-            <div class="flex items-center gap-2 min-w-0">
-                <button id="logout-button" type="button" class="hidden bg-blue-700 hover:bg-blue-800 text-white font-bold py-1 px-3 rounded-xl text-xs transition-colors">SALIR</button>
-                <span id="session-email" class="hidden block truncate text-sm font-bold text-blue-100"></span>
-            </div>
-
-            <!-- Right: Buttons -->
-            <div class="flex flex-col sm:flex-row items-center gap-2 shrink-0">
-                <button id="my-ads-button" class="bg-cyan-700 hover:bg-cyan-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap"><i class="fas fa-list-alt mr-1"></i> Mis anuncios</button>
-                <button id="contacts-button" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap"><i class="fas fa-star mr-1"></i> Mis contactos</button>
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-center md:justify-end gap-2 mb-8">
+            <div class="flex flex-wrap items-center justify-center md:justify-end gap-2">
                 <button id="about-us-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Acerca de nosotros</button>
                 <button id="articles-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Artículos de interés</button>
-                <button id="admin-tools-button" class="hidden bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Admin Tools</button>
+                <button id="my-ads-button" class="bg-cyan-700 hover:bg-cyan-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap"><i class="fas fa-list-alt mr-1"></i> Mis anuncios</button>
+                <button id="contacts-button" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap"><i class="fas fa-star mr-1"></i> Mis contactos</button>
+                <button id="session-email" type="button" class="hidden max-w-64 truncate rounded-xl bg-blue-900/70 px-4 py-2 text-sm font-bold text-blue-100 transition-colors hover:bg-blue-900 hover:text-white" title="Editar perfil"><i class="fas fa-user-edit mr-1" aria-hidden="true"></i><span data-profile-label></span></button>
+                <button id="admin-tools-button" class="hidden bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Admin</button>
+                <button id="logout-button" type="button" class="hidden bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl text-sm transition-colors whitespace-nowrap">Salir</button>
             </div>
         </div>
         <!-- Main Hero Content -->
         <div class="max-w-3xl mx-auto pt-16 text-center">
             <h1 class="text-4xl md:text-6xl font-black mb-2 leading-tight">Morelos Trabaja</h1>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-6" data-app-version>Versión 36.24</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-6" data-app-version>Versión 36.25</p>
             <h2 class="text-2xl md:text-3xl font-black mb-6 leading-tight">
                 El portal de empleos, servicios y ventas en Morelos.
             </h2>
@@ -671,6 +667,14 @@
                 && normalizeWhatsapp(profile.whatsappContacto));
         }
 
+        function setSessionProfileLabel(value) {
+            const button = document.getElementById('session-email');
+            const label = button.querySelector('[data-profile-label]');
+            const text = normalizeProfileText(value) || 'Editar perfil';
+            label.textContent = text;
+            button.setAttribute('aria-label', `Editar perfil de ${text}`);
+        }
+
         async function syncUserProfile(user) {
             const profileRef = firebase.firestore().collection('usuarios').doc(user.uid);
             const update = {
@@ -698,9 +702,15 @@
         }
 
         function showProfileOverlay(profile = {}) {
+            const editingExistingProfile = isCompleteProfile(profile);
             document.getElementById('profile-name').value = profile.nombreCompleto || firebase.auth().currentUser?.displayName || '';
             document.getElementById('profile-municipality').value = profile.municipio || '';
             document.getElementById('profile-whatsapp').value = profile.whatsappContacto || '';
+            document.getElementById('profile-title').textContent = editingExistingProfile ? 'Editar perfil' : 'Completa tus datos';
+            document.getElementById('profile-subtitle').textContent = editingExistingProfile
+                ? 'Actualiza tu nombre, municipio o WhatsApp de contacto.'
+                : 'Los usaremos para identificarte al contactar una publicación.';
+            document.getElementById('profile-close').classList.toggle('hidden', !editingExistingProfile);
             document.getElementById('profile-message').classList.add('hidden');
             document.getElementById('profile-overlay').classList.remove('hidden');
         }
@@ -713,6 +723,11 @@
             const form = document.getElementById('profile-form');
             const submitButton = document.getElementById('profile-submit');
             const message = document.getElementById('profile-message');
+            document.getElementById('session-email').addEventListener('click', () => {
+                if (firebase.auth().currentUser && isCompleteProfile(currentUserProfile)) {
+                    showProfileOverlay(currentUserProfile);
+                }
+            });
             form.addEventListener('submit', async event => {
                 event.preventDefault();
                 if (!form.reportValidity()) return;
@@ -740,7 +755,7 @@
                         await user.updateProfile({ displayName: profile.nombreCompleto });
                     }
                     currentUserProfile = profile;
-                    document.getElementById('session-email').textContent = `${profile.nombreCompleto} · ${profile.municipio}`;
+                    setSessionProfileLabel(profile.nombreCompleto);
                     hideProfileOverlay();
                     await filtrar(activeCategory, activeCriteria);
                 } catch (error) {
@@ -935,7 +950,7 @@
                     const registeredUser = user && !user.isAnonymous ? user : null;
                     overlay.classList.toggle('hidden', Boolean(registeredUser));
                     content.classList.toggle('hidden', Boolean(registeredUser));
-                    sessionEmail.textContent = registeredUser ? registeredUser.email : '';
+                    setSessionProfileLabel(registeredUser ? (registeredUser.displayName || registeredUser.email) : '');
                     sessionEmail.classList.toggle('hidden', !registeredUser);
                     logoutButton.classList.toggle('hidden', !registeredUser);
 
@@ -946,7 +961,7 @@
                         try {
                             const profile = await syncUserProfile(registeredUser);
                             if (isCompleteProfile(profile)) {
-                                sessionEmail.textContent = `${profile.nombreCompleto} · ${profile.municipio}`;
+                                setSessionProfileLabel(profile.nombreCompleto);
                                 hideProfileOverlay();
                             } else {
                                 showProfileOverlay(profile);
