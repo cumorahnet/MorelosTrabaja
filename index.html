@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja — VERSION 36.26</title>
+    <title>Morelos Trabaja — VERSION 36.27</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -509,7 +509,7 @@
         <!-- Main Hero Content -->
         <div class="max-w-3xl mx-auto pt-16 text-center">
             <h1 class="text-4xl md:text-6xl font-black mb-2 leading-tight">Morelos Trabaja</h1>
-            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-6" data-app-version>Versión 36.26</p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-blue-200 mb-6" data-app-version>Versión 36.27</p>
             <h2 class="text-2xl md:text-3xl font-black mb-6 leading-tight">
                 El portal de empleos, servicios y ventas en Morelos.
             </h2>
@@ -583,9 +583,14 @@
             </div>
         `;
 
-        const NO_ANUNCIOS_HTML = `
-            <div class="text-center py-20 text-slate-400 font-bold col-span-full">No hay anuncios de otras personas que coincidan con esta búsqueda.</div>
-        `;
+        function getNoAnunciosHtml(category = null, criteria = {}) {
+            const hasFilters = Boolean(category || Object.values(criteria || {}).some(value => String(value).trim()));
+            return `
+                <div class="col-span-full py-20 text-center text-slate-400">
+                    <p class="font-bold">${hasFilters ? 'No hay anuncios de otras personas que coincidan con esta búsqueda.' : 'Por ahora no hay anuncios de otras personas disponibles.'}</p>
+                    ${hasFilters ? '<button type="button" onclick="showAllAds()" class="mt-4 rounded-xl bg-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-blue-800"><i class="fas fa-list mr-2"></i>Mostrar todos los anuncios</button>' : ''}
+                </div>`;
+        }
 
         const PREVIEW_MODE_BANNER = `
             <div class="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-200 text-center text-xs font-bold text-amber-700 col-span-full">
@@ -948,6 +953,11 @@
                 async user => {
                     resolving.classList.add('hidden');
                     const registeredUser = user && !user.isAnonymous ? user : null;
+                    const nextSessionUid = registeredUser?.uid || null;
+                    if (nextSessionUid !== activeSessionUid) {
+                        activeSessionUid = nextSessionUid;
+                        resetExploreState();
+                    }
                     overlay.classList.toggle('hidden', Boolean(registeredUser));
                     content.classList.toggle('hidden', Boolean(registeredUser));
                     setSessionProfileLabel(registeredUser ? (registeredUser.displayName || registeredUser.email) : '');
@@ -1025,6 +1035,7 @@
 
         let activeCategory = null;
         let activeCriteria = {};
+        let activeSessionUid = null;
         let adsLoadRequestId = 0;
         let myAdsCache = [];
         let activeMyAdsTab = 'activos';
@@ -1207,7 +1218,7 @@
                 .filter(ejemplo => (!cat || ejemplo.categoria === cat) && matchesCriteria(ejemplo, criteria))
                 .map(ejemplo => renderAnuncioCard(ejemplo))
                 .join('');
-            cont.innerHTML = PREVIEW_MODE_BANNER + (cards || NO_ANUNCIOS_HTML);
+            cont.innerHTML = PREVIEW_MODE_BANNER + (cards || getNoAnunciosHtml(cat, criteria));
         }
 
         /**
@@ -1387,7 +1398,7 @@
                 if (requestId !== adsLoadRequestId) return;
 
                 if (snapshot.empty) {
-                    cont.innerHTML = NO_ANUNCIOS_HTML;
+                    cont.innerHTML = getNoAnunciosHtml(cat, criteria);
                     return;
                 }
 
@@ -1402,7 +1413,7 @@
                 });
 
                 if (!anuncios.length) {
-                    cont.innerHTML = NO_ANUNCIOS_HTML;
+                    cont.innerHTML = getNoAnunciosHtml(cat, criteria);
                     return;
                 }
 
@@ -1431,6 +1442,21 @@
         const searchCriteriaForm = document.getElementById('search-criteria-form');
         const searchFields = document.getElementById('search-fields');
         let selectedSearchCategory = null;
+
+        function resetExploreState() {
+            activeCategory = null;
+            activeCriteria = {};
+            selectedSearchCategory = null;
+            adsLoadRequestId += 1;
+            searchCriteriaForm.reset();
+        }
+
+        function showAllAds() {
+            resetExploreState();
+            hideSearchOverlay();
+            filtrar();
+            document.getElementById('contenedor-anuncios').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         function searchInput(label, name, placeholder) {
             return `<label class="block text-sm font-bold text-slate-700 mb-4">${label}<input name="${name}" type="text" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="${placeholder}"></label>`;
