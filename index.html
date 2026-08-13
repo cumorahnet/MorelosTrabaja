@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja — VERSION 36.33</title>
+    <title>Morelos Trabaja — VERSION 36.34</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -439,7 +439,7 @@
             <button onclick="hideAboutOverlay(); showArticlesOverlay()" class="w-full block text-center rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
                 <i class="fas fa-newspaper mr-2"></i> Ver Artículos de Interés
             </button>
-            <p class="text-xs text-slate-400 mt-4 text-center"><span data-app-version>Versión 36.22</span> - Desarrollado con ❤️ en Morelos.</p>
+            <p class="text-xs text-slate-400 mt-4 text-center"><span data-app-version>Versión 36.34</span> - Desarrollado con ❤️ en Morelos.</p>
         </section>
     </div>
 
@@ -447,10 +447,19 @@
     <div id="articles-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-5 hidden" aria-live="polite">
         <section class="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl relative max-h-[94vh] overflow-y-auto" aria-label="Artículos de interés">
             <div class="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:px-6">
-                <nav class="flex flex-wrap gap-2" aria-label="Seleccionar artículo">
-                    <button type="button" data-article-tab="cv" onclick="selectArticle('cv')" class="rounded-full bg-blue-700 px-4 py-2 text-xs font-black text-white">Crear un currículum</button>
-                    <button type="button" data-article-tab="guide" onclick="selectArticle('guide')" class="rounded-full bg-slate-100 px-4 py-2 text-xs font-black text-slate-600 hover:bg-slate-200">Cómo usar la plataforma</button>
-                </nav>
+                <div class="min-w-0 flex-1 sm:max-w-xl">
+                    <label for="article-selector" class="mb-1 block text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Seleccionar artículo</label>
+                    <select id="article-selector" onchange="selectArticle(this.value)" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-blue-950 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:text-sm">
+                        <option value="cv">Crear un currículum</option>
+                        <option value="guide">Cómo usar la plataforma</option>
+                        <option value="interview">Prepararte para una entrevista</option>
+                        <option value="job-fraud">Evitar ofertas de empleo falsas</option>
+                        <option value="candidate-selection">Seleccionar y filtrar candidatos</option>
+                        <option value="publication-policy">Políticas de publicación</option>
+                        <option value="photos-prices">Tomar fotos y fijar precios</option>
+                        <option value="safe-sales">Ventas y entregas seguras</option>
+                    </select>
+                </div>
                 <button onclick="hideArticlesOverlay()" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow ring-1 ring-slate-200 hover:text-blue-700" aria-label="Cerrar artículos de interés">
                     <i class="fas fa-times text-lg" aria-hidden="true"></i>
                 </button>
@@ -464,6 +473,7 @@
                     <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
                         <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>7 min de lectura</span>
                         <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>11 de agosto de 2026</span>
+                        <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700"><i class="fas fa-pen-nib mr-2" aria-hidden="true"></i>Morelos Trabaja</span>
                     </div>
                 </header>
 
@@ -545,6 +555,7 @@
                     <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
                         <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>6 min de lectura</span>
                         <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>13 de agosto de 2026</span>
+                        <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700"><i class="fas fa-pen-nib mr-2" aria-hidden="true"></i>Morelos Trabaja</span>
                     </div>
                 </header>
                 <div class="article-content px-6 py-8 md:px-12 md:py-12">
@@ -599,6 +610,215 @@
                     </div>
                 </div>
             </article>
+
+            <article id="article-interview" data-article-panel="interview" class="hidden overflow-hidden bg-white">
+                <header class="border-b border-slate-200 bg-white px-6 py-10 md:px-12 md:py-14">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-700 uppercase">Orientación laboral · Entrevistas</p>
+                    <h2 class="mt-4 max-w-3xl text-3xl font-black leading-tight text-blue-950 md:text-5xl">Consejos para prepararte antes de una entrevista de trabajo</h2>
+                    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">Prepárate para presentar tu experiencia con claridad, demostrar interés y llegar con mayor confianza.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>3 min de lectura</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>13 de agosto de 2026</span>
+                        <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700"><i class="fas fa-pen-nib mr-2" aria-hidden="true"></i>Morelos Trabaja</span>
+                    </div>
+                </header>
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">Prepararse adecuadamente para una entrevista de trabajo aumenta tus posibilidades de comunicar mejor lo que sabes hacer. Estas recomendaciones te ayudarán a destacar durante el proceso.</p>
+
+                    <h3>1. Investiga sobre la empresa</h3>
+                    <p>Antes de la entrevista, averigua la misión, visión, valores, productos o servicios y cultura organizacional de la empresa. Esto demuestra interés real y te permite relacionar tus respuestas con los objetivos de la organización.</p>
+
+                    <h3>2. Analiza el perfil del puesto</h3>
+                    <p>Repasa los requisitos de la vacante e identifica experiencias, proyectos o habilidades de tu trayectoria que demuestren que eres una buena opción para el puesto.</p>
+
+                    <h3>3. Prepara respuestas a preguntas comunes</h3>
+                    <p>Practica cómo explicarás tus fortalezas, áreas de mejora, motivos para cambiar de empleo y la manera en que resuelves situaciones de presión.</p>
+                    <aside class="my-8 rounded-2xl border border-blue-100 bg-blue-50 p-5 md:p-6">
+                        <p class="font-black text-blue-950"><i class="fas fa-lightbulb mr-2 text-amber-500" aria-hidden="true"></i>Utiliza el método STAR</p>
+                        <p class="mt-2 text-blue-900">Organiza tus ejemplos en cuatro partes: Situación, Tarea, Acción y Resultado. Así podrás explicar de manera concreta qué problema enfrentaste, qué hiciste y qué lograste.</p>
+                    </aside>
+
+                    <h3>4. Cuida tu presentación y puntualidad</h3>
+                    <ul>
+                        <li><strong class="text-slate-800">Entrevista presencial:</strong> planea tu ruta con anticipación, llega entre 10 y 15 minutos antes y elige vestimenta profesional acorde con la empresa.</li>
+                        <li><strong class="text-slate-800">Entrevista virtual:</strong> verifica con tiempo tu conexión, cámara y micrófono. Busca un espacio iluminado y sin distracciones.</li>
+                    </ul>
+
+                    <h3>5. Prepara preguntas para quien te entrevista</h3>
+                    <p>Pregunta sobre las dinámicas del equipo, los retos inmediatos del puesto o los siguientes pasos del proceso. Esto demuestra iniciativa e interés genuino.</p>
+                </div>
+            </article>
+
+            <article id="article-job-fraud" data-article-panel="job-fraud" class="hidden overflow-hidden bg-white">
+                <header class="border-b border-slate-200 bg-white px-6 py-10 md:px-12 md:py-14">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-700 uppercase">Seguridad · Búsqueda de empleo</p>
+                    <h2 class="mt-4 max-w-3xl text-3xl font-black leading-tight text-blue-950 md:text-5xl">Cómo identificar y evitar ofertas de empleo falsas o fraude</h2>
+                    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">Reconoce señales de alerta y protege tu información personal y financiera ante vacantes engañosas.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>3 min de lectura</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>13 de agosto de 2026</span>
+                        <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700"><i class="fas fa-pen-nib mr-2" aria-hidden="true"></i>Morelos Trabaja</span>
+                    </div>
+                </header>
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">En el mercado laboral es fundamental reconocer señales de alerta para proteger tus datos y tu dinero antes de responder a una vacante.</p>
+
+                    <h3>Principales señales de alerta</h3>
+                    <ul>
+                        <li><strong class="text-slate-800">Solicitud de dinero:</strong> desconfía si te piden pagos por exámenes médicos, capacitaciones, uniformes o trámites de selección.</li>
+                        <li><strong class="text-slate-800">Salarios excesivos sin requisitos claros:</strong> los sueldos extremadamente altos para tareas sencillas o sin experiencia pueden ser una señal de fraude.</li>
+                        <li><strong class="text-slate-800">Contacto exclusivamente informal:</strong> presta atención cuando no existe un proceso formal ni información corporativa verificable.</li>
+                        <li><strong class="text-slate-800">Información difusa de la empresa:</strong> la falta de sitio oficial, dirección física o datos legales comprobables es motivo de cautela.</li>
+                    </ul>
+
+                    <h3>Mejores prácticas para protegerte</h3>
+                    <ul>
+                        <li><strong class="text-slate-800">Investiga la empresa:</strong> busca su nombre, sitio oficial, perfiles profesionales y referencias para validar su existencia.</li>
+                        <li><strong class="text-slate-800">Protege tus datos sensibles:</strong> no compartas cuentas bancarias, contraseñas, códigos ni identificaciones completas durante el contacto inicial.</li>
+                        <li><strong class="text-slate-800">Desconfía de la urgencia excesiva:</strong> una presión para aceptar inmediatamente y sin entrevista formal debe tomarse con cautela.</li>
+                    </ul>
+
+                    <aside class="my-8 rounded-2xl border border-red-100 bg-red-50 p-5 md:p-6">
+                        <p class="font-black text-red-950"><i class="fas fa-shield-alt mr-2 text-red-600" aria-hidden="true"></i>Detente y verifica</p>
+                        <p class="mt-2 text-red-900">Si una oferta te exige dinero o información sensible para continuar, no realices el pago ni compartas los datos. Investiga primero a la empresa.</p>
+                    </aside>
+                </div>
+            </article>
+
+            <article id="article-candidate-selection" data-article-panel="candidate-selection" class="hidden overflow-hidden bg-white">
+                <header class="border-b border-slate-200 bg-white px-6 py-10 md:px-12 md:py-14">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-700 uppercase">Orientación empresarial · Reclutamiento</p>
+                    <h2 class="mt-4 max-w-3xl text-3xl font-black leading-tight text-blue-950 md:text-5xl">Buenas prácticas para la selección y filtro de candidatos</h2>
+                    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">Organiza un proceso objetivo para identificar a la persona adecuada y comunicarte con respeto con quienes participan.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>3 min de lectura</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>13 de agosto de 2026</span>
+                        <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700"><i class="fas fa-pen-nib mr-2" aria-hidden="true"></i>Morelos Trabaja</span>
+                    </div>
+                </header>
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">Un proceso ordenado de reclutamiento y selección permite identificar talento adecuado y aprovechar mejor el tiempo y los recursos de la organización.</p>
+
+                    <h3>1. Define claramente el perfil del puesto</h3>
+                    <p>Antes de publicar la vacante, establece los requisitos indispensables, competencias técnicas, habilidades personales y responsabilidades principales del puesto.</p>
+
+                    <h3>2. Aplica un filtro curricular objetivo</h3>
+                    <p>Define criterios iguales para todas las candidaturas. Considera la relevancia de la experiencia, los logros demostrables y los antecedentes relacionados con las tareas del puesto.</p>
+
+                    <h3>3. Utiliza entrevistas estructuradas</h3>
+                    <p>Prepara el mismo conjunto de preguntas principales para todas las personas candidatas a una posición. Esto facilita comparar respuestas y conocer cómo han resuelto situaciones similares.</p>
+
+                    <h3>4. Realiza pruebas relacionadas con el trabajo</h3>
+                    <p>Cuando sea necesario, utiliza evaluaciones breves que simulen tareas reales del puesto. Explica previamente el propósito y evita solicitar trabajo productivo gratuito.</p>
+
+                    <h3>5. Verifica referencias y mantén una comunicación transparente</h3>
+                    <p>Con autorización de la persona candidata, valida referencias laborales relevantes. Informa oportunamente las etapas y el estado de la candidatura, y protege los datos personales recibidos.</p>
+                </div>
+            </article>
+
+            <article id="article-publication-policy" data-article-panel="publication-policy" class="hidden overflow-hidden bg-white">
+                <header class="border-b border-slate-200 bg-white px-6 py-10 md:px-12 md:py-14">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-700 uppercase">Convivencia · Publicaciones</p>
+                    <h2 class="mt-4 max-w-3xl text-3xl font-black leading-tight text-blue-950 md:text-5xl">Políticas de publicación y contenido no permitido en ofertas</h2>
+                    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">Criterios básicos para mantener publicaciones claras, legales y confiables dentro de la plataforma.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>3 min de lectura</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>13 de agosto de 2026</span>
+                        <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700"><i class="fas fa-pen-nib mr-2" aria-hidden="true"></i>Morelos Trabaja</span>
+                    </div>
+                </header>
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">Para mantener una plataforma confiable y segura, todas las publicaciones deben respetar estos criterios de contenido y la normativa aplicable.</p>
+
+                    <h3>1. Productos y servicios prohibidos</h3>
+                    <p>Queda prohibida la publicación u oferta de los siguientes elementos:</p>
+                    <ul>
+                        <li>Sustancias no autorizadas, medicamentos controlados o productos de dudosa procedencia.</li>
+                        <li>Armas, pirotecnia, explosivos o materiales peligrosos.</li>
+                        <li>Documentos oficiales, identificaciones, bases de datos o información personal confidencial.</li>
+                        <li>Bienes falsificados, réplicas no autorizadas o productos que infrinjan derechos de propiedad intelectual.</li>
+                        <li>Contenido explícito, difamatorio, discriminatorio o que promueva actividades ilegales.</li>
+                    </ul>
+
+                    <h3>2. Reglas para publicar</h3>
+                    <ul>
+                        <li><strong class="text-slate-800">Información veraz:</strong> describe con exactitud las características y el estado real del producto, servicio o vacante.</li>
+                        <li><strong class="text-slate-800">Claridad en el precio:</strong> no publiques precios engañosos o simbólicos para atraer visitas cuando el costo real sea diferente.</li>
+                        <li><strong class="text-slate-800">Sin duplicados:</strong> evita crear varios anuncios del mismo producto u oportunidad en un periodo corto.</li>
+                    </ul>
+
+                    <aside class="my-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 md:p-6">
+                        <p class="font-black text-amber-950"><i class="fas fa-exclamation-triangle mr-2 text-amber-600" aria-hidden="true"></i>Revisión de contenido</p>
+                        <p class="mt-2 text-amber-900">Morelos Trabaja podrá retirar publicaciones que incumplan estas reglas, representen un riesgo para la comunidad o contravengan disposiciones aplicables.</p>
+                    </aside>
+                </div>
+            </article>
+
+            <article id="article-photos-prices" data-article-panel="photos-prices" class="hidden overflow-hidden bg-white">
+                <header class="border-b border-slate-200 bg-white px-6 py-10 md:px-12 md:py-14">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-700 uppercase">Ventas · Presentación del producto</p>
+                    <h2 class="mt-4 max-w-3xl text-3xl font-black leading-tight text-blue-950 md:text-5xl">Consejos para tomar buenas fotos y fijar precios competitivos</h2>
+                    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">Una presentación clara y un precio razonable pueden facilitar que las personas comprendan tu oferta.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>3 min de lectura</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>13 de agosto de 2026</span>
+                        <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700"><i class="fas fa-pen-nib mr-2" aria-hidden="true"></i>Morelos Trabaja</span>
+                    </div>
+                </header>
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">Una presentación atractiva y un precio justo son factores importantes para dar claridad a la oferta y facilitar la venta de tus productos.</p>
+
+                    <h3>Fotografía efectiva del producto</h3>
+                    <ul>
+                        <li><strong class="text-slate-800">Iluminación adecuada:</strong> utiliza luz natural cuando sea posible y evita sombras muy marcadas o fotografías oscuras.</li>
+                        <li><strong class="text-slate-800">Fondo limpio:</strong> fotografía el artículo sobre un espacio neutro y ordenado que no distraiga.</li>
+                        <li><strong class="text-slate-800">Ángulos y detalles:</strong> muestra varias vistas, marca, etiquetas y cualquier señal de uso o desgaste.</li>
+                        <li><strong class="text-slate-800">Sin filtros excesivos:</strong> presenta los colores y el estado real para evitar confusiones durante la entrega.</li>
+                    </ul>
+
+                    <h3>Estrategia para fijar un precio competitivo</h3>
+                    <ul>
+                        <li><strong class="text-slate-800">Investiga el mercado:</strong> revisa publicaciones similares para conocer el rango de precios.</li>
+                        <li><strong class="text-slate-800">Evalúa el estado:</strong> ajusta el precio dependiendo de si el producto es nuevo, seminuevo, usado o reacondicionado.</li>
+                        <li><strong class="text-slate-800">Considera la negociación:</strong> si aceptarás ofertas, establece previamente el precio mínimo que estarías dispuesto a recibir.</li>
+                    </ul>
+                </div>
+            </article>
+
+            <article id="article-safe-sales" data-article-panel="safe-sales" class="hidden overflow-hidden bg-white">
+                <header class="border-b border-slate-200 bg-white px-6 py-10 md:px-12 md:py-14">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-700 uppercase">Seguridad · Compraventas</p>
+                    <h2 class="mt-4 max-w-3xl text-3xl font-black leading-tight text-blue-950 md:text-5xl">Recomendaciones para concretar ventas y entregas de forma segura</h2>
+                    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">Protege tu integridad y tu patrimonio cuando acuerdes entregar o recibir un producto.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>2 min de lectura</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>13 de agosto de 2026</span>
+                        <span class="rounded-full bg-blue-50 px-3 py-1.5 text-blue-700"><i class="fas fa-pen-nib mr-2" aria-hidden="true"></i>Morelos Trabaja</span>
+                    </div>
+                </header>
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">Proteger tu integridad física y patrimonial durante las entregas es primordial. Planea el encuentro y verifica las condiciones antes de intercambiar un producto o realizar un pago.</p>
+
+                    <h3>1. Coordina la entrega</h3>
+                    <ul>
+                        <li><strong class="text-slate-800">Elige un punto seguro:</strong> acuerda reunirte en un lugar público, transitado y bien iluminado, como un centro comercial o una zona con vigilancia.</li>
+                        <li><strong class="text-slate-800">Acude acompañado:</strong> siempre que sea posible, pide a una persona de confianza que vaya contigo.</li>
+                        <li><strong class="text-slate-800">Define los detalles:</strong> confirma fecha, hora y punto de referencia antes de trasladarte.</li>
+                    </ul>
+
+                    <h3>2. Verifica antes de entregar o pagar</h3>
+                    <ul>
+                        <li>Permite que la persona compradora inspeccione el producto durante el encuentro.</li>
+                        <li>No entregues el artículo ni envíes un paquete hasta confirmar que recibiste el pago acordado.</li>
+                        <li>Evita intercambios nocturnos o en ubicaciones aisladas.</li>
+                    </ul>
+
+                    <aside class="my-8 rounded-2xl border border-blue-100 bg-blue-50 p-5 md:p-6">
+                        <p class="font-black text-blue-950"><i class="fas fa-user-shield mr-2 text-blue-600" aria-hidden="true"></i>Prioriza tu seguridad</p>
+                        <p class="mt-2 text-blue-900">Si durante la conversación o el encuentro algo te genera desconfianza, cancela la operación. Ninguna venta es más importante que tu seguridad.</p>
+                    </aside>
+                </div>
+            </article>
         </section>
     </div>
 
@@ -650,7 +870,7 @@
             <div class="mx-auto flex max-w-7xl flex-col gap-2 px-3 py-3 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
                 <button type="button" onclick="showLandingScreen()" class="flex items-center justify-center gap-2 text-left lg:justify-start" aria-label="Volver a la portada">
                     <span class="text-lg font-black sm:text-xl">Morelos Trabaja</span>
-                    <span class="hidden text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:inline" data-app-version>Versión 36.33</span>
+                    <span class="hidden text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:inline" data-app-version>Versión 36.34</span>
                 </button>
                 <nav class="flex flex-wrap items-center justify-center gap-1.5" aria-label="Navegación principal">
                     <button type="button" onclick="showExplorePage()" class="member-nav-button bg-blue-700 hover:bg-blue-600"><i class="fas fa-compass mr-1" aria-hidden="true"></i>Explorar</button>
@@ -2149,15 +2369,13 @@
         }
 
         function selectArticle(article) {
-            const selected = article === 'guide' ? 'guide' : 'cv';
-            document.querySelectorAll('[data-article-panel]').forEach(panel => {
+            const panels = Array.from(document.querySelectorAll('[data-article-panel]'));
+            const selected = panels.some(panel => panel.dataset.articlePanel === article) ? article : 'cv';
+            panels.forEach(panel => {
                 panel.classList.toggle('hidden', panel.dataset.articlePanel !== selected);
             });
-            document.querySelectorAll('[data-article-tab]').forEach(button => {
-                const active = button.dataset.articleTab === selected;
-                button.className = `rounded-full px-4 py-2 text-xs font-black ${active ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
-                button.setAttribute('aria-pressed', String(active));
-            });
+            const selector = document.getElementById('article-selector');
+            if (selector) selector.value = selected;
             const section = document.querySelector('#articles-overlay > section');
             if (section) section.scrollTop = 0;
         }
