@@ -1,6 +1,7 @@
 const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 const { FieldPath, Timestamp, getFirestore } = require('firebase-admin/firestore');
+const { createHash } = require('crypto');
 const functions = require('firebase-functions/v1');
 
 initializeApp();
@@ -171,6 +172,40 @@ exports.registerContact = adminFunctions.https.onCall(async (data, context) => {
   return result;
 });
 
+exports.recordAdView = adminFunctions.https.onCall(async (data, context) => {
+  const viewerUid = requireRegisteredUser(context);
+  const adId = validateDocumentId(data?.adId, 'El identificador del anuncio');
+  const db = getFirestore();
+  const adRef = db.collection('anuncios').doc(adId);
+  const viewId = createHash('sha256').update(`${adId}:${viewerUid}`).digest('hex');
+  const viewRef = db.collection('vistasAnuncios').doc(viewId);
+
+  return db.runTransaction(async transaction => {
+    const [adSnapshot, viewSnapshot] = await Promise.all([
+      transaction.get(adRef),
+      transaction.get(viewRef)
+    ]);
+    if (!adSnapshot.exists) {
+      throw new functions.https.HttpsError('not-found', 'El anuncio ya no está disponible.');
+    }
+    const ad = adSnapshot.data();
+    const currentCount = Math.max(0, Number(ad.viewCount || 0));
+    if (ad.authorUid === viewerUid) return { counted: false, viewCount: currentCount };
+    if (!isAdActive(ad)) return { counted: false, viewCount: currentCount };
+    if (viewSnapshot.exists) return { counted: false, viewCount: currentCount };
+
+    const nextCount = currentCount + 1;
+    transaction.create(viewRef, {
+      adId,
+      viewerUid,
+      createdAt: Timestamp.now(),
+      purgeAt: timestampFromMillis((adExpirationMillis(ad) || Date.now()) + ARCHIVE_RETENTION_MS)
+    });
+    transaction.update(adRef, { viewCount: nextCount });
+    return { counted: true, viewCount: nextCount };
+  });
+});
+
 exports.listMyContacts = adminFunctions.https.onCall(async (_data, context) => {
   const uid = requireRegisteredUser(context);
   const db = getFirestore();
@@ -315,11 +350,16 @@ async function deleteQueryInBatches(query) {
 }
 
 async function deleteUserData(db, uid) {
+  const authoredAds = await db.collection('anuncios').where('authorUid', '==', uid).get();
   await deleteQueryInBatches(db.collection('anuncios').where('authorUid', '==', uid));
+  for (const adDocument of authoredAds.docs) {
+    await deleteQueryInBatches(db.collection('vistasAnuncios').where('adId', '==', adDocument.id));
+  }
   await deleteQueryInBatches(db.collection('contactos').where('advertiserUid', '==', uid));
   await deleteQueryInBatches(db.collection('contactos').where('contactorUid', '==', uid));
   await deleteQueryInBatches(db.collection('calificaciones').where('authorUid', '==', uid));
   await deleteQueryInBatches(db.collection('calificaciones').where('raterUid', '==', uid));
+  await deleteQueryInBatches(db.collection('vistasAnuncios').where('viewerUid', '==', uid));
   await db.collection('usuarios').doc(uid).delete();
 }
 
@@ -335,6 +375,7 @@ exports.adminDeleteAd = adminFunctions.https.onCall(async (data, context) => {
   if (!snapshot.exists) return { deleted: false, notFound: true, adId };
 
   await adRef.delete();
+  await deleteQueryInBatches(getFirestore().collection('vistasAnuncios').where('adId', '==', adId));
   functions.logger.info('Anuncio eliminado por el superusuario', {
     adId,
     adminUid: context.auth.uid,
@@ -489,6 +530,18 @@ exports.purgeArchivedAds = adminFunctions.pubsub
       await batch.commit();
       deleted += snapshot.size;
     }
-    functions.logger.info('Anuncios archivados eliminados definitivamente', { deleted });
+    let deletedViews = 0;
+    while (true) {
+      const viewSnapshot = await db.collection('vistasAnuncios')
+        .where('purgeAt', '<=', Timestamp.now())
+        .limit(400)
+        .get();
+      if (viewSnapshot.empty) break;
+      const batch = db.batch();
+      viewSnapshot.docs.forEach(document => batch.delete(document.ref));
+      await batch.commit();
+      deletedViews += viewSnapshot.size;
+    }
+    functions.logger.info('Anuncios y vistas archivados eliminados definitivamente', { deleted, deletedViews });
     return null;
   });

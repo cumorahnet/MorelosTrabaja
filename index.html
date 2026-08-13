@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morelos Trabaja — VERSION 36.30</title>
+    <title>Morelos Trabaja — VERSION 36.33</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -60,6 +60,11 @@
             line-height: 1rem;
             white-space: nowrap;
             transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .advertising-slot {
+            min-height: 110px;
+            background-image: linear-gradient(135deg, rgba(226, 232, 240, 0.45) 25%, transparent 25%, transparent 50%, rgba(226, 232, 240, 0.45) 50%, rgba(226, 232, 240, 0.45) 75%, transparent 75%, transparent);
+            background-size: 18px 18px;
         }
         @media (min-width: 640px) {
             .member-nav-button { padding: 0.6rem 0.85rem; font-size: 0.75rem; }
@@ -440,19 +445,25 @@
 
     <!-- Artículos de interés -->
     <div id="articles-overlay" class="fixed inset-0 z-[101] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-5 hidden" aria-live="polite">
-        <section class="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl relative max-h-[94vh] overflow-y-auto" aria-labelledby="articles-title">
-            <button onclick="hideArticlesOverlay()" class="sticky top-4 z-10 float-right mr-4 md:mr-6 mt-4 h-11 w-11 rounded-full bg-white/95 text-slate-500 shadow-lg ring-1 ring-slate-200 hover:text-blue-700" aria-label="Cerrar artículos de interés">
-                <i class="fas fa-times text-xl" aria-hidden="true"></i>
-            </button>
+        <section class="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl relative max-h-[94vh] overflow-y-auto" aria-label="Artículos de interés">
+            <div class="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:px-6">
+                <nav class="flex flex-wrap gap-2" aria-label="Seleccionar artículo">
+                    <button type="button" data-article-tab="cv" onclick="selectArticle('cv')" class="rounded-full bg-blue-700 px-4 py-2 text-xs font-black text-white">Crear un currículum</button>
+                    <button type="button" data-article-tab="guide" onclick="selectArticle('guide')" class="rounded-full bg-slate-100 px-4 py-2 text-xs font-black text-slate-600 hover:bg-slate-200">Cómo usar la plataforma</button>
+                </nav>
+                <button onclick="hideArticlesOverlay()" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow ring-1 ring-slate-200 hover:text-blue-700" aria-label="Cerrar artículos de interés">
+                    <i class="fas fa-times text-lg" aria-hidden="true"></i>
+                </button>
+            </div>
 
-            <article class="overflow-hidden">
-                <header class="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-700 px-6 py-10 md:px-12 md:py-14 text-white">
-                    <p class="text-xs font-black tracking-[0.25em] text-blue-200 uppercase">Artículos de interés · Búsqueda de empleo</p>
-                    <h2 id="articles-title" class="mt-4 max-w-3xl text-3xl md:text-5xl font-black leading-tight">Cómo crear un currículum que te ayude a conseguir entrevistas</h2>
-                    <p class="mt-5 max-w-2xl text-base md:text-lg leading-relaxed text-blue-100">Una guía sencilla para presentar tu experiencia, destacar tus habilidades y enviar un CV claro y profesional.</p>
-                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-blue-100">
-                        <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>7 min de lectura</span>
-                        <span class="rounded-full bg-white/10 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>11 de agosto de 2026</span>
+            <article id="article-cv" data-article-panel="cv" class="overflow-hidden bg-white">
+                <header class="border-b border-slate-200 bg-white px-6 py-10 md:px-12 md:py-14">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-700 uppercase">Artículos de interés · Búsqueda de empleo</p>
+                    <h2 id="articles-title" class="mt-4 max-w-3xl text-3xl font-black leading-tight text-blue-950 md:text-5xl">Cómo crear un currículum que te ayude a conseguir entrevistas</h2>
+                    <p class="mt-5 max-w-2xl text-base md:text-lg leading-relaxed text-slate-600">Una guía sencilla para presentar tu experiencia, destacar tus habilidades y enviar un CV claro y profesional.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>7 min de lectura</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>11 de agosto de 2026</span>
                     </div>
                 </header>
 
@@ -525,6 +536,69 @@
                     <p class="mt-8 text-sm border-t border-slate-200 pt-6">Un currículum claro facilita que la persona reclutadora encuentre lo importante. Actualízalo cada vez que aprendas una habilidad, termines un curso o consigas un nuevo logro.</p>
                 </div>
             </article>
+
+            <article id="article-guide" data-article-panel="guide" class="hidden overflow-hidden bg-white">
+                <header class="border-b border-slate-200 bg-white px-6 py-10 md:px-12 md:py-14">
+                    <p class="text-xs font-black tracking-[0.25em] text-blue-700 uppercase">Instructivo · Morelos Trabaja</p>
+                    <h2 class="mt-4 max-w-3xl text-3xl font-black leading-tight text-blue-950 md:text-5xl">Cómo usar Morelos Trabaja paso a paso</h2>
+                    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">Aprende a crear tu cuenta, buscar oportunidades, publicar anuncios y contactar de forma más segura.</p>
+                    <div class="mt-6 flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-clock mr-2" aria-hidden="true"></i>6 min de lectura</span>
+                        <span class="rounded-full bg-slate-100 px-3 py-1.5"><i class="far fa-calendar mr-2" aria-hidden="true"></i>13 de agosto de 2026</span>
+                    </div>
+                </header>
+                <div class="article-content px-6 py-8 md:px-12 md:py-12">
+                    <p class="text-lg font-medium text-slate-700">Morelos Trabaja conecta a personas del estado que ofrecen empleos, prestan servicios o venden productos. Para dar mayor trazabilidad, las funciones principales requieren una cuenta y un teléfono de contacto registrado.</p>
+
+                    <h3>1. Entra desde la portada</h3>
+                    <p>En la portada encontrarás los botones <strong>Publicar</strong> y <strong>Buscar</strong>. Al elegir cualquiera, verás una explicación sobre el registro. Pulsa <strong>Continuar</strong> para crear una cuenta o iniciar sesión.</p>
+
+                    <h3>2. Crea y completa tu cuenta</h3>
+                    <ol>
+                        <li>Regístrate con correo y contraseña o utiliza tu cuenta de Google.</li>
+                        <li>Lee y acepta los Términos y Condiciones.</li>
+                        <li>Escribe tu nombre, municipio y WhatsApp. Ese teléfono se utilizará automáticamente en los anuncios que publiques.</li>
+                        <li>Puedes actualizar tus datos pulsando tu nombre en el encabezado.</li>
+                    </ol>
+
+                    <h3>3. Explora o busca anuncios</h3>
+                    <p>La sección <strong>Explorar</strong> muestra publicaciones recientes de otras personas. Para localizar algo específico, pulsa <strong>Buscar</strong>, elige Empleo, Servicio o Venta y agrega palabras clave, municipio u otros filtros disponibles.</p>
+                    <aside class="my-8 rounded-2xl border border-blue-100 bg-blue-50 p-5 md:p-6">
+                        <p class="font-black text-blue-950"><i class="fas fa-eye mr-2 text-blue-600" aria-hidden="true"></i>Contador de vistas</p>
+                        <p class="mt-2 text-blue-900">Cada tarjeta indica cuántas personas registradas distintas la han visto. Las recargas de una misma cuenta no aumentan el contador.</p>
+                    </aside>
+
+                    <h3>4. Publica una oportunidad</h3>
+                    <ol>
+                        <li>Pulsa <strong>Publicar</strong> y selecciona la categoría correspondiente.</li>
+                        <li>Escribe un título directo y una descripción completa.</li>
+                        <li>Selecciona el municipio o zona de atención.</li>
+                        <li>Completa los datos particulares: sueldo y prestaciones para empleos, experiencia para servicios o precio y condición para ventas.</li>
+                        <li>Revisa la información y confirma la publicación.</li>
+                    </ol>
+                    <p>Tu número no se solicita de nuevo: el sistema toma el WhatsApp de tu perfil. Los anuncios permanecen activos durante el plazo indicado.</p>
+
+                    <h3>5. Administra tus publicaciones</h3>
+                    <p>En <strong>Mis anuncios</strong> puedes revisar anuncios activos, cerrados y vencidos. Cuando una vacante se cubra, un producto se venda o ya no ofrezcas un servicio, retíralo para evitar contactos innecesarios.</p>
+
+                    <h3>6. Contacta y evalúa</h3>
+                    <p>El botón verde abre WhatsApp con un mensaje preparado. Después de contactar, ambas personas disponen del plazo señalado para evaluar la experiencia. Las calificaciones ayudan a construir confianza, así que deben ser honestas y corresponder a contactos reales.</p>
+
+                    <h3>7. Usa la plataforma con seguridad</h3>
+                    <ul>
+                        <li>Verifica la identidad y los datos de la otra persona antes de llegar a un acuerdo.</li>
+                        <li>No compartas contraseñas, códigos de verificación, documentos completos ni información bancaria sensible.</li>
+                        <li>Desconfía de empleos que pidan depósitos, compras o pagos anticipados.</li>
+                        <li>Para compraventas, procura reunirte en un lugar público y revisar el producto antes de pagar.</li>
+                        <li>Reporta dudas o situaciones sospechosas a <a class="font-bold text-blue-700 underline" href="mailto:atencionaclientes@morelostrabaja.com">atencionaclientes@morelostrabaja.com</a>.</li>
+                    </ul>
+
+                    <div class="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-6 md:p-8">
+                        <h3 class="!mt-0">Resumen rápido</h3>
+                        <p>Regístrate, completa tu perfil, explora o publica, verifica a la contraparte y mantén actualizados tus anuncios. La plataforma facilita el contacto; las decisiones y acuerdos corresponden a las personas participantes.</p>
+                    </div>
+                </div>
+            </article>
         </section>
     </div>
 
@@ -576,7 +650,7 @@
             <div class="mx-auto flex max-w-7xl flex-col gap-2 px-3 py-3 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
                 <button type="button" onclick="showLandingScreen()" class="flex items-center justify-center gap-2 text-left lg:justify-start" aria-label="Volver a la portada">
                     <span class="text-lg font-black sm:text-xl">Morelos Trabaja</span>
-                    <span class="hidden text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:inline" data-app-version>Versión 36.30</span>
+                    <span class="hidden text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:inline" data-app-version>Versión 36.33</span>
                 </button>
                 <nav class="flex flex-wrap items-center justify-center gap-1.5" aria-label="Navegación principal">
                     <button type="button" onclick="showExplorePage()" class="member-nav-button bg-blue-700 hover:bg-blue-600"><i class="fas fa-compass mr-1" aria-hidden="true"></i>Explorar</button>
@@ -600,6 +674,22 @@
                 <p class="mt-3 max-w-3xl text-sm text-slate-500 sm:text-base">Consulta empleos, servicios y productos publicados en Morelos. Tus publicaciones están separadas en <button type="button" onclick="showMyAdsOverlay()" class="font-black text-cyan-700 hover:underline">Mis anuncios</button>.</p>
             </div>
         </section>
+        <section class="mx-auto w-full max-w-6xl px-5 pt-6 sm:px-6" aria-label="Publicidad y negocios destacados">
+            <div id="local-sponsors" class="grid gap-4 md:grid-cols-2"></div>
+            <aside id="adsense-top-slot" data-adsense-slot="top" class="advertising-slot mt-5 flex min-h-[110px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-center" aria-label="Publicidad de Google">
+                <div data-ad-placeholder>
+                    <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Publicidad</p>
+                    <p class="mt-2 text-sm font-bold text-slate-500">Espacio horizontal para Google AdSense</p>
+                </div>
+            </aside>
+        </section>
+        <div class="mx-auto flex max-w-6xl items-end justify-between px-5 pt-8 sm:px-6">
+            <div>
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Publicaciones recientes</p>
+                <h2 class="mt-1 text-2xl font-black text-blue-950">Anuncios de la comunidad</h2>
+            </div>
+            <span class="hidden text-xs font-bold text-slate-400 sm:block">El contenido patrocinado siempre se identifica</span>
+        </div>
         <main class="mx-auto mt-2 grid max-w-6xl grid-cols-1 gap-6 p-5 sm:p-6 md:grid-cols-2 lg:grid-cols-3" id="contenedor-anuncios">
             <!-- Los anuncios se cargan al entrar a esta segunda pantalla. -->
         </main>
@@ -668,6 +758,90 @@
 
         const SUPERUSER_EMAIL = 'cumorahnet@gmail.com';
         const TERMS_VERSION = '2026-08-13';
+        const ADVERTISING_EMAIL = 'ventas@morelostrabaja.com';
+
+        // Agrega aquí los identificadores entregados por Google AdSense.
+        // Mientras estén vacíos se conserva una vista previa del espacio publicitario.
+        const ADSENSE_CONFIG = Object.freeze({
+            client: '', // Ejemplo: ca-pub-1234567890123456
+            topSlot: '',
+            feedSlot: ''
+        });
+
+        // Los anuncios locales pagados se administran manualmente para evitar que
+        // una persona pueda marcar su propia publicación como patrocinada.
+        const LOCAL_SPONSORS = Object.freeze([
+            // { business: 'Nombre del negocio', message: 'Descripción breve', url: 'https://...', cta: 'Conocer más' }
+        ]);
+
+        function advertisingContactUrl() {
+            const subject = encodeURIComponent('Quiero anunciar mi negocio en Morelos Trabaja');
+            const body = encodeURIComponent('Hola, deseo información sobre espacios publicitarios locales en Morelos Trabaja.\n\nNombre del negocio:\nMunicipio:\nTeléfono:');
+            return `mailto:${ADVERTISING_EMAIL}?subject=${subject}&body=${body}`;
+        }
+
+        function renderLocalSponsors() {
+            const container = document.getElementById('local-sponsors');
+            if (!container) return;
+            if (!LOCAL_SPONSORS.length) {
+                container.innerHTML = `
+                    <aside class="md:col-span-2 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-5 sm:flex sm:items-center sm:justify-between sm:gap-6" aria-label="Espacio publicitario local disponible">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-[0.25em] text-amber-700">Publicidad local</p>
+                            <h2 class="mt-2 text-xl font-black text-slate-900">Destaca tu negocio ante personas de Morelos</h2>
+                            <p class="mt-2 max-w-2xl text-sm text-slate-600">Espacio preferente para comercios, profesionistas y servicios locales. La contratación y publicación se revisan directamente con Morelos Trabaja.</p>
+                        </div>
+                        <a href="${advertisingContactUrl()}" class="mt-4 inline-flex shrink-0 items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-sm font-black text-white hover:bg-amber-700 sm:mt-0"><i class="fas fa-bullhorn mr-2" aria-hidden="true"></i>Anunciar mi negocio</a>
+                    </aside>`;
+                return;
+            }
+            container.innerHTML = LOCAL_SPONSORS.slice(0, 2).map(sponsor => `
+                <article class="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm">
+                    <p class="text-[10px] font-black uppercase tracking-[0.25em] text-amber-700">Publicidad local · Patrocinado</p>
+                    <h2 class="mt-2 text-xl font-black text-slate-900">${escapeHtml(sponsor.business)}</h2>
+                    <p class="mt-2 text-sm text-slate-600">${escapeHtml(sponsor.message)}</p>
+                    <a href="${escapeHtml(sponsor.url)}" target="_blank" rel="sponsored noopener noreferrer" class="mt-4 inline-flex rounded-xl bg-amber-600 px-4 py-2 text-sm font-black text-white hover:bg-amber-700">${escapeHtml(sponsor.cta || 'Conocer más')}</a>
+                </article>`).join('');
+        }
+
+        function loadAdsenseScript() {
+            if (!ADSENSE_CONFIG.client || document.querySelector('script[data-morelos-adsense]')) return;
+            const script = document.createElement('script');
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            script.dataset.morelosAdsense = 'true';
+            script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(ADSENSE_CONFIG.client)}`;
+            document.head.appendChild(script);
+        }
+
+        function activateAdsenseSlots() {
+            loadAdsenseScript();
+            document.querySelectorAll('[data-adsense-slot]:not([data-ad-initialized])').forEach(container => {
+                const slot = container.dataset.adsenseSlot === 'top' ? ADSENSE_CONFIG.topSlot : ADSENSE_CONFIG.feedSlot;
+                if (!ADSENSE_CONFIG.client || !slot) return;
+                container.innerHTML = `<ins class="adsbygoogle block" style="display:block" data-ad-client="${escapeHtml(ADSENSE_CONFIG.client)}" data-ad-slot="${escapeHtml(slot)}" data-ad-format="auto" data-full-width-responsive="true"></ins>`;
+                container.dataset.adInitialized = 'true';
+                try { (window.adsbygoogle = window.adsbygoogle || []).push({}); }
+                catch (error) { console.warn('AdSense todavía no está listo:', error); }
+            });
+        }
+
+        function renderInFeedAdvertisingSlot() {
+            return `<aside data-adsense-slot="feed" class="advertising-slot flex min-h-[180px] items-center justify-center rounded-2xl border border-slate-200 bg-white p-5 text-center md:min-h-[260px] md:col-span-2 lg:col-span-1" aria-label="Publicidad de Google">
+                <div data-ad-placeholder>
+                    <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Publicidad</p>
+                    <p class="mt-2 text-sm font-bold text-slate-500">Espacio para anuncio dentro del listado</p>
+                </div>
+            </aside>`;
+        }
+
+        function renderExploreCards(anuncios, ratings = {}) {
+            return anuncios.map((data, index) => {
+                const card = renderAnuncioCard(data, ratings[data.authorUid] || {});
+                const insertAdvertising = (index + 1) % 6 === 0 && index < anuncios.length - 1;
+                return card + (insertAdvertising ? renderInFeedAdvertisingSlot() : '');
+            }).join('');
+        }
 
         async function loadAppVersion() {
             try {
@@ -828,6 +1002,7 @@
             document.getElementById('member-app').classList.remove('hidden');
             pendingProtectedAction = null;
             filtrar(activeCategory, activeCriteria);
+            activateAdsenseSlots();
             window.scrollTo({ top: 0, behavior: 'auto' });
             if (action === 'publish') setTimeout(() => showPublishOverlay(), 0);
             if (action === 'search') setTimeout(() => showSearchOverlay(), 0);
@@ -1314,6 +1489,48 @@
             return ratings;
         }
 
+        function formatViewCount(value) {
+            const parsed = Number(value);
+            const count = Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+            return `${count.toLocaleString('es-MX')} vista${count === 1 ? '' : 's'}`;
+        }
+
+        async function recordVisibleAdView(element) {
+            const encodedAdId = element.dataset.trackAdView;
+            if (!encodedAdId || element.dataset.viewRecording === 'true') return;
+            const storageKey = `morelosViewed:${encodedAdId}`;
+            try {
+                if (sessionStorage.getItem(storageKey) === 'true') return;
+            } catch (_error) { /* El servidor mantiene la deduplicación definitiva. */ }
+            element.dataset.viewRecording = 'true';
+            try {
+                const result = await firebase.app().functions().httpsCallable('recordAdView')({ adId: decodeURIComponent(encodedAdId) });
+                const counter = element.querySelector('[data-view-count]');
+                if (counter) counter.textContent = formatViewCount(result.data.viewCount);
+                try { sessionStorage.setItem(storageKey, 'true'); } catch (_error) { /* Sin almacenamiento local. */ }
+            } catch (error) {
+                console.warn('No fue posible registrar la vista del anuncio:', error.code || error);
+                element.dataset.viewRecording = 'false';
+            }
+        }
+
+        function observeAdViews() {
+            const cards = [...document.querySelectorAll('[data-track-ad-view]')];
+            if (!cards.length) return;
+            if (!('IntersectionObserver' in window)) {
+                cards.forEach(recordVisibleAdView);
+                return;
+            }
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting || entry.intersectionRatio < 0.6) return;
+                    observer.unobserve(entry.target);
+                    recordVisibleAdView(entry.target);
+                });
+            }, { threshold: 0.6 });
+            cards.forEach(card => observer.observe(card));
+        }
+
         function renderAnuncioCard(data, ratingInfo = {}) {
             const category = String(data.categoria || 'default').toLowerCase();
             const style = CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
@@ -1334,6 +1551,8 @@
             const tipoProducto = escapeHtml(data.tipo_producto || '');
             const currentUid = firebase.apps.length ? firebase.auth().currentUser?.uid : null;
             const isOwner = Boolean(data.id && currentUid && currentUid === data.authorUid);
+            const encodedAdId = data.id ? encodeURIComponent(data.id) : '';
+            const viewCounter = `<p class="mt-3 text-xs font-bold text-slate-500"><i class="far fa-eye mr-1" aria-hidden="true"></i><span data-view-count>${escapeHtml(formatViewCount(data.viewCount))}</span></p>`;
             const expirationMillis = data.expiresAt?.toMillis?.() || (data.fecha?.toMillis?.() ? data.fecha.toMillis() + (8 * 24 * 60 * 60 * 1000) : null);
             const expirationText = expirationMillis ? `<p class="mt-3 text-xs font-bold text-slate-500"><i class="far fa-clock mr-1"></i>Disponible hasta ${escapeHtml(new Date(expirationMillis).toLocaleDateString('es-MX', { dateStyle: 'medium' }))}</p>` : '';
             const adminDeleteButton = isSuperUser() && data.id ? `<button type="button" onclick="deleteAd('${encodeURIComponent(data.id)}', this)" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-black text-red-700 hover:bg-red-100 disabled:cursor-wait disabled:opacity-60"><i class="fas fa-trash mr-1"></i>ELIMINAR ANUNCIO</button>` : '';
@@ -1375,13 +1594,14 @@
                 </div>` : '';
 
             return `
-                <div class="card-anuncio bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between gap-4 border-l-[6px] ${style.borderColorClass}">
+                <div class="card-anuncio bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between gap-4 border-l-[6px] ${style.borderColorClass}" ${encodedAdId && !isOwner ? `data-track-ad-view="${escapeHtml(encodedAdId)}"` : ''}>
                     <div class="min-w-0 flex-grow">
                         <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${escapeHtml(category)}</span>
                         <h3 class="text-xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
                         <p class="text-slate-500 text-sm mt-2">${escapeHtml(data.descripcion)}</p>
                         ${specificFieldsHtml}
                         ${expirationText}
+                        ${viewCounter}
                         ${renderRating(data.authorUid, ratingInfo)}
                         ${ownerCloseButton}
                         ${adminDeleteButton}
@@ -1458,11 +1678,11 @@
                 }
             ];
 
-            const cards = ejemplos
-                .filter(ejemplo => (!cat || ejemplo.categoria === cat) && matchesCriteria(ejemplo, criteria))
-                .map(ejemplo => renderAnuncioCard(ejemplo))
-                .join('');
+            const filteredExamples = ejemplos.filter(ejemplo => (!cat || ejemplo.categoria === cat) && matchesCriteria(ejemplo, criteria));
+            const cards = renderExploreCards(filteredExamples);
             cont.innerHTML = PREVIEW_MODE_BANNER + (cards || getNoAnunciosHtml(cat, criteria));
+            activateAdsenseSlots();
+            observeAdViews();
         }
 
         /**
@@ -1544,6 +1764,7 @@
                 <p class="mt-3 text-sm text-slate-500">${escapeHtml(anuncio.descripcion || '')}</p>
                 <div class="mt-4 space-y-1 text-xs text-slate-500">
                     <p><strong>Publicado:</strong> ${escapeHtml(formatAdDate(anuncio.fecha))}</p>
+                    <p><i class="far fa-eye mr-1" aria-hidden="true"></i><strong>${escapeHtml(formatViewCount(anuncio.viewCount))}</strong></p>
                     ${expiration ? `<p><strong>${lifecycle === 'vencidos' ? 'Venció' : 'Vigencia'}:</strong> ${escapeHtml(new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(new Date(expiration)))}</p>` : ''}
                 </div>
                 ${(closeButton || deleteButton) ? `<div class="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4">${closeButton}${deleteButton}</div>` : ''}
@@ -1667,9 +1888,9 @@
 
                 const ratings = await loadRatings(anuncios.map(data => data.authorUid));
                 if (requestId !== adsLoadRequestId) return;
-                cont.innerHTML = anuncios
-                    .map(data => renderAnuncioCard(data, ratings[data.authorUid] || {}))
-                    .join('');
+                cont.innerHTML = renderExploreCards(anuncios, ratings);
+                activateAdsenseSlots();
+                observeAdViews();
             } catch (error) {
                 if (requestId !== adsLoadRequestId) return;
                 console.error("Error al cargar anuncios de Firebase:", error);
@@ -1856,7 +2077,8 @@
                     authorUid: currentUser.uid,
                     fecha: firebase.firestore.FieldValue.serverTimestamp(),
                     expiresAt: firebase.firestore.Timestamp.fromMillis(Date.now() + (8 * 24 * 60 * 60 * 1000)),
-                    estado: 'activo'
+                    estado: 'activo',
+                    viewCount: 0
                 };
 
                 if (category === 'empleo') {
@@ -1922,7 +2144,22 @@
         function showArticlesOverlay() {
             const overlay = document.getElementById('articles-overlay');
             overlay.classList.remove('hidden');
+            selectArticle('cv');
             overlay.querySelector('section').scrollTop = 0;
+        }
+
+        function selectArticle(article) {
+            const selected = article === 'guide' ? 'guide' : 'cv';
+            document.querySelectorAll('[data-article-panel]').forEach(panel => {
+                panel.classList.toggle('hidden', panel.dataset.articlePanel !== selected);
+            });
+            document.querySelectorAll('[data-article-tab]').forEach(button => {
+                const active = button.dataset.articleTab === selected;
+                button.className = `rounded-full px-4 py-2 text-xs font-black ${active ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                button.setAttribute('aria-pressed', String(active));
+            });
+            const section = document.querySelector('#articles-overlay > section');
+            if (section) section.scrollTop = 0;
         }
 
         function hideArticlesOverlay() {
@@ -2154,6 +2391,7 @@
         // --- Event Listeners ---
         window.addEventListener('load', () => {
             loadAppVersion();
+            renderLocalSponsors();
             setupProfileForm();
             setupAuthentication();
             // Assign event listeners for new header buttons
