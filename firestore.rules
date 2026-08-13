@@ -22,9 +22,13 @@ service cloud.firestore {
       allow read: if isSuperUser() || (request.auth != null && request.auth.uid == userId);
       allow create, update: if request.auth != null
         && request.auth.uid == userId
-        && request.resource.data.keys().hasOnly(['email', 'lastLogin', 'nombreCompleto', 'municipio', 'whatsappContacto', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['email', 'lastLogin', 'nombreCompleto', 'municipio', 'whatsappContacto', 'updatedAt', 'terminosAceptados', 'terminosVersion', 'terminosAceptadosEn'])
         && request.resource.data.email is string
-        && request.resource.data.email == request.auth.token.email;
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.terminosAceptados == true
+        && request.resource.data.terminosVersion is string
+        && request.resource.data.terminosVersion.size() <= 30
+        && request.resource.data.terminosAceptadosEn is timestamp;
       allow delete: if isSuperUser();
     }
 

@@ -29,9 +29,7 @@
                 <label class="block font-bold text-slate-700">Descripción
                     <textarea name="descripcion" required minlength="10" maxlength="500" rows="5" class="mt-2 w-full border rounded-xl p-3"></textarea>
                 </label>
-                <label class="block font-bold text-slate-700">WhatsApp (con lada)
-                    <input name="whatsapp" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full border rounded-xl p-3" placeholder="777 123 4567">
-                </label>
+                <p class="rounded-xl bg-blue-50 p-4 text-sm font-bold text-blue-800">El anuncio usará automáticamente el WhatsApp registrado en tu perfil.</p>
                 <div id="employment-fields" class="space-y-5">
                     <label class="block font-bold text-slate-700">Prestaciones
                         <textarea name="prestaciones" required minlength="3" maxlength="300" rows="3" class="mt-2 w-full border rounded-xl p-3" placeholder="Ej: Seguro social, aguinaldo, vacaciones y bonos"></textarea>
@@ -78,6 +76,7 @@
         const categoryInput = form.elements.categoria;
         const employmentFields = document.getElementById('employment-fields');
         let authenticatedUser = null;
+        let authenticatedWhatsapp = '';
 
         function updateEmploymentFields() {
             const employmentSelected = categoryInput.value === 'empleo';
@@ -105,6 +104,20 @@
                 return;
             }
             authenticatedUser = user;
+            try {
+                const profile = await firebase.firestore().collection('usuarios').doc(user.uid).get();
+                authenticatedWhatsapp = String(profile.get('whatsappContacto') || '').replace(/\D/g, '');
+                if (!/^\d{10,15}$/.test(authenticatedWhatsapp) || profile.get('terminosAceptados') !== true) {
+                    estado.textContent = 'Completa tu perfil y acepta los términos en la página principal.';
+                    estado.className = 'text-sm font-bold text-blue-700';
+                    window.location.replace('index.html');
+                    return;
+                }
+            } catch (error) {
+                console.error('No se pudo cargar el perfil:', error);
+                window.location.replace('index.html');
+                return;
+            }
             enviar.disabled = false;
             enviar.textContent = 'PUBLICAR ANUNCIO';
         });
@@ -120,7 +133,7 @@
             }
 
             const values = new FormData(form);
-            const whatsapp = String(values.get('whatsapp')).replace(/\D/g, '');
+            const whatsapp = authenticatedWhatsapp;
             if (!/^\d{10,15}$/.test(whatsapp)) {
                 estado.textContent = 'Escribe un número de WhatsApp válido, con lada.';
                 estado.className = 'text-sm font-bold text-red-700';
