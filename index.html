@@ -11,7 +11,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-functions.js"></script>
+    <script async data-morelos-adsense src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6435494453666957" crossorigin="anonymous"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -20,6 +22,17 @@
             background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
                         url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=1200');
             background-size: cover; background-position: center;
+        }
+        .brand-mark {
+            filter: drop-shadow(0 10px 22px rgba(2, 132, 199, 0.28));
+        }
+        .splash-progress-fill {
+            width: 0%;
+            animation: splash-progress 3.6s cubic-bezier(0.22, 0.8, 0.35, 1) forwards;
+        }
+        @keyframes splash-progress {
+            from { width: 0%; }
+            to { width: 100%; }
         }
         /* La clase card-anuncio ahora usa border-l-[6px] y el color se asigna dinámicamente con clases de Tailwind */
         .card-anuncio { 
@@ -73,18 +86,23 @@
 </head>
 <body class="bg-slate-50 min-h-screen">
 
-    <section id="landing-screen" class="hero-gradient min-h-screen px-5 py-6 text-white flex flex-col" aria-labelledby="landing-title">
-        <div class="mx-auto flex w-full max-w-6xl items-center justify-between">
-            <p class="text-sm font-black tracking-wide">Morelos Trabaja</p>
-            <button id="landing-exit-button" type="button" class="rounded-xl bg-slate-800/80 px-4 py-2 text-sm font-black hover:bg-slate-900"><i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i>Salir</button>
-        </div>
+    <section id="landing-screen" class="hero-gradient min-h-screen px-5 py-6 text-white flex flex-col" aria-labelledby="landing-title" aria-describedby="landing-description">
         <div class="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center py-16 text-center">
+            <svg class="brand-mark mb-7 h-28 w-28 sm:h-32 sm:w-32" viewBox="0 0 128 128" role="img" aria-label="Logotipo de Morelos Trabaja">
+                <rect x="4" y="4" width="120" height="120" rx="32" fill="#0ea5e9"/>
+                <circle cx="91" cy="35" r="13" fill="#fbbf24"/>
+                <path d="M19 94 45 56l17 19 16-24 31 43H19Z" fill="#082f49" opacity=".95"/>
+                <path d="m27 91 20-25 15 17 15-21 20 29H27Z" fill="#fff" opacity=".94"/>
+                <path d="M35 99h59" stroke="#fbbf24" stroke-linecap="round" stroke-width="7"/>
+            </svg>
             <p class="mb-4 text-xs font-black uppercase tracking-[0.3em] text-blue-200">Oportunidades en todo Morelos</p>
             <h1 id="landing-title" class="text-5xl font-black leading-tight sm:text-6xl md:text-7xl">Morelos Trabaja</h1>
-            <p class="mt-6 max-w-2xl text-lg font-medium text-blue-100 sm:text-xl">Empleos, servicios y productos cerca de ti.</p>
-            <div class="mt-10 flex w-full max-w-xl flex-col justify-center gap-4 sm:flex-row">
-                <button type="button" onclick="requestProtectedAction('publish')" class="flex-1 rounded-2xl bg-red-600 px-8 py-4 text-lg font-black uppercase tracking-wider shadow-2xl hover:bg-red-700"><i class="fas fa-bullhorn mr-2" aria-hidden="true"></i>Publicar</button>
-                <button type="button" onclick="requestProtectedAction('search')" class="flex-1 rounded-2xl bg-white px-8 py-4 text-lg font-black uppercase tracking-wider text-blue-950 shadow-2xl hover:bg-blue-50"><i class="fas fa-search mr-2" aria-hidden="true"></i>Buscar</button>
+            <p id="landing-description" class="mt-6 max-w-2xl text-lg font-medium text-blue-100 sm:text-xl">Empleos, servicios y productos cerca de ti.</p>
+            <div class="mt-10 w-full max-w-xs" role="status" aria-label="Cargando información">
+                <div class="h-2 overflow-hidden rounded-full bg-white/20 shadow-inner">
+                    <div class="splash-progress-fill h-full rounded-full bg-gradient-to-r from-amber-300 via-yellow-200 to-white"></div>
+                </div>
+                <p class="mt-3 text-sm font-bold text-blue-200">Preparando tu inicio...</p>
             </div>
         </div>
     </section>
@@ -109,7 +127,45 @@
             <h2 id="registration-reason-title" class="mt-2 text-3xl font-black text-blue-950">¿Por qué necesitas registrarte?</h2>
             <p class="mt-4 leading-relaxed text-slate-600">La cuenta permite vincular cada publicación con un perfil y un teléfono de contacto, conservar el historial de anuncios y habilitar las evaluaciones entre personas que establecen contacto.</p>
             <p class="mt-3 leading-relaxed text-slate-600">Esto aporta mayor trazabilidad y confianza a la comunidad, ayuda a prevenir usos indebidos y permite atender reportes. Morelos Trabaja no sustituye la verificación personal: antes de aceptar un empleo, contratar un servicio o comprar un producto, verifica siempre a la otra persona.</p>
-            <button id="registration-reason-continue" type="button" class="mt-7 w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800"><i class="fas fa-arrow-right mr-2" aria-hidden="true"></i>CONTINUAR</button>
+            <button id="registration-reason-continue" type="button" class="mt-7 w-full rounded-xl bg-blue-700 py-3.5 font-black text-white hover:bg-blue-800"><i class="fas fa-arrow-right mr-2" aria-hidden="true"></i>ELEGIR ACCESO</button>
+        </section>
+    </div>
+
+    <div id="auth-choice-overlay" class="fixed inset-0 z-[101] hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4" aria-live="polite">
+        <section class="relative w-full max-w-lg rounded-[2rem] bg-white p-7 shadow-2xl sm:p-9" aria-labelledby="auth-choice-title">
+            <button type="button" onclick="hideAuthChoice()" class="absolute right-5 top-5 text-slate-400 hover:text-slate-700" aria-label="Cerrar opciones de acceso"><i class="fas fa-times text-xl" aria-hidden="true"></i></button>
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-2xl text-blue-700"><i class="fas fa-user-circle" aria-hidden="true"></i></div>
+            <p class="mt-6 text-xs font-black uppercase tracking-[0.25em] text-blue-600">Acceso a Morelos Trabaja</p>
+            <h2 id="auth-choice-title" class="mt-2 text-3xl font-black text-blue-950">Elige cómo continuar</h2>
+            <p class="mt-3 leading-relaxed text-slate-600">Inicia sesión si ya tienes una cuenta o crea una nueva para publicar y contactar.</p>
+            <div class="mt-7 grid gap-3 sm:grid-cols-2">
+                <button id="auth-choice-login" type="button" class="rounded-xl bg-blue-700 px-5 py-4 font-black text-white hover:bg-blue-800"><i class="fas fa-sign-in-alt mr-2" aria-hidden="true"></i>INICIAR SESIÓN</button>
+                <button id="auth-choice-register" type="button" class="rounded-xl border-2 border-blue-200 bg-blue-50 px-5 py-4 font-black text-blue-800 hover:bg-blue-100"><i class="fas fa-user-plus mr-2" aria-hidden="true"></i>CREAR CUENTA</button>
+            </div>
+        </section>
+    </div>
+
+    <div id="whatsapp-contact-overlay" class="fixed inset-0 z-[103] hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4" aria-live="polite">
+        <section class="relative w-full max-w-lg rounded-[2rem] bg-white p-7 shadow-2xl sm:p-9" aria-labelledby="whatsapp-contact-title">
+            <button type="button" onclick="hideWhatsappContactOptions()" class="absolute right-5 top-5 text-slate-400 hover:text-slate-700" aria-label="Cerrar opciones de WhatsApp"><i class="fas fa-times text-xl" aria-hidden="true"></i></button>
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-3xl text-green-600"><i class="fab fa-whatsapp" aria-hidden="true"></i></div>
+            <p class="mt-6 text-xs font-black uppercase tracking-[0.25em] text-green-700">Contactar por WhatsApp</p>
+            <h2 id="whatsapp-contact-title" class="mt-2 text-3xl font-black text-blue-950">Elige cómo contactar</h2>
+            <p class="mt-3 leading-relaxed text-slate-600">En computadora se abrirá WhatsApp Web. Si no usas WhatsApp, puedes abrir tu correo y llevar el número y el mensaje preparados.</p>
+            <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p class="text-xs font-black uppercase tracking-wider text-slate-500">Número de contacto</p>
+                <p id="whatsapp-contact-number" class="mt-1 break-all text-lg font-black text-slate-800"></p>
+            </div>
+            <p id="whatsapp-contact-message" role="status" class="mt-4 hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
+            <div class="mt-6 grid gap-3 sm:grid-cols-2">
+                <button type="button" onclick="openWhatsappWeb()" class="rounded-xl bg-green-600 px-5 py-4 font-black text-white hover:bg-green-700"><i class="fab fa-whatsapp mr-2" aria-hidden="true"></i>ABRIR WHATSAPP WEB</button>
+                <button type="button" onclick="openEmailContact()" class="rounded-xl border-2 border-blue-200 bg-blue-50 px-5 py-4 font-black text-blue-800 hover:bg-blue-100"><i class="fas fa-envelope mr-2" aria-hidden="true"></i>ABRIR CORREO</button>
+            </div>
+            <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                <button type="button" onclick="copyWhatsappContact('phone')" class="rounded-xl border border-slate-300 bg-white px-5 py-3.5 text-sm font-black text-slate-700 hover:bg-slate-50"><i class="far fa-copy mr-2" aria-hidden="true"></i>COPIAR NÚMERO</button>
+                <button type="button" onclick="copyWhatsappContact('message')" class="rounded-xl border border-slate-300 bg-white px-5 py-3.5 text-sm font-black text-slate-700 hover:bg-slate-50"><i class="far fa-copy mr-2" aria-hidden="true"></i>COPIAR MENSAJE</button>
+            </div>
+            <button type="button" onclick="copyWhatsappContact('all')" class="mt-3 w-full rounded-xl border border-slate-300 bg-slate-50 px-5 py-3.5 text-sm font-black text-slate-700 hover:bg-slate-100"><i class="far fa-copy mr-2" aria-hidden="true"></i>COPIAR NÚMERO Y MENSAJE</button>
         </section>
     </div>
 
@@ -136,7 +192,7 @@
                             <input id="auth-whatsapp" type="tel" autocomplete="tel" required inputmode="tel" pattern="[0-9 +()-]{10,20}" maxlength="20" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 5217771234567">
                         </label>
                     </div>
-                    <label class="block text-sm font-bold text-slate-700">Correo electrónico
+                    <label id="auth-email-label" class="block text-sm font-bold text-slate-700">Correo electrónico
                         <input id="auth-email" type="email" autocomplete="email" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="tu@correo.com">
                     </label>
                     <label class="block text-sm font-bold text-slate-700">Contraseña
@@ -158,10 +214,10 @@
                     <span class="h-px flex-1 bg-slate-200"></span>O CONTINÚA CON<span class="h-px flex-1 bg-slate-200"></span>
                 </div>
                 <button id="google-login" type="button" class="w-full rounded-xl border border-slate-300 bg-white py-3.5 font-black text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60">
-                    <i class="fab fa-google mr-2 text-red-500" aria-hidden="true"></i> GOOGLE
+                    <i class="fab fa-google mr-2 text-red-500" aria-hidden="true"></i> INICIAR CON GOOGLE
                 </button>
                 <div class="mt-5 flex flex-col items-center gap-3 text-sm">
-                    <button id="auth-reset" type="button" class="font-bold text-blue-700 hover:underline disabled:opacity-60">Olvidé mi contraseña</button>
+                    <button id="auth-reset" type="button" class="hidden font-bold text-blue-700 hover:underline disabled:opacity-60">Olvidé mi contraseña</button>
                     <button id="auth-toggle" type="button" class="text-slate-600 disabled:opacity-60">Ya tengo cuenta. <span class="font-black text-blue-700">Iniciar sesión</span></button>
                 </div>
             </div>
@@ -171,7 +227,7 @@
     <!-- Perfil requerido para cuentas existentes o acceso con Google -->
     <div id="profile-overlay" class="fixed inset-0 z-[102] bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-5 hidden" aria-live="polite">
         <section class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-7 md:p-9 relative" aria-labelledby="profile-title">
-            <button id="profile-close" type="button" onclick="hideProfileOverlay()" class="hidden absolute top-5 right-5 text-slate-400 hover:text-slate-700" aria-label="Cerrar edición de perfil"><i class="fas fa-times text-xl"></i></button>
+            <button id="profile-close" type="button" onclick="cancelProfileFlow()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700" aria-label="Cerrar formulario de perfil"><i class="fas fa-times text-xl"></i></button>
             <p class="text-xs font-black tracking-[0.25em] text-blue-600 uppercase">Tu perfil</p>
             <h2 id="profile-title" class="text-3xl font-black text-blue-950 mt-2">Completa tus datos</h2>
             <p id="profile-subtitle" class="text-slate-500 mt-2 mb-7">Los usaremos para identificarte al contactar una publicación.</p>
@@ -394,6 +450,23 @@
                     <label class="block text-sm font-bold text-slate-700">Tipo de Producto
                         <input type="text" id="ventas-tipo-producto" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Ej: Electrónica, Muebles, Ropa, Vehículos, Servicios">
                     </label>
+                    <fieldset class="rounded-2xl border border-purple-200 bg-purple-50/60 p-4">
+                        <legend class="px-1 text-sm font-black text-purple-950">Fotografías del producto (opcional)</legend>
+                        <p id="ventas-fotos-ayuda" class="mt-1 text-xs text-slate-600">Agrega desde tus archivos y/o toma una foto con tu móvil. Máximo 3 fotografías.</p>
+                        <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                            <label class="flex cursor-pointer items-center justify-center rounded-xl border border-purple-300 bg-white px-4 py-3 text-sm font-black text-purple-800 hover:bg-purple-100 focus-within:ring-2 focus-within:ring-purple-500">
+                                <i class="fas fa-image mr-2" aria-hidden="true"></i>Elegir archivos
+                                <input type="file" id="ventas-fotos-archivo" accept="image/jpeg,image/png,image/webp" multiple class="sr-only" aria-describedby="ventas-fotos-ayuda ventas-fotos-contador">
+                            </label>
+                            <label class="flex cursor-pointer items-center justify-center rounded-xl border border-purple-300 bg-white px-4 py-3 text-sm font-black text-purple-800 hover:bg-purple-100 focus-within:ring-2 focus-within:ring-purple-500">
+                                <i class="fas fa-camera mr-2" aria-hidden="true"></i>Tomar fotografía
+                                <input type="file" id="ventas-foto-camara" accept="image/*" capture="environment" class="sr-only" aria-describedby="ventas-fotos-ayuda ventas-fotos-contador">
+                            </label>
+                        </div>
+                        <p id="ventas-fotos-contador" class="mt-3 text-xs font-bold text-purple-800" aria-live="polite">0 de 3 fotografías seleccionadas</p>
+                        <p id="ventas-fotos-error" class="mt-2 hidden text-xs font-bold text-red-700" role="alert"></p>
+                        <div id="ventas-fotos-preview" class="mt-3 grid grid-cols-3 gap-2" aria-label="Vista previa de fotografías"></div>
+                    </fieldset>
                     <p id="ventas-message" role="status" class="hidden rounded-xl px-4 py-3 text-sm font-bold"></p>
                     <button type="submit" class="w-full rounded-xl bg-purple-700 py-3.5 font-black text-white hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-60">PUBLICAR VENTA</button>
                     <button type="button" onclick="showCategorySelection()" class="w-full mt-2 text-sm font-bold text-slate-600 hover:underline">Volver a categorías</button>
@@ -561,8 +634,8 @@
                 <div class="article-content px-6 py-8 md:px-12 md:py-12">
                     <p class="text-lg font-medium text-slate-700">Morelos Trabaja conecta a personas del estado que ofrecen empleos, prestan servicios o venden productos. Para dar mayor trazabilidad, las funciones principales requieren una cuenta y un teléfono de contacto registrado.</p>
 
-                    <h3>1. Entra desde la portada</h3>
-                    <p>En la portada encontrarás los botones <strong>Publicar</strong> y <strong>Buscar</strong>. Al elegir cualquiera, verás una explicación sobre el registro. Pulsa <strong>Continuar</strong> para crear una cuenta o iniciar sesión.</p>
+                    <h3>1. Entra desde el inicio</h3>
+                    <p>Al terminar la pantalla de bienvenida llegarás al inicio, donde encontrarás los botones <strong>Publicar</strong> y <strong>Buscar</strong>. Al elegir cualquiera, verás una explicación sobre el registro. Pulsa <strong>Continuar</strong> para crear una cuenta o iniciar sesión.</p>
 
                     <h3>2. Crea y completa tu cuenta</h3>
                     <ol>
@@ -573,7 +646,7 @@
                     </ol>
 
                     <h3>3. Explora o busca anuncios</h3>
-                    <p>La sección <strong>Explorar</strong> muestra publicaciones recientes de otras personas. Para localizar algo específico, pulsa <strong>Buscar</strong>, elige Empleo, Servicio o Venta y agrega palabras clave, municipio u otros filtros disponibles.</p>
+                    <p>La sección <strong>Explorar</strong> muestra todas las publicaciones recientes, incluidas las tuyas. Para localizar algo específico, pulsa <strong>Buscar</strong>, elige Empleo, Servicio o Venta y agrega palabras clave, municipio u otros filtros disponibles.</p>
                     <aside class="my-8 rounded-2xl border border-blue-100 bg-blue-50 p-5 md:p-6">
                         <p class="font-black text-blue-950"><i class="fas fa-eye mr-2 text-blue-600" aria-hidden="true"></i>Contador de vistas</p>
                         <p class="mt-2 text-blue-900">Cada tarjeta indica cuántas personas registradas distintas la han visto. Las recargas de una misma cuenta no aumentan el contador.</p>
@@ -868,7 +941,14 @@
     <div id="member-app" class="hidden min-h-screen bg-slate-50">
         <header class="sticky top-0 z-40 border-b border-blue-900 bg-blue-950 text-white shadow-lg">
             <div class="mx-auto flex max-w-7xl flex-col gap-2 px-3 py-3 sm:px-5 lg:flex-row lg:items-center lg:justify-between">
-                <button type="button" onclick="showLandingScreen()" class="flex items-center justify-center gap-2 text-left lg:justify-start" aria-label="Volver a la portada">
+                <button type="button" onclick="showHome()" class="flex items-center justify-center gap-2 text-left lg:justify-start" aria-label="Ir al inicio">
+                    <svg class="brand-mark h-9 w-9 shrink-0" viewBox="0 0 128 128" aria-hidden="true">
+                        <rect x="4" y="4" width="120" height="120" rx="32" fill="#0ea5e9"/>
+                        <circle cx="91" cy="35" r="13" fill="#fbbf24"/>
+                        <path d="M19 94 45 56l17 19 16-24 31 43H19Z" fill="#082f49" opacity=".95"/>
+                        <path d="m27 91 20-25 15 17 15-21 20 29H27Z" fill="#fff" opacity=".94"/>
+                        <path d="M35 99h59" stroke="#fbbf24" stroke-linecap="round" stroke-width="7"/>
+                    </svg>
                     <span class="text-lg font-black sm:text-xl">Morelos Trabaja</span>
                     <span class="hidden text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:inline" data-app-version>Versión 36.34</span>
                 </button>
@@ -890,13 +970,13 @@
         <section class="border-b border-slate-200 bg-white">
             <div class="mx-auto max-w-6xl px-5 py-9 sm:px-6 sm:py-12">
                 <p class="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Explorar anuncios</p>
-                <h1 class="mt-2 text-3xl font-black text-blue-950 sm:text-4xl">Oportunidades de otras personas</h1>
-                <p class="mt-3 max-w-3xl text-sm text-slate-500 sm:text-base">Consulta empleos, servicios y productos publicados en Morelos. Tus publicaciones están separadas en <button type="button" onclick="showMyAdsOverlay()" class="font-black text-cyan-700 hover:underline">Mis anuncios</button>.</p>
+                <h1 class="mt-2 text-3xl font-black text-blue-950 sm:text-4xl">Todas las oportunidades</h1>
+                <p class="mt-3 max-w-3xl text-sm text-slate-500 sm:text-base">Consulta empleos, servicios y productos publicados en Morelos. Tus publicaciones también aparecen aquí con la marca <strong class="text-cyan-700">Tu anuncio</strong> y puedes administrarlas en <button type="button" onclick="showMyAdsOverlay()" class="font-black text-cyan-700 hover:underline">Mis anuncios</button>.</p>
             </div>
         </section>
         <section class="mx-auto w-full max-w-6xl px-5 pt-6 sm:px-6" aria-label="Publicidad y negocios destacados">
             <div id="local-sponsors" class="grid gap-4 md:grid-cols-2"></div>
-            <aside id="adsense-top-slot" data-adsense-slot="top" class="advertising-slot mt-5 flex min-h-[110px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-center" aria-label="Publicidad de Google">
+            <aside id="adsense-top-slot" data-adsense-slot="top" class="advertising-slot mt-5 hidden min-h-[110px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 text-center" aria-label="Publicidad de Google">
                 <div data-ad-placeholder>
                     <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Publicidad</p>
                     <p class="mt-2 text-sm font-bold text-slate-500">Espacio horizontal para Google AdSense</p>
@@ -965,7 +1045,7 @@
             const hasFilters = Boolean(category || Object.values(criteria || {}).some(value => String(value).trim()));
             return `
                 <div class="col-span-full py-20 text-center text-slate-400">
-                    <p class="font-bold">${hasFilters ? 'No hay anuncios de otras personas que coincidan con esta búsqueda.' : 'Por ahora no hay anuncios de otras personas disponibles.'}</p>
+                    <p class="font-bold">${hasFilters ? 'No hay anuncios que coincidan con esta búsqueda.' : 'Por ahora no hay anuncios disponibles.'}</p>
                     ${hasFilters ? '<button type="button" onclick="showAllAds()" class="mt-4 rounded-xl bg-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-blue-800"><i class="fas fa-list mr-2"></i>Mostrar todos los anuncios</button>' : ''}
                 </div>`;
         }
@@ -980,13 +1060,15 @@
         const TERMS_VERSION = '2026-08-13';
         const ADVERTISING_EMAIL = 'ventas@morelostrabaja.com';
 
-        // Agrega aquí los identificadores entregados por Google AdSense.
-        // Mientras estén vacíos se conserva una vista previa del espacio publicitario.
+        // Auto Ads usa el Publisher ID. Los slots se habilitan únicamente cuando
+        // AdSense entregue identificadores para bloques manuales.
         const ADSENSE_CONFIG = Object.freeze({
-            client: '', // Ejemplo: ca-pub-1234567890123456
+            client: 'ca-pub-6435494453666957',
+            autoAds: true,
             topSlot: '',
             feedSlot: ''
         });
+        let adsenseAutoAdsInitialized = false;
 
         // Los anuncios locales pagados se administran manualmente para evitar que
         // una persona pueda marcar su propia publicación como patrocinada.
@@ -1034,11 +1116,24 @@
             document.head.appendChild(script);
         }
 
+        function activateAdsenseAutoAds() {
+            if (!ADSENSE_CONFIG.client || !ADSENSE_CONFIG.autoAds || adsenseAutoAdsInitialized) return;
+            window.adsbygoogle = window.adsbygoogle || [];
+            window.adsbygoogle.push({
+                google_ad_client: ADSENSE_CONFIG.client,
+                enable_page_level_ads: true
+            });
+            adsenseAutoAdsInitialized = true;
+        }
+
         function activateAdsenseSlots() {
             loadAdsenseScript();
+            activateAdsenseAutoAds();
             document.querySelectorAll('[data-adsense-slot]:not([data-ad-initialized])').forEach(container => {
                 const slot = container.dataset.adsenseSlot === 'top' ? ADSENSE_CONFIG.topSlot : ADSENSE_CONFIG.feedSlot;
                 if (!ADSENSE_CONFIG.client || !slot) return;
+                container.classList.remove('hidden');
+                container.classList.add('flex');
                 container.innerHTML = `<ins class="adsbygoogle block" style="display:block" data-ad-client="${escapeHtml(ADSENSE_CONFIG.client)}" data-ad-slot="${escapeHtml(slot)}" data-ad-format="auto" data-full-width-responsive="true"></ins>`;
                 container.dataset.adInitialized = 'true';
                 try { (window.adsbygoogle = window.adsbygoogle || []).push({}); }
@@ -1047,6 +1142,7 @@
         }
 
         function renderInFeedAdvertisingSlot() {
+            if (!ADSENSE_CONFIG.client || !ADSENSE_CONFIG.feedSlot) return '';
             return `<aside data-adsense-slot="feed" class="advertising-slot flex min-h-[180px] items-center justify-center rounded-2xl border border-slate-200 bg-white p-5 text-center md:min-h-[260px] md:col-span-2 lg:col-span-1" aria-label="Publicidad de Google">
                 <div data-ad-placeholder>
                     <p class="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Publicidad</p>
@@ -1104,6 +1200,8 @@
             'auth/account-exists-with-different-credential': 'Ese correo ya está registrado con otro método de acceso.',
             'auth/unauthorized-domain': 'Este dominio no está autorizado en Firebase para iniciar sesión con Google.',
             'permission-denied': 'Permiso denegado. Revisa las Reglas de Seguridad de Firestore para permitir la escritura.',
+            'storage/unauthorized': 'No fue posible subir las fotografías. Verifica los permisos de Storage.',
+            'storage/retry-limit-exceeded': 'La carga de fotografías tardó demasiado. Revisa tu conexión e intenta nuevamente.',
             'auth/requires-account': 'Inicia sesión con correo o Google para publicar.',
             'form/invalid-ad': 'Revisa el título, la descripción y que tu perfil tenga un WhatsApp válido.',
             'form/invalid-profile': 'Revisa tu nombre, municipio y WhatsApp de contacto.',
@@ -1114,6 +1212,169 @@
         let pendingRegistrationProfile = null;
         let pendingTermsAcceptance = false;
         let pendingProtectedAction = null;
+        let pendingWhatsappContact = null;
+        let authModeController = null;
+        const SESSION_IDLE_TIMEOUT_MS = 60 * 60 * 1000;
+        const SESSION_LAST_ACTIVITY_KEY = 'morelosTrabaja:lastActivity';
+        let sessionIdleTimer = null;
+        let splashTimer = null;
+        const MAX_SALE_PHOTOS = 3;
+        const MAX_SOURCE_PHOTO_BYTES = 12 * 1024 * 1024;
+        const ALLOWED_SALE_PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+        let selectedSalePhotos = [];
+
+        function createSalePhotoId() {
+            return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        }
+
+        function clearSessionIdleTimer() {
+            if (sessionIdleTimer !== null) {
+                window.clearTimeout(sessionIdleTimer);
+                sessionIdleTimer = null;
+            }
+        }
+
+        function resetSessionIdleTimer() {
+            clearSessionIdleTimer();
+            if (!firebase.apps.length || !firebase.auth().currentUser || firebase.auth().currentUser.isAnonymous) return;
+            let lastActivity = 0;
+            try { lastActivity = Number(localStorage.getItem(SESSION_LAST_ACTIVITY_KEY) || 0); } catch (_error) { /* Sin almacenamiento local, se usa el temporizador de esta página. */ }
+            if (lastActivity && Date.now() - lastActivity >= SESSION_IDLE_TIMEOUT_MS) {
+                firebase.auth().signOut().then(() => {
+                    showLandingScreen();
+                    alert('Tu sesión se cerró después de una hora sin actividad.');
+                }).catch(error => console.error('No fue posible cerrar la sesión vencida:', error));
+                return;
+            }
+            try { localStorage.setItem(SESSION_LAST_ACTIVITY_KEY, String(Date.now())); } catch (_error) { /* Sin almacenamiento local. */ }
+            sessionIdleTimer = window.setTimeout(async () => {
+                sessionIdleTimer = null;
+                try {
+                    await firebase.auth().signOut();
+                    try { localStorage.removeItem(SESSION_LAST_ACTIVITY_KEY); } catch (_error) { /* Sin almacenamiento local. */ }
+                    showLandingScreen();
+                    alert('Tu sesión se cerró después de una hora sin actividad.');
+                } catch (error) {
+                    console.error('No fue posible cerrar la sesión por inactividad:', error);
+                }
+            }, SESSION_IDLE_TIMEOUT_MS);
+        }
+
+        function registerSessionActivity() {
+            if (!firebase.apps.length || !firebase.auth().currentUser) return;
+            resetSessionIdleTimer();
+        }
+
+        function setSalePhotoError(message = '') {
+            const errorElement = document.getElementById('ventas-fotos-error');
+            if (!errorElement) return;
+            errorElement.textContent = message;
+            errorElement.classList.toggle('hidden', !message);
+        }
+
+        function renderSalePhotoPreviews() {
+            const preview = document.getElementById('ventas-fotos-preview');
+            const counter = document.getElementById('ventas-fotos-contador');
+            if (!preview || !counter) return;
+            counter.textContent = `${selectedSalePhotos.length} de ${MAX_SALE_PHOTOS} fotografías seleccionadas`;
+            preview.innerHTML = selectedSalePhotos.map((photo, index) => `
+                <div class="relative overflow-hidden rounded-xl border border-purple-200 bg-white">
+                    <img src="${escapeHtml(photo.previewUrl)}" alt="Vista previa ${index + 1}" class="aspect-square h-full w-full object-cover">
+                    <button type="button" onclick="removeSalePhoto('${photo.id}')" class="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-slate-950/75 text-white hover:bg-red-700" aria-label="Quitar fotografía ${index + 1}">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>`).join('');
+        }
+
+        function addSalePhotos(fileList) {
+            setSalePhotoError();
+            let rejectedMessage = '';
+            for (const file of Array.from(fileList || [])) {
+                if (selectedSalePhotos.length >= MAX_SALE_PHOTOS) {
+                    rejectedMessage = 'Sólo puedes agregar un máximo de 3 fotografías.';
+                    break;
+                }
+                if (!ALLOWED_SALE_PHOTO_TYPES.has(file.type)) {
+                    rejectedMessage = 'Usa fotografías en formato JPG, PNG o WebP.';
+                    continue;
+                }
+                if (file.size > MAX_SOURCE_PHOTO_BYTES) {
+                    rejectedMessage = 'Cada fotografía debe pesar 12 MB o menos.';
+                    continue;
+                }
+                const duplicate = selectedSalePhotos.some(photo => photo.file.name === file.name && photo.file.size === file.size && photo.file.lastModified === file.lastModified);
+                if (duplicate) continue;
+                selectedSalePhotos.push({ id: createSalePhotoId(), file, previewUrl: URL.createObjectURL(file) });
+            }
+            if (rejectedMessage) setSalePhotoError(rejectedMessage);
+            renderSalePhotoPreviews();
+        }
+
+        function removeSalePhoto(photoId) {
+            const photo = selectedSalePhotos.find(item => item.id === photoId);
+            if (photo) URL.revokeObjectURL(photo.previewUrl);
+            selectedSalePhotos = selectedSalePhotos.filter(item => item.id !== photoId);
+            setSalePhotoError();
+            renderSalePhotoPreviews();
+        }
+
+        function clearSalePhotos() {
+            selectedSalePhotos.forEach(photo => URL.revokeObjectURL(photo.previewUrl));
+            selectedSalePhotos = [];
+            setSalePhotoError();
+            renderSalePhotoPreviews();
+        }
+
+        function loadSalePhoto(file) {
+            return new Promise((resolve, reject) => {
+                const sourceUrl = URL.createObjectURL(file);
+                const image = new Image();
+                image.onload = () => {
+                    URL.revokeObjectURL(sourceUrl);
+                    resolve(image);
+                };
+                image.onerror = () => {
+                    URL.revokeObjectURL(sourceUrl);
+                    reject(new Error('No fue posible leer una de las fotografías.'));
+                };
+                image.src = sourceUrl;
+            });
+        }
+
+        async function optimizeSalePhoto(file) {
+            const image = await loadSalePhoto(file);
+            const maxSide = 1600;
+            const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+            canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+            const context = canvas.getContext('2d');
+            context.fillStyle = '#ffffff';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.82));
+            if (!blob) throw new Error('No fue posible preparar una de las fotografías.');
+            return blob;
+        }
+
+        async function uploadSalePhotos(userId, adId, photos, onProgress, onUploadedPath) {
+            const uploaded = { urls: [], paths: [] };
+            for (let index = 0; index < photos.length; index += 1) {
+                onProgress?.(index + 1, photos.length);
+                const blob = await optimizeSalePhoto(photos[index].file);
+                const path = `anuncios/${userId}/${adId}/${String(index + 1).padStart(2, '0')}-${createSalePhotoId()}.jpg`;
+                const reference = firebase.storage().ref(path);
+                await reference.put(blob, { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000,immutable' });
+                uploaded.paths.push(path);
+                onUploadedPath?.(path);
+                uploaded.urls.push(await reference.getDownloadURL());
+            }
+            return uploaded;
+        }
+
+        async function removeUploadedSalePhotos(paths) {
+            await Promise.allSettled(paths.map(path => firebase.storage().ref(path).delete()));
+        }
 
         function rememberGoogleRedirect() {
             try {
@@ -1181,10 +1442,14 @@
 
         function hideRegistrationReason(clearAction = true) {
             document.getElementById('registration-reason-overlay').classList.add('hidden');
-            if (clearAction) pendingProtectedAction = null;
+            if (clearAction) {
+                pendingProtectedAction = null;
+                pendingWhatsappContact = null;
+            }
         }
 
-        function showAuthOverlay() {
+        function showAuthOverlay(mode = null) {
+            if (mode && authModeController) authModeController(mode);
             const overlay = document.getElementById('auth-overlay');
             overlay.classList.remove('hidden');
             if (firebase.apps.length && firebase.auth().currentUser) {
@@ -1205,15 +1470,55 @@
             document.getElementById('auth-overlay').classList.add('hidden');
         }
 
+        function showAuthChoice() {
+            document.getElementById('auth-choice-overlay').classList.remove('hidden');
+        }
+
+        function hideAuthChoice(clearAction = true) {
+            document.getElementById('auth-choice-overlay').classList.add('hidden');
+            if (clearAction) {
+                pendingProtectedAction = null;
+                pendingWhatsappContact = null;
+            }
+        }
+
         function hideMemberOverlays() {
-            ['registration-reason-overlay', 'publish-overlay', 'search-overlay', 'my-ads-overlay', 'contacts-overlay', 'about-overlay', 'articles-overlay', 'admin-overlay']
+            ['registration-reason-overlay', 'auth-choice-overlay', 'publish-overlay', 'search-overlay', 'my-ads-overlay', 'contacts-overlay', 'about-overlay', 'articles-overlay', 'admin-overlay']
                 .forEach(id => document.getElementById(id)?.classList.add('hidden'));
+        }
+
+        function startSplashScreen() {
+            const progress = document.querySelector('.splash-progress-fill');
+            if (progress) {
+                progress.classList.remove('splash-progress-fill');
+                void progress.offsetWidth;
+                progress.classList.add('splash-progress-fill');
+            }
+            if (splashTimer) window.clearTimeout(splashTimer);
+            splashTimer = window.setTimeout(showHome, 3600);
         }
 
         function showLandingScreen() {
             hideMemberOverlays();
+            hideAuthOverlay();
+            hideAuthChoice();
             document.getElementById('member-app').classList.add('hidden');
             document.getElementById('landing-screen').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            startSplashScreen();
+        }
+
+        function showHome() {
+            if (splashTimer) {
+                window.clearTimeout(splashTimer);
+                splashTimer = null;
+            }
+            hideMemberOverlays();
+            if (document.getElementById('member-app').classList.contains('hidden')) {
+                enterMemberApp('explore');
+                return;
+            }
+            filtrar(activeCategory, activeCriteria);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1231,9 +1536,17 @@
         function continuePendingAction(defaultAction = 'explore') {
             const user = firebase.apps.length ? firebase.auth().currentUser : null;
             if (!user || user.isAnonymous || !isCompleteProfile(currentUserProfile)) return false;
+            const action = pendingProtectedAction || defaultAction;
+            const contact = action === 'contact' ? pendingWhatsappContact : null;
+            pendingWhatsappContact = null;
             hideAuthOverlay();
             hideProfileOverlay();
-            enterMemberApp(pendingProtectedAction || defaultAction);
+            if (action === 'contact') {
+                enterMemberApp('explore');
+                if (contact) window.setTimeout(() => completeWhatsappContact(contact), 0);
+            } else {
+                enterMemberApp(action);
+            }
             return true;
         }
 
@@ -1247,6 +1560,13 @@
             }
             if (!isCompleteProfile(currentUserProfile)) {
                 showProfileOverlay(currentUserProfile || { nombreCompleto: user.displayName || '' });
+                return;
+            }
+            if (action === 'contact') {
+                const contact = pendingWhatsappContact;
+                pendingWhatsappContact = null;
+                enterMemberApp('explore');
+                if (contact) completeWhatsappContact(contact);
                 return;
             }
             enterMemberApp(action);
@@ -1318,13 +1638,18 @@
             document.getElementById('profile-subtitle').textContent = editingExistingProfile
                 ? 'Actualiza tu nombre, municipio o WhatsApp de contacto.'
                 : 'Los usaremos para identificarte al contactar una publicación.';
-            document.getElementById('profile-close').classList.toggle('hidden', !editingExistingProfile);
             document.getElementById('profile-message').classList.add('hidden');
             document.getElementById('profile-overlay').classList.remove('hidden');
         }
 
         function hideProfileOverlay() {
             document.getElementById('profile-overlay').classList.add('hidden');
+        }
+
+        function cancelProfileFlow() {
+            pendingProtectedAction = null;
+            pendingWhatsappContact = null;
+            hideProfileOverlay();
         }
 
         function setupProfileForm() {
@@ -1393,6 +1718,7 @@
             const municipalityInput = document.getElementById('auth-municipality');
             const whatsappInput = document.getElementById('auth-whatsapp');
             const emailInput = document.getElementById('auth-email');
+            const emailLabel = document.getElementById('auth-email-label');
             const passwordInput = document.getElementById('auth-password');
             const togglePasswordButton = document.getElementById('toggle-password'); // Get the new toggle button
             const submitButton = document.getElementById('auth-submit');
@@ -1408,6 +1734,10 @@
             const adminToolsButton = document.getElementById('admin-tools-button'); // Added reference
             let isRegistering = true;
             let loading = false;
+
+            ['click', 'keydown', 'scroll', 'touchstart'].forEach(eventName => {
+                window.addEventListener(eventName, registerSessionActivity, { passive: true });
+            });
 
             const showMessage = (text, type = 'error') => {
                 message.textContent = text;
@@ -1429,6 +1759,7 @@
                 clearMessage();
                 title.textContent = isRegistering ? 'Crea tu cuenta' : 'Bienvenido de nuevo';
                 subtitle.textContent = isRegistering ? 'Regístrate para continuar.' : 'Inicia sesión para continuar.';
+                emailLabel.firstChild.textContent = isRegistering ? 'Correo electrónico' : 'Nombre de usuario (correo electrónico)';
                 submitButton.textContent = isRegistering ? 'CREAR CUENTA' : 'INICIAR SESIÓN';
                 toggleButton.innerHTML = isRegistering
                     ? 'Ya tengo cuenta. <span class="font-black text-blue-700">Iniciar sesión</span>'
@@ -1437,10 +1768,17 @@
                 termsInput.required = isRegistering;
                 registrationFields.classList.toggle('hidden', !isRegistering);
                 document.getElementById('registration-terms-field').classList.toggle('hidden', !isRegistering);
+                resetButton.classList.toggle('hidden', isRegistering);
                 [nameInput, municipalityInput, whatsappInput].forEach(input => {
                     input.required = isRegistering;
                     input.disabled = !isRegistering;
                 });
+            };
+
+            authModeController = mode => {
+                if (loading) return;
+                isRegistering = mode !== 'login';
+                renderMode();
             };
 
             toggleButton.addEventListener('click', () => {
@@ -1567,16 +1905,15 @@
                 try { await auth.signOut(); }
                 catch (error) { console.error('Firebase Auth signOut:', error.code, error); } // Log full error object
                 finally {
+                    clearSessionIdleTimer();
+                    try { localStorage.removeItem(SESSION_LAST_ACTIVITY_KEY); } catch (_error) { /* Sin almacenamiento local. */ }
                     logoutButton.disabled = false;
                     showLandingScreen();
                 }
             });
-            document.getElementById('landing-exit-button').addEventListener('click', async () => {
-                if (auth.currentUser) await auth.signOut();
-                showLandingScreen();
-            });
             document.getElementById('auth-close').addEventListener('click', () => {
                 pendingProtectedAction = null;
+                pendingWhatsappContact = null;
                 pendingRegistrationProfile = null;
                 pendingTermsAcceptance = false;
                 clearGoogleRedirect();
@@ -1584,13 +1921,26 @@
             });
             document.getElementById('registration-reason-continue').addEventListener('click', () => {
                 hideRegistrationReason(false);
-                showAuthOverlay();
+                showAuthChoice();
+            });
+            document.getElementById('auth-choice-login').addEventListener('click', () => {
+                hideAuthChoice(false);
+                showAuthOverlay('login');
+            });
+            document.getElementById('auth-choice-register').addEventListener('click', () => {
+                hideAuthChoice(false);
+                showAuthOverlay('register');
             });
 
             const unsubscribeAuth = auth.onAuthStateChanged(
                 async user => {
                     resolving.classList.add('hidden');
                     const registeredUser = user && !user.isAnonymous ? user : null;
+                    if (registeredUser) resetSessionIdleTimer();
+                    else {
+                        clearSessionIdleTimer();
+                        try { localStorage.removeItem(SESSION_LAST_ACTIVITY_KEY); } catch (_error) { /* Sin almacenamiento local. */ }
+                    }
                     const nextSessionUid = registeredUser?.uid || null;
                     if (nextSessionUid !== activeSessionUid) {
                         activeSessionUid = nextSessionUid;
@@ -1769,8 +2119,16 @@
             const precio = data.precio ? `$${Number(data.precio).toLocaleString('es-MX')}` : '';
             const condicion = escapeHtml(data.condicion || '');
             const tipoProducto = escapeHtml(data.tipo_producto || '');
+            const fotos = category === 'ventas' && Array.isArray(data.fotos)
+                ? data.fotos.filter(url => typeof url === 'string' && url.startsWith('https://firebasestorage.googleapis.com/')).slice(0, 3)
+                : [];
+            const photoGridClass = fotos.length === 1 ? 'grid-cols-1' : (fotos.length === 2 ? 'grid-cols-2' : 'grid-cols-3');
+            const photosHtml = fotos.length ? `<div class="mb-4 grid ${photoGridClass} gap-1.5 overflow-hidden rounded-xl bg-slate-100">
+                ${fotos.map((url, index) => `<img src="${escapeHtml(url)}" alt="Fotografía ${index + 1} de ${escapeHtml(data.titulo || 'producto')}" loading="lazy" class="aspect-[4/3] h-full w-full object-cover">`).join('')}
+            </div>` : '';
             const currentUid = firebase.apps.length ? firebase.auth().currentUser?.uid : null;
             const isOwner = Boolean(data.id && currentUid && currentUid === data.authorUid);
+            const ownerBadge = isOwner ? '<span class="mb-2 inline-flex items-center rounded-full bg-cyan-100 px-2 py-1 text-[10px] font-black uppercase text-cyan-800"><i class="fas fa-user-check mr-1" aria-hidden="true"></i>Tu anuncio</span>' : '';
             const encodedAdId = data.id ? encodeURIComponent(data.id) : '';
             const viewCounter = `<p class="mt-3 text-xs font-bold text-slate-500"><i class="far fa-eye mr-1" aria-hidden="true"></i><span data-view-count>${escapeHtml(formatViewCount(data.viewCount))}</span></p>`;
             const expirationMillis = data.expiresAt?.toMillis?.() || (data.fecha?.toMillis?.() ? data.fecha.toMillis() + (8 * 24 * 60 * 60 * 1000) : null);
@@ -1808,7 +2166,7 @@
             const contactLink = whatsapp && !isOwner ? `
                 <div class="flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
                     ${trackedContact ? '<p class="text-xs text-slate-500">Al contactar tendrás 5 días para evaluar.</p>' : '<span></span>'}
-                    <a href="${whatsappUrl}" ${trackedContact ? `onclick="contactByWhatsapp(event, '${encodeURIComponent(data.id)}', this)"` : 'target="_blank"'} rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="shrink-0 bg-green-500 text-white p-3 rounded-xl shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 flex items-center justify-center">
+                    <a href="${whatsappUrl}" data-whatsapp="${escapeHtml(whatsapp)}" data-category="${escapeHtml(category)}" onclick="contactByWhatsapp(event, '${encodeURIComponent(data.id || '')}', this)" rel="noopener noreferrer" aria-label="Contactar por WhatsApp" class="shrink-0 bg-green-500 text-white p-3 rounded-xl shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 flex items-center justify-center">
                         <i class="fab fa-whatsapp text-xl" aria-hidden="true"></i>
                     </a>
                 </div>` : '';
@@ -1816,7 +2174,11 @@
             return `
                 <div class="card-anuncio bg-white p-5 rounded-xl shadow-sm flex flex-col justify-between gap-4 border-l-[6px] ${style.borderColorClass}" ${encodedAdId && !isOwner ? `data-track-ad-view="${escapeHtml(encodedAdId)}"` : ''}>
                     <div class="min-w-0 flex-grow">
-                        <span class="text-[10px] font-black px-2 py-1 ${style.tagBgColorClass} ${style.tagTextColorClass} rounded-full uppercase italic mb-2 inline-block">${escapeHtml(category)}</span>
+                        ${photosHtml}
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="mb-2 inline-block rounded-full px-2 py-1 text-[10px] font-black uppercase italic ${style.tagBgColorClass} ${style.tagTextColorClass}">${escapeHtml(category)}</span>
+                            ${ownerBadge}
+                        </div>
                         <h3 class="text-xl font-black text-slate-800 tracking-tight">${escapeHtml(data.titulo)}</h3>
                         <p class="text-slate-500 text-sm mt-2">${escapeHtml(data.descripcion)}</p>
                         ${specificFieldsHtml}
@@ -2091,10 +2453,9 @@
                     return;
                 }
 
-                const currentUid = firebase.auth().currentUser?.uid;
                 const anuncios = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(data => data.authorUid !== currentUid && isAdCurrentlyActive(data) && matchesCriteria(data, criteria))
+                    .filter(data => isAdCurrentlyActive(data) && matchesCriteria(data, criteria))
                     .sort((a, b) => {
                     const fechaA = a.fecha?.toMillis?.() ?? 0;
                     const fechaB = b.fecha?.toMillis?.() ?? 0;
@@ -2270,6 +2631,9 @@
             messageElement.textContent = 'Publicando...';
             messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-blue-50 text-blue-700'; // Neutral message
             messageElement.classList.remove('hidden'); // Ensure message is visible
+            const salePhotosToUpload = category === 'ventas' ? selectedSalePhotos.slice() : [];
+            const uploadedPhotoPaths = [];
+            let adSaved = false;
 
             try {
                 initializeFirebase();
@@ -2325,11 +2689,27 @@
                     anuncioData.tipo_producto = form.querySelector('#ventas-tipo-producto').value.trim();
                 }
 
-                await db.collection("anuncios").add(anuncioData);
+                const adReference = db.collection('anuncios').doc();
+                if (salePhotosToUpload.length) {
+                    const uploadedPhotos = await uploadSalePhotos(
+                        currentUser.uid,
+                        adReference.id,
+                        salePhotosToUpload,
+                        (current, total) => { messageElement.textContent = `Preparando fotografía ${current} de ${total}...`; },
+                        path => uploadedPhotoPaths.push(path)
+                    );
+                    anuncioData.fotos = uploadedPhotos.urls;
+                    anuncioData.fotoPaths = uploadedPhotos.paths;
+                    messageElement.textContent = 'Guardando el anuncio...';
+                }
+
+                await adReference.set(anuncioData);
+                adSaved = true;
 
                 messageElement.textContent = '¡Anuncio publicado! Puedes consultarlo en Mis anuncios.';
                 messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-green-50 text-green-700';
                 form.reset(); // Limpia el formulario
+                if (category === 'ventas') clearSalePhotos();
                 await filtrar(); // Recarga los anuncios en la página principal
                 setTimeout(() => {
                     hidePublishOverlay(); // Cierra el modal después de un éxito
@@ -2338,6 +2718,7 @@
 
             } catch (error) {
                 console.error("Error al publicar anuncio:", error);
+                if (!adSaved && uploadedPhotoPaths.length) await removeUploadedSalePhotos(uploadedPhotoPaths);
                 const errorMessage = GENERIC_ERROR_MESSAGES[error.code] || 'Error al publicar. Revisa la consola para más detalles.';
                 messageElement.textContent = errorMessage;
                 messageElement.className = 'rounded-xl px-4 py-3 text-sm font-bold bg-red-50 text-red-700';
@@ -2350,6 +2731,13 @@
         document.getElementById('form-empleo').addEventListener('submit', (e) => submitPublishForm(e, 'empleo'));
         document.getElementById('form-servicios').addEventListener('submit', (e) => submitPublishForm(e, 'servicios'));
         document.getElementById('form-ventas').addEventListener('submit', (e) => submitPublishForm(e, 'ventas'));
+        ['ventas-fotos-archivo', 'ventas-foto-camara'].forEach(inputId => {
+            document.getElementById(inputId).addEventListener('change', event => {
+                addSalePhotos(event.target.files);
+                event.target.value = '';
+            });
+        });
+        renderSalePhotoPreviews();
 
 
         // --- New Overlay Functions ---
@@ -2458,7 +2846,7 @@
             }
         }
 
-        async function contactByWhatsapp(event, encodedAdId, link) {
+        async function legacyContactByWhatsapp(event, encodedAdId, link) {
             event.preventDefault();
             if (!link || link.dataset.loading === 'true') return;
             link.dataset.loading = 'true';
@@ -2472,6 +2860,166 @@
             } catch (error) {
                 console.error('No fue posible registrar el contacto para evaluación:', error);
                 alert(error.message || 'No fue posible registrar el contacto. Intenta nuevamente para poder calificarlo después.');
+                link.dataset.loading = 'false';
+                link.removeAttribute('aria-disabled');
+                if (icon) icon.className = originalClass;
+            }
+        }
+
+        function showWhatsappContactOptions(contact) {
+            if (!contact?.url) return;
+            pendingWhatsappContact = contact;
+            document.getElementById('whatsapp-contact-number').textContent = contact.whatsapp || 'Número no disponible';
+            const message = document.getElementById('whatsapp-contact-message');
+            message.textContent = '';
+            message.className = 'mt-4 hidden rounded-xl px-4 py-3 text-sm font-bold';
+            document.getElementById('whatsapp-contact-overlay').classList.remove('hidden');
+        }
+
+        function hideWhatsappContactOptions() {
+            pendingWhatsappContact = null;
+            document.getElementById('whatsapp-contact-overlay').classList.add('hidden');
+        }
+
+        function showWhatsappContactMessage(text, type = 'success') {
+            const message = document.getElementById('whatsapp-contact-message');
+            message.textContent = text;
+            message.className = `mt-4 rounded-xl px-4 py-3 text-sm font-bold ${type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`;
+        }
+
+        async function copyText(value, successMessage) {
+            if (!value) return showWhatsappContactMessage('No hay información disponible para copiar.', 'error');
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(value);
+                } else {
+                    const field = document.createElement('textarea');
+                    field.value = value;
+                    field.className = 'fixed -left-[9999px]';
+                    document.body.appendChild(field);
+                    field.select();
+                    document.execCommand('copy');
+                    field.remove();
+                }
+                showWhatsappContactMessage(successMessage);
+            } catch (error) {
+                console.warn('No fue posible copiar el contacto:', error);
+                showWhatsappContactMessage('No se pudo copiar. Selecciona y copia el número manualmente.', 'error');
+            }
+        }
+
+        function copyWhatsappContact(type) {
+            const contact = pendingWhatsappContact;
+            const value = type === 'message'
+                ? contact?.message
+                : type === 'all'
+                    ? `Número de contacto: ${contact?.whatsapp || ''}\n\nMensaje sugerido:\n${contact?.message || ''}`
+                    : contact?.whatsapp;
+            const successMessage = type === 'message'
+                ? 'Mensaje copiado.'
+                : type === 'all'
+                    ? 'Número y mensaje copiados.'
+                    : 'Número copiado.';
+            copyText(value, successMessage);
+        }
+
+        function openEmailContact() {
+            const contact = pendingWhatsappContact;
+            if (!contact?.whatsapp || !contact.message) return;
+            const subject = 'Consulta sobre tu anuncio en Morelos Trabaja';
+            const body = `Número de WhatsApp del anunciante: ${contact.whatsapp}\n\n${contact.message}`;
+            const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+            document.getElementById('whatsapp-contact-overlay').classList.add('hidden');
+            pendingWhatsappContact = null;
+            window.location.assign(mailtoUrl);
+
+            if (contact.adId) {
+                firebase.app().functions().httpsCallable('registerContact')({ adId: decodeURIComponent(contact.adId) })
+                    .catch(error => console.error('No fue posible registrar el contacto por correo:', error));
+            }
+        }
+
+        function completeWhatsappContact(contact) {
+            showWhatsappContactOptions(contact);
+        }
+
+        async function openWhatsappWeb() {
+            const contact = pendingWhatsappContact;
+            if (!contact?.url) return;
+            try {
+                if (contact.adId) {
+                    await firebase.app().functions().httpsCallable('registerContact')({ adId: decodeURIComponent(contact.adId) });
+                }
+                document.getElementById('whatsapp-contact-overlay').classList.add('hidden');
+                pendingWhatsappContact = null;
+                window.location.assign(contact.url);
+            } catch (error) {
+                console.error('No fue posible registrar el contacto:', error);
+                showWhatsappContactMessage(error.message || 'No fue posible abrir WhatsApp. Intenta nuevamente.', 'error');
+            }
+        }
+
+        function waitForCurrentUser() {
+            initializeFirebase();
+            const auth = firebase.auth();
+            if (auth.currentUser) return Promise.resolve(auth.currentUser);
+            return new Promise(resolve => {
+                let settled = false;
+                let unsubscribe = () => {};
+                const finish = user => {
+                    if (settled) return;
+                    settled = true;
+                    unsubscribe();
+                    resolve(user || null);
+                };
+                unsubscribe = auth.onAuthStateChanged(finish);
+                window.setTimeout(() => finish(auth.currentUser), 1500);
+            });
+        }
+
+        async function contactByWhatsapp(event, encodedAdId, link) {
+            event.preventDefault();
+            if (!link || link.dataset.loading === 'true') return;
+            link.dataset.loading = 'true';
+            link.setAttribute('aria-disabled', 'true');
+            const contact = {
+                url: link.href,
+                adId: encodedAdId || '',
+                whatsapp: link.dataset.whatsapp || '',
+                message: getWhatsappMessage(link.dataset.category)
+            };
+            const icon = link.querySelector('i');
+            const originalClass = icon?.className || '';
+            if (icon) icon.className = 'fas fa-spinner fa-spin text-xl';
+            const user = await waitForCurrentUser();
+            if (!user || user.isAnonymous) {
+                pendingWhatsappContact = contact;
+                link.dataset.loading = 'false';
+                link.removeAttribute('aria-disabled');
+                if (icon) icon.className = originalClass;
+                requestProtectedAction('contact');
+                return;
+            }
+            if (!isCompleteProfile(currentUserProfile)) {
+                try {
+                    await syncUserProfile(user);
+                } catch (error) {
+                    console.warn('No fue posible recuperar el perfil antes de contactar:', error.code || error);
+                }
+            }
+            if (!isCompleteProfile(currentUserProfile)) {
+                pendingWhatsappContact = contact;
+                pendingProtectedAction = 'contact';
+                link.dataset.loading = 'false';
+                link.removeAttribute('aria-disabled');
+                if (icon) icon.className = originalClass;
+                showProfileOverlay(currentUserProfile || { nombreCompleto: user.displayName || '' });
+                return;
+            }
+            try {
+                await completeWhatsappContact(contact);
+            } finally {
                 link.dataset.loading = 'false';
                 link.removeAttribute('aria-disabled');
                 if (icon) icon.className = originalClass;
@@ -2612,6 +3160,7 @@
             renderLocalSponsors();
             setupProfileForm();
             setupAuthentication();
+            startSplashScreen();
             // Assign event listeners for new header buttons
             document.getElementById('my-ads-button').addEventListener('click', showMyAdsOverlay);
             document.getElementById('contacts-button').addEventListener('click', showContactsOverlay);

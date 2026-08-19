@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0",
+  "id": "session-20260818225924-790f1c",
+  "projectId": "morelostrabaja",
+  "projectName": "morelostrabaja",
+  "status": "active",
+  "startedAt": "2026-08-18T22:59:24.425Z",
+  "closedAt": null,
+  "durationMs": null,
+  "objective": "",
+  "modifiedFiles": [],
+  "changes": [],
+  "startState": {
+    "available": true,
+    "commit": "f57eb522901d6f082cac0c8d97496821e3dd3190",
+    "branch": "main",
+    "timestamp": "2026-08-18T22:59:24.425Z",
+    "dirty": true,
+    "workingTree": [
+      {
+        "status": "M",
+        "path": ".firebase/hosting..cache"
+      },
+      {
+        "status": "M",
+        "path": "CHANGELOG.md"
+      },
+      {
+        "status": "M",
+        "path": "DECISIONS.md"
+      },
+      {
+        "status": "M",
+        "path": "NEXT.md"
+      },
+      {
+        "status": "M",
+        "path": "firebase.json"
+      },
+      {
+        "status": "M",
+        "path": "firestore.rules"
+      },
+      {
+        "status": "M",
+        "path": "functions/index.js"
+      },
+      {
+        "status": "M",
+        "path": "index.html"
+      },
+      {
+        "status": "??",
+        "path": "ads.txt"
+      },
+      {
+        "status": "??",
+        "path": "firebase-debug.log"
+      },
+      {
+        "status": "??",
+        "path": "storage.rules"
+      }
+    ]
+  },
+  "baseline": {
+    ".firebaserc": {
+      "size": 62,
+      "mtimeMs": 1786149234174
+    },
+    "ads.txt": {
+      "size": 59,
+      "mtimeMs": 1786736000264
+    },
+    "CHANGELOG.md": {
+      "size": 7303,
+      "mtimeMs": 1786756915517
+    },
+    "DECISIONS.md": {
+      "size": 312,
+      "mtimeMs": 1786756915523
+    },
+    "firebase-debug.log": {
+      "size": 4400774,
+      "mtimeMs": 1786743419557
+    },
+    "firebase.json": {
+      "size": 755,
+      "mtimeMs": 1786724028347
+    },
+    "firestore.indexes.json": {
+      "size": 515,
+      "mtimeMs": 1786498228996
+    },
+    "firestore.rules": {
+      "size": 5537,
+      "mtimeMs": 1786724164747
+    },
+    "index.html": {
+      "size": 199387,
+      "mtimeMs": 1786737150170
+    },
+    "index.html.backup": {
+      "size": 86189,
+      "mtimeMs": 1786495699438
+    },
+    "NEXT.md": {
+      "size": 562,
+      "mtimeMs": 1786756915519
+    },
+    "publicar.html": {
+      "size": 10528,
+      "mtimeMs": 1786642431998
+    },
+    "storage.rules": {
+      "size": 618,
+      "mtimeMs": 1786724152631
+    },
+    "version.json": {
+      "size": 33,
+      "mtimeMs": 1786645080323
+    },
+    "functions/.gitignore": {
+      "size": 33,
+      "mtimeMs": 1786484306242
+    },
+    "functions/firebase-debug.log": {
+      "size": 208694,
+      "mtimeMs": 1786485577021
+    },
+    "functions/index.js": {
+      "size": 22709,
+      "mtimeMs": 1786724289854
+    },
+    "functions/package-lock.json": {
+      "size": 127909,
+      "mtimeMs": 1786484338068
+    },
+    "functions/package.json": {
+      "size": 211,
+      "mtimeMs": 1786484295616
+    },
+    ".firebase/hosting..cache": {
+      "size": 362,
+      "mtimeMs": 1786743416765
+    }
+  }
+}

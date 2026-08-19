@@ -1,6 +1,7 @@
 const { initializeApp } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 const { FieldPath, Timestamp, getFirestore } = require('firebase-admin/firestore');
+const { getStorage } = require('firebase-admin/storage');
 const { createHash } = require('crypto');
 const functions = require('firebase-functions/v1');
 
@@ -349,10 +350,19 @@ async function deleteQueryInBatches(query) {
   }
 }
 
+async function deleteAdPhotos(authorUid, adId) {
+  if (!authorUid || !adId) return;
+  await getStorage().bucket().deleteFiles({
+    prefix: `anuncios/${authorUid}/${adId}/`,
+    force: true
+  });
+}
+
 async function deleteUserData(db, uid) {
   const authoredAds = await db.collection('anuncios').where('authorUid', '==', uid).get();
   await deleteQueryInBatches(db.collection('anuncios').where('authorUid', '==', uid));
   for (const adDocument of authoredAds.docs) {
+    await deleteAdPhotos(uid, adDocument.id);
     await deleteQueryInBatches(db.collection('vistasAnuncios').where('adId', '==', adDocument.id));
   }
   await deleteQueryInBatches(db.collection('contactos').where('advertiserUid', '==', uid));
@@ -375,6 +385,7 @@ exports.adminDeleteAd = adminFunctions.https.onCall(async (data, context) => {
   if (!snapshot.exists) return { deleted: false, notFound: true, adId };
 
   await adRef.delete();
+  await deleteAdPhotos(snapshot.get('authorUid'), adId);
   await deleteQueryInBatches(getFirestore().collection('vistasAnuncios').where('adId', '==', adId));
   functions.logger.info('Anuncio eliminado por el superusuario', {
     adId,
@@ -528,6 +539,9 @@ exports.purgeArchivedAds = adminFunctions.pubsub
       const batch = db.batch();
       snapshot.docs.forEach(document => batch.delete(document.ref));
       await batch.commit();
+      for (const document of snapshot.docs) {
+        await deleteAdPhotos(document.get('authorUid'), document.id);
+      }
       deleted += snapshot.size;
     }
     let deletedViews = 0;

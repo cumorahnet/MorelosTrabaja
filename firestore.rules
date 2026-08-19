@@ -63,6 +63,23 @@ service cloud.firestore {
         && request.resource.data.expiresAt > request.time + duration.value(7, 'd')
         && request.resource.data.expiresAt <= request.time + duration.value(8, 'd') + duration.value(10, 'm')
         && (!request.resource.data.keys().hasAny(['viewCount']) || request.resource.data.viewCount == 0)
+        && (!request.resource.data.keys().hasAny(['fotos']) || (
+          request.resource.data.categoria == 'ventas'
+          && request.resource.data.fotos is list
+          && request.resource.data.fotos.size() <= 3
+          && (request.resource.data.fotos.size() < 1 || (request.resource.data.fotos[0] is string && request.resource.data.fotos[0].matches('^https://firebasestorage.googleapis.com/.*$')))
+          && (request.resource.data.fotos.size() < 2 || (request.resource.data.fotos[1] is string && request.resource.data.fotos[1].matches('^https://firebasestorage.googleapis.com/.*$')))
+          && (request.resource.data.fotos.size() < 3 || (request.resource.data.fotos[2] is string && request.resource.data.fotos[2].matches('^https://firebasestorage.googleapis.com/.*$')))
+        ))
+        && (!request.resource.data.keys().hasAny(['fotoPaths']) || (
+          request.resource.data.categoria == 'ventas'
+          && request.resource.data.fotoPaths is list
+          && request.resource.data.fotoPaths.size() == request.resource.data.fotos.size()
+          && request.resource.data.fotoPaths.size() <= 3
+          && (request.resource.data.fotoPaths.size() < 1 || (request.resource.data.fotoPaths[0] is string && request.resource.data.fotoPaths[0].matches('^anuncios/' + request.auth.uid + '/' + anuncioId + '/[^/]+$')))
+          && (request.resource.data.fotoPaths.size() < 2 || (request.resource.data.fotoPaths[1] is string && request.resource.data.fotoPaths[1].matches('^anuncios/' + request.auth.uid + '/' + anuncioId + '/[^/]+$')))
+          && (request.resource.data.fotoPaths.size() < 3 || (request.resource.data.fotoPaths[2] is string && request.resource.data.fotoPaths[2].matches('^anuncios/' + request.auth.uid + '/' + anuncioId + '/[^/]+$')))
+        ))
         && request.resource.data.estado == 'activo';
 
       // Cierres, vencimientos y eliminaciones se procesan en Cloud Functions.
